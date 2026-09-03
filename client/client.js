@@ -153,10 +153,15 @@ var MOBILE_STYLES_CSS = `
         height: 100% !important;
       }
 
-      div[class*="_detailsCol"],
+      div[class*="_detailsCol"] {
+        display: none !important;
+      }
+      /* patch(dsh-bridge mobile): keep better-sidebar toggle visible below the mobile header */
       div[class*="toggleCluster"],
       div[class*="W-zNGW_toggleCluster"] {
-        display: none !important;
+        display: flex !important;
+        top: calc(var(--dsh-mobile-header-h, 52px) + 4px) !important;
+        right: 12px !important;
       }
 
       /* 3.0 \u5DE5\u4F5C\u533A Workbench / \u4EFB\u52A1\u7BA1\u7406 / \u591A Tab \u680F\u79FB\u52A8\u7AEF\u81EA\u9002\u5E94\u9002\u914D */
@@ -740,6 +745,37 @@ var MOBILE_STYLES_CSS = `
       }
       div[class*="overlayLayer"] > * {
         pointer-events: auto !important;
+      }
+
+      /* \u9876\u90E8\u5185\u5BB9\u533A\u7CBE\u7B80\uFF1A\u521B\u9020\u6A21\u5F0F(Preset)\u5FBD\u6807\u3001Session log \u6309\u94AE\u3001\u5BF9\u8BDD/\u8F68\u8FF9 tabs\u3001\u7EDF\u8BA1\u680F\u5168\u90E8\u9690\u85CF\uFF0C
+         \u5E76\u628A\u5DF2\u7A7A\u7684\u5185\u5BB9\u533A header \u884C\u6574\u4F53\u6298\u53E0\uFF0C\u628A\u7EB5\u5411\u7A7A\u95F4\u8BA9\u7ED9\u804A\u5929\u5185\u5BB9 (patch: dsh-bridge mobile) */
+      span.SVAs4q_label,
+      span.SVAs4q_icon {
+        display: none !important;
+      }
+      button[class*="nL4_yW_sessionLogButton"],
+      button[class*="sessionLogButton"] {
+        display: none !important;
+      }
+      div[class*="wSkVaW_tabs"] {
+        display: none !important;
+      }
+      div.FJxK0a_root {
+        display: none !important;
+      }
+      header[class*="wSkVaW_header"] {
+        display: none !important;
+      }
+
+      /* \u8F93\u5165\u6846\u8212\u9002\u5316\uFF1A\u5706\u89D2\u5927\u80F6\u56CA + \u67D4\u548C\u9634\u5F71 + 16px \u8F93\u5165\u5B57\u53F7 (\u5BF9\u9F50\u79FB\u52A8\u7AEF\u8F93\u5165\u4F53\u9A8C) */
+      div[class*="uV2eYG_card"] {
+        border-radius: 26px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+      }
+      div[class*="uV2eYG_card"] textarea,
+      textarea[class*="uV2eYG_input"] {
+        font-size: 16px !important;
+        line-height: 1.5 !important;
       }
     }
 

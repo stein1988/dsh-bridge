@@ -122,10 +122,15 @@ export const MOBILE_STYLES_CSS = `
         height: 100% !important;
       }
 
-      div[class*="_detailsCol"],
+      div[class*="_detailsCol"] {
+        display: none !important;
+      }
+      /* patch(dsh-bridge mobile): keep better-sidebar toggle visible below the mobile header */
       div[class*="toggleCluster"],
       div[class*="W-zNGW_toggleCluster"] {
-        display: none !important;
+        display: flex !important;
+        top: calc(var(--dsh-mobile-header-h, 52px) + 4px) !important;
+        right: 12px !important;
       }
 
       /* 3.0 工作区 Workbench / 任务管理 / 多 Tab 栏移动端自适应适配 */
@@ -709,6 +714,37 @@ export const MOBILE_STYLES_CSS = `
       }
       div[class*="overlayLayer"] > * {
         pointer-events: auto !important;
+      }
+
+      /* 顶部内容区精简：创造模式(Preset)徽标、Session log 按钮、对话/轨迹 tabs、统计栏全部隐藏，
+         并把已空的内容区 header 行整体折叠，把纵向空间让给聊天内容 (patch: dsh-bridge mobile) */
+      span.SVAs4q_label,
+      span.SVAs4q_icon {
+        display: none !important;
+      }
+      button[class*="nL4_yW_sessionLogButton"],
+      button[class*="sessionLogButton"] {
+        display: none !important;
+      }
+      div[class*="wSkVaW_tabs"] {
+        display: none !important;
+      }
+      div.FJxK0a_root {
+        display: none !important;
+      }
+      header[class*="wSkVaW_header"] {
+        display: none !important;
+      }
+
+      /* 输入框舒适化：圆角大胶囊 + 柔和阴影 + 16px 输入字号 (对齐移动端输入体验) */
+      div[class*="uV2eYG_card"] {
+        border-radius: 26px !important;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
+      }
+      div[class*="uV2eYG_card"] textarea,
+      textarea[class*="uV2eYG_input"] {
+        font-size: 16px !important;
+        line-height: 1.5 !important;
       }
     }
 
