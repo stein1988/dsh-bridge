@@ -425,15 +425,15 @@ var MOBILE_STYLES_CSS = `
         right: 0 !important;
       }
 
-      /* \u8F93\u5165\u6846\u5E95\u5EA7\uFF1ADeepSeek App \u5C45\u4E2D\u53CA\u5E95\u90E8\u56FA\u5B9A */
+      /* \u8F93\u5165\u6846\u5E95\u5EA7\uFF1ADeepSeek App \u5C45\u4E2D\u53CA\u5E95\u90E8\u56FA\u5B9A (\u5E95\u8DDD\u6536\u7D27\u8BA9\u8F93\u5165\u6846\u8D34\u5E95\u4E0B\u79FB) */
       div[class*="wSkVaW_scrollBody"] {
-        padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+        padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
       }
 
       /* \u8F93\u5165\u5361\u7247\uFF1ADeepSeek App \u5706\u89D2\u5927\u80F6\u56CA\u9020\u578B */
       div[class*="uV2eYG_card"] {
-        border-radius: 26px !important;
-        padding: 14px 16px 12px !important;
+        border-radius: 18px !important;
+        padding: 8px 12px 7px !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
         border: 1px solid rgba(0, 0, 0, 0.07) !important;
         background: var(--dsw-alias-bg-layer-2, #f4f4f7) !important;
@@ -797,15 +797,11 @@ var MOBILE_STYLES_CSS = `
         margin: 8px 0 !important;
       }
 
-      /* \u8F93\u5165\u6846\u8212\u9002\u5316\uFF1A\u5706\u89D2\u5927\u80F6\u56CA + \u67D4\u548C\u9634\u5F71 + 16px \u8F93\u5165\u5B57\u53F7 (\u5BF9\u9F50\u79FB\u52A8\u7AEF\u8F93\u5165\u4F53\u9A8C) */
-      div[class*="uV2eYG_card"] {
-        border-radius: 26px !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
-      }
+      /* \u8F93\u5165\u6846\u8212\u9002\u5316\uFF1A\u5185\u8FB9\u8DDD\u6536\u7D27\u3001\u5706\u89D2\u9002\u4E2D\u300115px \u8F93\u5165\u5B57\u53F7\uFF1B\u6574\u4F53\u8D34\u5E95\u66F4\u7A33 (patch: dsh-bridge mobile) */
       div[class*="uV2eYG_card"] textarea,
       textarea[class*="uV2eYG_input"] {
-        font-size: 16px !important;
-        line-height: 1.5 !important;
+        font-size: 15px !important;
+        line-height: 1.4 !important;
       }
     }
 

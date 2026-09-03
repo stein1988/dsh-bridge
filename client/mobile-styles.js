@@ -394,15 +394,15 @@ export const MOBILE_STYLES_CSS = `
         right: 0 !important;
       }
 
-      /* 输入框底座：DeepSeek App 居中及底部固定 */
+      /* 输入框底座：DeepSeek App 居中及底部固定 (底距收紧让输入框贴底下移) */
       div[class*="wSkVaW_scrollBody"] {
-        padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+        padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
       }
 
       /* 输入卡片：DeepSeek App 圆角大胶囊造型 */
       div[class*="uV2eYG_card"] {
-        border-radius: 26px !important;
-        padding: 14px 16px 12px !important;
+        border-radius: 18px !important;
+        padding: 8px 12px 7px !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
         border: 1px solid rgba(0, 0, 0, 0.07) !important;
         background: var(--dsw-alias-bg-layer-2, #f4f4f7) !important;
@@ -766,15 +766,11 @@ export const MOBILE_STYLES_CSS = `
         margin: 8px 0 !important;
       }
 
-      /* 输入框舒适化：圆角大胶囊 + 柔和阴影 + 16px 输入字号 (对齐移动端输入体验) */
-      div[class*="uV2eYG_card"] {
-        border-radius: 26px !important;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06) !important;
-      }
+      /* 输入框舒适化：内边距收紧、圆角适中、15px 输入字号；整体贴底更稳 (patch: dsh-bridge mobile) */
       div[class*="uV2eYG_card"] textarea,
       textarea[class*="uV2eYG_input"] {
-        font-size: 16px !important;
-        line-height: 1.5 !important;
+        font-size: 15px !important;
+        line-height: 1.4 !important;
       }
     }
 
