@@ -3507,6 +3507,72 @@ function setupMobileExperience(rpcCall, ctx) {
       }
     }
   }, true);
+
+  // 6. 移动端「轨迹」视图被困自救：顶部 tab 已被移动样式隐藏，但若用户进入轨迹视图，
+  //    需要一个「回到对话」的返回入口。检测激活 tab 文案，非「对话」时注入悬浮返回钮，
+  //    点击时触发对话 tab（即使 tab 被 CSS 隐藏，JS click 依然有效）。
+  const setupTrajectoryEscape = () => {
+    const isMobileNow = () => window.innerWidth <= 768;
+    let escapeBtn = null;
+
+    const hideEscape = () => {
+      if (escapeBtn) {
+        escapeBtn.remove();
+        escapeBtn = null;
+      }
+    };
+
+    const showEscape = () => {
+      if (escapeBtn || !isMobileNow()) return;
+      escapeBtn = document.createElement('button');
+      escapeBtn.type = 'button';
+      escapeBtn.textContent = '← 对话';
+      escapeBtn.style.cssText = [
+        'position:fixed', 'left:16px', 'top:calc(var(--dsh-mobile-header-h,52px) + 6px)',
+        'z-index:10010', 'height:30px', 'padding:0 14px',
+        'border-radius:999px', 'border:1px solid var(--dsw-alias-border-l2,#e5e7eb)',
+        'background:var(--dsw-alias-bg-layer-1,#fff)', 'color:var(--dsw-alias-label-primary,#111827)',
+        'font-size:13px', 'font-weight:500', 'cursor:pointer',
+        'box-shadow:0 2px 10px rgba(0,0,0,0.12)',
+        'display:inline-flex', 'align-items:center', 'gap:4px',
+      ].join(';');
+      escapeBtn.addEventListener('click', () => {
+        const tabs = document.querySelector('div[class*="wSkVaW_tabs"]');
+        if (tabs) {
+          const chatTab = Array.prototype.slice.call(tabs.querySelectorAll('button[role="tab"]'))
+            .find((b) => (b.textContent || '').trim() !== '轨迹');
+          if (chatTab) chatTab.click();
+        }
+        hideEscape();
+      });
+      document.body.appendChild(escapeBtn);
+    };
+
+    const checkActiveTab = () => {
+      const active = document.querySelector('div[class*="wSkVaW_tabs"] button[role="tab"][class*="tabActive"], div[class*="wSkVaW_tabs"] button[role="tab"].is-on');
+      const activeText = active ? (active.textContent || '').trim() : '对话';
+      // 仅当明确处于轨迹（非对话）视图时才注入返回钮
+      if (isMobileNow() && activeText && activeText !== '对话' && activeText !== '聊天') {
+        showEscape();
+      } else {
+        hideEscape();
+      }
+    };
+
+    // 视图切换后 DOM 会变化，轻量轮询即可（开销极小）
+    const pollTimer = setInterval(checkActiveTab, 600);
+    if (typeof pollTimer.unref === 'function') pollTimer.unref();
+    window.addEventListener('resize', checkActiveTab);
+    checkActiveTab();
+
+    // 插件卸载/停止时清理
+    ctx.effect(() => () => {
+      clearInterval(pollTimer);
+      window.removeEventListener('resize', checkActiveTab);
+      hideEscape();
+    }, 'dsh-bridge: mobile trajectory escape cleanup');
+  };
+  setupTrajectoryEscape();
 }
 
 // 辅助函数：HTML 转义

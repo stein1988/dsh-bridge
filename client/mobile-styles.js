@@ -766,16 +766,18 @@ export const MOBILE_STYLES_CSS = `
         margin: 8px 0 !important;
       }
 
-      /* 输入框舒适化：字号统一设到 card（input/mirror/backdrop 三层 inherit 同步，避免光标偏移）；
-         内边距左右对称放大，与工具栏留白协调 (patch: dsh-bridge mobile) */
+      /* 输入框舒适化：input/mirror/backdrop 三层必须共享完全一致的 font 与 padding，否则光标错位；
+         注意 input 是 textarea，选择器不能限定 div (patch: dsh-bridge mobile) */
       div[class*="uV2eYG_card"] {
         font-size: 15px !important;
         line-height: 21px !important;
       }
-      /* 三层共享 padding 覆盖为非对称来源，统一左右 10px 且底部留白更小 */
-      div[class*="uV2eYG_input"],
-      div[class*="uV2eYG_mirror"],
-      div[class*="uV2eYG_backdrop"] {
+      [class*="uV2eYG_input"],
+      [class*="uV2eYG_mirror"],
+      [class*="uV2eYG_backdrop"] {
+        font-size: 15px !important;
+        line-height: 21px !important;
+        box-sizing: border-box !important;
         padding: 4px 10px 0 10px !important;
       }
     }

@@ -797,16 +797,18 @@ var MOBILE_STYLES_CSS = `
         margin: 8px 0 !important;
       }
 
-      /* \u8F93\u5165\u6846\u8212\u9002\u5316\uFF1A\u5B57\u53F7\u7EDF\u4E00\u8BBE\u5230 card\uFF08input/mirror/backdrop \u4E09\u5C42 inherit \u540C\u6B65\uFF0C\u907F\u514D\u5149\u6807\u504F\u79FB\uFF09\uFF1B
-         \u5185\u8FB9\u8DDD\u5DE6\u53F3\u5BF9\u79F0\u653E\u5927\uFF0C\u4E0E\u5DE5\u5177\u680F\u7559\u767D\u534F\u8C03 (patch: dsh-bridge mobile) */
+      /* \u8F93\u5165\u6846\u8212\u9002\u5316\uFF1Ainput/mirror/backdrop \u4E09\u5C42\u5FC5\u987B\u5171\u4EAB\u5B8C\u5168\u4E00\u81F4\u7684 font \u4E0E padding\uFF0C\u5426\u5219\u5149\u6807\u9519\u4F4D\uFF1B
+         \u6CE8\u610F input \u662F textarea\uFF0C\u9009\u62E9\u5668\u4E0D\u80FD\u9650\u5B9A div (patch: dsh-bridge mobile) */
       div[class*="uV2eYG_card"] {
         font-size: 15px !important;
         line-height: 21px !important;
       }
-      /* \u4E09\u5C42\u5171\u4EAB padding \u8986\u76D6\u4E3A\u975E\u5BF9\u79F0\u6765\u6E90\uFF0C\u7EDF\u4E00\u5DE6\u53F3 10px \u4E14\u5E95\u90E8\u7559\u767D\u66F4\u5C0F */
-      div[class*="uV2eYG_input"],
-      div[class*="uV2eYG_mirror"],
-      div[class*="uV2eYG_backdrop"] {
+      [class*="uV2eYG_input"],
+      [class*="uV2eYG_mirror"],
+      [class*="uV2eYG_backdrop"] {
+        font-size: 15px !important;
+        line-height: 21px !important;
+        box-sizing: border-box !important;
         padding: 4px 10px 0 10px !important;
       }
     }
@@ -4778,6 +4780,69 @@ function setupMobileExperience(rpcCall, ctx) {
       }
     }
   }, true);
+  const setupTrajectoryEscape = () => {
+    const isMobileNow = () => window.innerWidth <= 768;
+    let escapeBtn = null;
+    const hideEscape = () => {
+      if (escapeBtn) {
+        escapeBtn.remove();
+        escapeBtn = null;
+      }
+    };
+    const showEscape = () => {
+      if (escapeBtn || !isMobileNow()) return;
+      escapeBtn = document.createElement("button");
+      escapeBtn.type = "button";
+      escapeBtn.textContent = "\u2190 \u5BF9\u8BDD";
+      escapeBtn.style.cssText = [
+        "position:fixed",
+        "left:16px",
+        "top:calc(var(--dsh-mobile-header-h,52px) + 6px)",
+        "z-index:10010",
+        "height:30px",
+        "padding:0 14px",
+        "border-radius:999px",
+        "border:1px solid var(--dsw-alias-border-l2,#e5e7eb)",
+        "background:var(--dsw-alias-bg-layer-1,#fff)",
+        "color:var(--dsw-alias-label-primary,#111827)",
+        "font-size:13px",
+        "font-weight:500",
+        "cursor:pointer",
+        "box-shadow:0 2px 10px rgba(0,0,0,0.12)",
+        "display:inline-flex",
+        "align-items:center",
+        "gap:4px"
+      ].join(";");
+      escapeBtn.addEventListener("click", () => {
+        const tabs = document.querySelector('div[class*="wSkVaW_tabs"]');
+        if (tabs) {
+          const chatTab = Array.prototype.slice.call(tabs.querySelectorAll('button[role="tab"]')).find((b) => (b.textContent || "").trim() !== "\u8F68\u8FF9");
+          if (chatTab) chatTab.click();
+        }
+        hideEscape();
+      });
+      document.body.appendChild(escapeBtn);
+    };
+    const checkActiveTab = () => {
+      const active = document.querySelector('div[class*="wSkVaW_tabs"] button[role="tab"][class*="tabActive"], div[class*="wSkVaW_tabs"] button[role="tab"].is-on');
+      const activeText = active ? (active.textContent || "").trim() : "\u5BF9\u8BDD";
+      if (isMobileNow() && activeText && activeText !== "\u5BF9\u8BDD" && activeText !== "\u804A\u5929") {
+        showEscape();
+      } else {
+        hideEscape();
+      }
+    };
+    const pollTimer = setInterval(checkActiveTab, 600);
+    if (typeof pollTimer.unref === "function") pollTimer.unref();
+    window.addEventListener("resize", checkActiveTab);
+    checkActiveTab();
+    ctx.effect(() => () => {
+      clearInterval(pollTimer);
+      window.removeEventListener("resize", checkActiveTab);
+      hideEscape();
+    }, "dsh-bridge: mobile trajectory escape cleanup");
+  };
+  setupTrajectoryEscape();
 }
 function escapeHtml(str) {
   if (!str) return "";
