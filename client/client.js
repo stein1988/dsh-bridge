@@ -430,10 +430,10 @@ var MOBILE_STYLES_CSS = `
         padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
       }
 
-      /* \u8F93\u5165\u5361\u7247\uFF1ADeepSeek App \u5706\u89D2\u5927\u80F6\u56CA\u9020\u578B */
+      /* \u8F93\u5165\u5361\u7247\uFF1A\u5706\u89D2\u80F6\u56CA\u9020\u578B\uFF0C\u5185\u8FB9\u8DDD\u5DE6\u53F3\u5BF9\u79F0\u7559\u767D */
       div[class*="uV2eYG_card"] {
         border-radius: 18px !important;
-        padding: 8px 12px 7px !important;
+        padding: 8px 10px 7px !important;
         box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05) !important;
         border: 1px solid rgba(0, 0, 0, 0.07) !important;
         background: var(--dsw-alias-bg-layer-2, #f4f4f7) !important;
@@ -797,11 +797,17 @@ var MOBILE_STYLES_CSS = `
         margin: 8px 0 !important;
       }
 
-      /* \u8F93\u5165\u6846\u8212\u9002\u5316\uFF1A\u5185\u8FB9\u8DDD\u6536\u7D27\u3001\u5706\u89D2\u9002\u4E2D\u300115px \u8F93\u5165\u5B57\u53F7\uFF1B\u6574\u4F53\u8D34\u5E95\u66F4\u7A33 (patch: dsh-bridge mobile) */
-      div[class*="uV2eYG_card"] textarea,
-      textarea[class*="uV2eYG_input"] {
+      /* \u8F93\u5165\u6846\u8212\u9002\u5316\uFF1A\u5B57\u53F7\u7EDF\u4E00\u8BBE\u5230 card\uFF08input/mirror/backdrop \u4E09\u5C42 inherit \u540C\u6B65\uFF0C\u907F\u514D\u5149\u6807\u504F\u79FB\uFF09\uFF1B
+         \u5185\u8FB9\u8DDD\u5DE6\u53F3\u5BF9\u79F0\u653E\u5927\uFF0C\u4E0E\u5DE5\u5177\u680F\u7559\u767D\u534F\u8C03 (patch: dsh-bridge mobile) */
+      div[class*="uV2eYG_card"] {
         font-size: 15px !important;
-        line-height: 1.4 !important;
+        line-height: 21px !important;
+      }
+      /* \u4E09\u5C42\u5171\u4EAB padding \u8986\u76D6\u4E3A\u975E\u5BF9\u79F0\u6765\u6E90\uFF0C\u7EDF\u4E00\u5DE6\u53F3 10px \u4E14\u5E95\u90E8\u7559\u767D\u66F4\u5C0F */
+      div[class*="uV2eYG_input"],
+      div[class*="uV2eYG_mirror"],
+      div[class*="uV2eYG_backdrop"] {
+        padding: 4px 10px 0 10px !important;
       }
     }
 
