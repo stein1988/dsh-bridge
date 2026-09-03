@@ -451,11 +451,7 @@ var MOBILE_STYLES_CSS = `
       }
 
       div[class*="uV2eYG_tools"] {
-        display: flex !important;
-        align-items: center !important;
-        gap: 6px !important;
-        flex: 0 0 auto !important;
-        min-width: 0 !important;
+        display: none !important;
       }
 
       div[class*="uV2eYG_modes"] {
@@ -765,6 +761,40 @@ var MOBILE_STYLES_CSS = `
       }
       header[class*="wSkVaW_header"] {
         display: none !important;
+      }
+
+      /* \u6D88\u606F\u6392\u7248\u7D27\u51D1\u5316\uFF1A\u624B\u673A\u7AEF\u7F29\u5C0F\u6B63\u6587/\u6807\u9898\u5B57\u53F7\u5E76\u6536\u7D27\u884C\u8DDD\u4E0E\u6BB5\u8DDD\uFF0C\u8BA9\u5355\u5C4F\u663E\u793A\u66F4\u591A\u5185\u5BB9 */
+      div[class*="gdEzaW_bubble"] {
+        font-size: 14px !important;
+        line-height: 20px !important;
+      }
+      div[class*="wSkVaW_scrollBody"] p,
+      div[class*="wSkVaW_scrollBody"] li,
+      div[class*="wSkVaW_scrollBody"] td,
+      div[class*="wSkVaW_scrollBody"] th {
+        font-size: 14px !important;
+        line-height: 1.55 !important;
+      }
+      div[class*="wSkVaW_scrollBody"] p {
+        margin: 0 0 8px !important;
+      }
+      div[class*="wSkVaW_scrollBody"] h1 {
+        font-size: 17px !important;
+      }
+      div[class*="wSkVaW_scrollBody"] h2 {
+        font-size: 16px !important;
+      }
+      div[class*="wSkVaW_scrollBody"] h3 {
+        font-size: 15px !important;
+      }
+      div[class*="wSkVaW_scrollBody"] h1,
+      div[class*="wSkVaW_scrollBody"] h2,
+      div[class*="wSkVaW_scrollBody"] h3 {
+        margin: 10px 0 6px !important;
+        line-height: 1.35 !important;
+      }
+      div[class*="gdEzaW_userRow"] {
+        margin: 8px 0 !important;
       }
 
       /* \u8F93\u5165\u6846\u8212\u9002\u5316\uFF1A\u5706\u89D2\u5927\u80F6\u56CA + \u67D4\u548C\u9634\u5F71 + 16px \u8F93\u5165\u5B57\u53F7 (\u5BF9\u9F50\u79FB\u52A8\u7AEF\u8F93\u5165\u4F53\u9A8C) */

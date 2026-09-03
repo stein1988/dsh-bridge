@@ -420,11 +420,7 @@ export const MOBILE_STYLES_CSS = `
       }
 
       div[class*="uV2eYG_tools"] {
-        display: flex !important;
-        align-items: center !important;
-        gap: 6px !important;
-        flex: 0 0 auto !important;
-        min-width: 0 !important;
+        display: none !important;
       }
 
       div[class*="uV2eYG_modes"] {
@@ -734,6 +730,40 @@ export const MOBILE_STYLES_CSS = `
       }
       header[class*="wSkVaW_header"] {
         display: none !important;
+      }
+
+      /* 消息排版紧凑化：手机端缩小正文/标题字号并收紧行距与段距，让单屏显示更多内容 */
+      div[class*="gdEzaW_bubble"] {
+        font-size: 14px !important;
+        line-height: 20px !important;
+      }
+      div[class*="wSkVaW_scrollBody"] p,
+      div[class*="wSkVaW_scrollBody"] li,
+      div[class*="wSkVaW_scrollBody"] td,
+      div[class*="wSkVaW_scrollBody"] th {
+        font-size: 14px !important;
+        line-height: 1.55 !important;
+      }
+      div[class*="wSkVaW_scrollBody"] p {
+        margin: 0 0 8px !important;
+      }
+      div[class*="wSkVaW_scrollBody"] h1 {
+        font-size: 17px !important;
+      }
+      div[class*="wSkVaW_scrollBody"] h2 {
+        font-size: 16px !important;
+      }
+      div[class*="wSkVaW_scrollBody"] h3 {
+        font-size: 15px !important;
+      }
+      div[class*="wSkVaW_scrollBody"] h1,
+      div[class*="wSkVaW_scrollBody"] h2,
+      div[class*="wSkVaW_scrollBody"] h3 {
+        margin: 10px 0 6px !important;
+        line-height: 1.35 !important;
+      }
+      div[class*="gdEzaW_userRow"] {
+        margin: 8px 0 !important;
       }
 
       /* 输入框舒适化：圆角大胶囊 + 柔和阴影 + 16px 输入字号 (对齐移动端输入体验) */
