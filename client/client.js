@@ -126,6 +126,23 @@ var MOBILE_STYLES_CSS = `
         opacity: 0.6;
       }
 
+      /* \u4E0A\u6E38 v2.10.8 \u7684\u8F93\u5165\u6846\u6298\u53E0\u6309\u94AE\u88AB\u642C\u5230\u79FB\u52A8\u9876\u680F\u91CC\uFF08\u89C1 client/index.js relocateFoldButton\uFF09\uFF1A
+         \u4E0E\u9876\u680F\u5176\u5B83\u6309\u94AE\u540C\u89C4\u683C\uFF0840px \u89E6\u63A7\u533A\u3001\u900F\u660E\u5E95\uFF09\uFF0C\u4FDD\u8BC1\u53EF\u70B9\u4E14\u4E0D\u989D\u5916\u5360\u884C\u9AD8 */
+      .dsh-mobile-app-header .dsh-header-fold-btn {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        border: none !important;
+        background: transparent !important;
+        color: var(--dsw-alias-label-primary, #111827) !important;
+        box-shadow: none !important;
+        pointer-events: auto !important;
+      }
+      .dsh-mobile-app-header .dsh-header-fold-btn svg {
+        width: 20px !important;
+        height: 20px !important;
+      }
+
       /* \u4E2D\u95F4\u52A8\u6001\u4F1A\u8BDD\u6807\u9898 (\u5355\u884C\u5C45\u4E2D\u6253\u70B9\u622A\u65AD\uFF0C100% \u8FD8\u539F\u539F\u751F App \u5BFC\u822A\u4F53\u9A8C) */
       .dsh-mobile-header-title {
         flex: 1 1 auto !important;
@@ -428,6 +445,74 @@ var MOBILE_STYLES_CSS = `
       /* \u8F93\u5165\u6846\u5E95\u5EA7\uFF1ADeepSeek App \u5C45\u4E2D\u53CA\u5E95\u90E8\u56FA\u5B9A (\u5E95\u8DDD\u6536\u7D27\u8BA9\u8F93\u5165\u6846\u8D34\u5E95\u4E0B\u79FB) */
       div[class*="wSkVaW_scrollBody"] {
         padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
+      }
+
+      /* \u2500\u2500 \u79FB\u52A8\u7AEF\u8F93\u5165\u6846\u6298\u53E0\u6A21\u5F0F\uFF08body.dsh-composer-collapsed\uFF09\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
+         \u6298\u53E0\u540E\u9690\u85CF\u5438\u5E95\u8F93\u5165\u533A\uFF0C\u8BA9\u6D88\u606F viewArea \u81EA\u52A8\u4F38\u5C55\u5230\u5168\u9AD8\uFF0C\u6700\u5927\u5316\u9605\u8BFB\u533A\u3002
+         \u5165\u53E3\uFF1A\u804A\u5929\u5934\u90E8\u5DE5\u5177\u680F\uFF08Session \u4E0B\u8F7D\u94AE\u65C1\uFF09\u7684\u6298\u53E0\u6309\u94AE\uFF0C\u6216\u6298\u53E0\u6001\u5E95\u90E8\u7EC6\u8F93\u5165\u6761\u70B9\u5B83\u5524\u56DE\u3002
+         \u72B6\u6001\u6301\u4E45\u5316\u5230 localStorage\u3002 */
+      body.dsh-composer-collapsed div[class*="wSkVaW_composerSeat"] {
+        display: none !important;
+      }
+      body.dsh-composer-collapsed div[class*="wSkVaW_viewArea"] {
+        flex: 1 1 auto !important;
+        height: auto !important;
+        min-height: 0 !important;
+      }
+      /* \u6298\u53E0\u65F6\u6EDA\u52A8\u533A\u5E95\u90E8\u5BF9\u9F50 safe-area\uFF0C\u907F\u514D\u5185\u5BB9\u88AB iPhone \u5E95\u90E8\u6A2A\u6761\u906E\u6321 */
+      body.dsh-composer-collapsed div[class*="wSkVaW_scrollBody"] {
+        padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+      }
+
+      /* \u6298\u53E0\u8F93\u5165\u6846\u6309\u94AE\uFF1A\u6CE8\u5165\u5728\u804A\u5929\u5934\u90E8\u5DE5\u5177\u680F\uFF08Session \u4E0B\u8F7D\u94AE\u65C1\uFF09\uFF0C
+         \u4E0E DSH sessionLogButton \u540C\u89C4\u683C\uFF0828px \u5706\u5F62\u56FE\u6807\u94AE\uFF09\uFF0C\u89C6\u89C9\u4E0E\u539F\u751F\u4E00\u81F4 */
+      .dsh-header-fold-btn {
+        min-width: 28px !important;
+        width: 28px !important;
+        height: 28px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+        border: 1px solid var(--dsw-alias-border-l2, rgba(0, 0, 0, 0.1)) !important;
+        background: var(--dsw-alias-bg-layer-2, rgba(0, 0, 0, 0.03)) !important;
+        color: var(--dsw-alias-label-secondary, #6b7280) !important;
+        cursor: pointer !important;
+        transition: opacity 0.15s !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+        -webkit-tap-highlight-color: transparent !important;
+      }
+      .dsh-header-fold-btn:active {
+        opacity: 0.6 !important;
+      }
+      .dsh-header-fold-btn svg {
+        width: 15px !important;
+        height: 15px !important;
+      }
+
+      /* \u6298\u53E0\u6001\u5E95\u90E8\u7EC6\u8F93\u5165\u6761\uFF1A\u70B9\u51FB\u5524\u8D77\u8F93\u5165\u6846\uFF08\u4F4D\u4E8E\u539F\u8F93\u5165\u533A\u4F4D\u7F6E\uFF0Csticky \u5E95\u90E8\uFF09 */
+      .dsh-composer-collapsed-bar {
+        display: none !important;
+        position: sticky !important;
+        bottom: 0 !important;
+        margin: 8px 12px max(8px, env(safe-area-inset-bottom, 0px)) 12px !important;
+        padding: 11px 16px !important;
+        border-radius: 22px !important;
+        background: var(--dsw-alias-bg-layer-2, #f4f4f7) !important;
+        border: 1px solid rgba(0, 0, 0, 0.07) !important;
+        color: var(--dsw-alias-label-tertiary, #8b93a1) !important;
+        font-size: 13.5px !important;
+        line-height: 1.4 !important;
+        cursor: pointer !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
+        -webkit-tap-highlight-color: transparent !important;
+        z-index: 40 !important;
+        box-sizing: border-box !important;
+      }
+      body.dsh-composer-collapsed .dsh-composer-collapsed-bar {
+        display: block !important;
       }
 
       /* \u8F93\u5165\u5361\u7247\uFF1A\u5706\u89D2\u80F6\u56CA\u9020\u578B\uFF0C\u5185\u8FB9\u8DDD\u5DE6\u53F3\u5BF9\u79F0\u7559\u767D */
@@ -893,6 +978,38 @@ var MOBILE_STYLES_CSS = `
       to { transform: translateY(0); }
     }
 
+    /* \u6DF1\u8272\u6A21\u5F0F\u9002\u914D\uFF1Adsh-bridge \u76EE\u5F55\u6D4F\u89C8\u5668\u5F39\u7A97\u4F7F\u7528\u4E86 DSH \u4E3B\u9898\u7CFB\u7EDF\u672A\u5B9A\u4E49\u7684
+       state-*-bg / state-*-border / state-*-primary \u53D8\u91CF\uFF0C\u8865\u4E0A\u6DF1\u8272\u6A21\u5F0F\u503C\uFF0C\u907F\u514D\u6D45\u8272 fallback \u6C38\u8FDC\u751F\u6548 */
+    body[data-ds-dark-theme] {
+      --dsw-alias-state-info-bg: rgba(65, 118, 230, 0.12);
+      --dsw-alias-state-info-border: rgba(65, 118, 230, 0.25);
+      --dsw-alias-state-info-primary: #60a5fa;
+      --dsw-alias-state-success-bg: rgba(34, 197, 94, 0.12);
+      --dsw-alias-state-success-border: rgba(34, 197, 94, 0.25);
+      --dsw-alias-state-success-primary: #4ade80;
+      --dsw-alias-state-warn-bg: rgba(245, 158, 11, 0.12);
+      --dsw-alias-state-warn-border: rgba(245, 158, 11, 0.25);
+      --dsw-alias-state-warn-primary: #fbbf24;
+      --dsw-alias-state-error-bg: rgba(239, 68, 68, 0.12);
+      --dsw-alias-state-error-border: rgba(239, 68, 68, 0.25);
+      --dsw-alias-state-error-primary: #f87171;
+    }
+
+    /* \u6DF1\u8272\u6A21\u5F0F\uFF1A\u76F4\u63A5\u8986\u76D6\u5F39\u7A97\u5185\u6240\u6709\u4F7F\u7528 #fff/#ffffff fallback \u7684\u5185\u8054\u80CC\u666F\uFF0C
+       \u786E\u4FDD\u5373\u4F7F CSS \u53D8\u91CF\u672A\u6B63\u786E\u7EE7\u627F\uFF0C\u5F39\u7A97\u4E5F\u4E0D\u4F1A\u663E\u793A\u767D\u8272\u80CC\u666F */
+    body[data-ds-dark-theme] #dsh-remote-workspace-modal .dsh-ws-dialog-card,
+    body[data-ds-dark-theme] #dsh-remote-workspace-modal .dsh-ws-dialog-card * {
+      --dsw-alias-bg-layer-1: #1b1b1c;
+      --dsw-alias-bg-layer-2: #2c2c2e;
+      --dsw-alias-bg-layer-3: #353638;
+      --dsw-alias-border-l2: #3c3c3d;
+      --dsw-alias-label-primary: #f9fafb;
+      --dsw-alias-label-secondary: #adb2b8;
+      --dsw-alias-label-tertiary: #81858c;
+      --dsw-alias-brand-primary: #f9fafb;
+      --dsw-alias-label-primary-foreground: #0f1115;
+    }
+
     @media (min-width: 769px) {
       .dsh-mobile-app-header,
       .dsh-mobile-backdrop,
@@ -1037,6 +1154,7 @@ var BRIDGE_ENDPOINTS = {
   setLanIp: "setLanIp",
   checkVersion: "checkVersion",
   upgradePlugin: "upgradePlugin",
+  upgradeDsh: "upgradeDsh",
   restartDsh: "restartDsh",
   exportBackup: "exportBackup",
   importBackup: "importBackup",
@@ -1123,6 +1241,7 @@ var GITHUB_URL = "https://github.com/wenbin-wb/dsh-bridge";
 var RELEASES_URL = "https://github.com/wenbin-wb/dsh-bridge/releases";
 var ISSUES_URL = "https://github.com/wenbin-wb/dsh-bridge/issues/new";
 var TUNNEL_DOCS_URL = "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/custom-tunnel.md";
+var CLOUDFLARE_TUTORIAL_URL = "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/cloudflare-fixed-domain.md";
 function upgradeCommands(latest) {
   const spec = `@wenbin_wb/dsh-bridge@${latest}`;
   return [
@@ -1260,14 +1379,14 @@ function StatusTag({ running, status }) {
     bg = "var(--dsw-alias-state-success-bg,#ecfdf5)";
     color = "var(--dsw-alias-state-success-primary,#059669)";
     text = "\u5DF2\u8FDE\u63A5";
-  } else if (status === "starting") {
+  } else if (status === "starting" || status === "connecting" || status === "downloading") {
     bg = "var(--dsw-alias-state-info-bg,#eff6ff)";
     color = "var(--dsw-alias-state-info-primary,#3b82f6)";
-    text = "\u8FDE\u63A5\u4E2D\u2026";
+    text = status === "downloading" ? "\u4E0B\u8F7D\u4E2D\u2026" : "\u8FDE\u63A5\u4E2D\u2026";
   } else if (status === "reconnecting") {
     bg = "var(--dsw-alias-state-warn-bg,#fffbeb)";
     color = "var(--dsw-alias-state-warn-primary,#d97706)";
-    text = "\u91CD\u8FDE\u4E2D\u2026";
+    text = "\u81EA\u52A8\u91CD\u8FDE\u4E2D\u2026";
   } else if (status === "paused") {
     bg = "var(--dsw-alias-state-warn-bg,#fffbeb)";
     color = "var(--dsw-alias-state-warn-primary,#d97706)";
@@ -1483,6 +1602,185 @@ var CustomTunnelGuide = React.memo(function CustomTunnelGuide2() {
     }, "\u67E5\u770B\u81EA\u5EFA\u96A7\u9053\u670D\u52A1\u5668\u642D\u5EFA\u6559\u7A0B")
   );
 });
+var TunnelEntryCard = React.memo(function TunnelEntryCard2({
+  entry,
+  onCopy,
+  copied,
+  autoStart,
+  onToggleAutoStart,
+  onStart,
+  onStop,
+  onReset
+}) {
+  const [showQr, setShowQr] = React.useState(false);
+  const hasUrl = Boolean(entry && entry.url);
+  const active = Boolean(entry && entry.running);
+  return React.createElement(
+    "div",
+    {
+      style: {
+        ...s.card,
+        borderColor: active ? "var(--dsw-alias-state-success-border,#a7f3d0)" : void 0,
+        background: active ? "linear-gradient(180deg, var(--dsw-alias-bg-layer-2,#f9fafb), var(--dsw-alias-bg-layer-1,#ffffff))" : void 0
+      }
+    },
+    React.createElement(
+      "div",
+      { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 } },
+      React.createElement(
+        "div",
+        { style: { flex: "1 1 auto", minWidth: 0 } },
+        React.createElement(
+          "div",
+          { style: { display: "flex", alignItems: "center", gap: 8 } },
+          React.createElement("span", { style: { fontSize: 16 } }, "\u{1F310}"),
+          React.createElement("div", { style: s.label }, "\u516C\u7F51\u8BBF\u95EE\u5165\u53E3")
+        ),
+        React.createElement(
+          "div",
+          { style: { ...s.muted, marginTop: 4 } },
+          entry ? entry.title + " \xB7 " + entry.desc : "\u5C1A\u672A\u914D\u7F6E\u4EFB\u4F55\u516C\u7F51\u96A7\u9053\uFF0C\u53EF\u5728\u4E0B\u65B9\u5F00\u542F Cloudflare \u96A7\u9053\u6216\u914D\u7F6E\u81EA\u5EFA\u96A7\u9053"
+        )
+      ),
+      React.createElement(StatusTag, {
+        running: active,
+        status: entry && entry.phase && entry.phase !== "ready" ? entry.phase : void 0
+      })
+    ),
+    React.createElement(
+      "div",
+      { style: { ...s.block, display: "flex", flexDirection: "column", gap: 10 } },
+      // 有地址：大号 URL + 复制
+      hasUrl && React.createElement(
+        "div",
+        {
+          style: {
+            padding: "10px 12px",
+            background: "var(--dsw-alias-bg-layer-1,#ffffff)",
+            border: "1px solid var(--dsw-alias-border-l2,#e5e7eb)",
+            borderRadius: 10,
+            display: "flex",
+            alignItems: "center",
+            gap: 10
+          }
+        },
+        React.createElement("code", {
+          style: { ...s.code, flex: "1 1 auto", fontSize: 13.5, wordBreak: "break-all", lineHeight: 1.5 }
+        }, entry.url),
+        React.createElement("button", {
+          style: { ...s.btnGhost, flexShrink: 0, height: 28, padding: "0 12px", fontSize: 12 },
+          onClick: () => onCopy && onCopy(entry.url)
+        }, copied ? "\u2713 \u5DF2\u590D\u5236" : "\u590D\u5236")
+      ),
+      // 状态细节（重连/错误/连接中）——无 URL 时格外重要，让用户知道隧道在自愈而非消失
+      entry && entry.stateDetail && React.createElement("div", {
+        style: {
+          fontSize: 12,
+          lineHeight: 1.5,
+          color: entry.phase === "error" ? "var(--dsw-alias-state-error-primary,#dc2626)" : entry.phase === "reconnecting" ? "var(--dsw-alias-state-warn-primary,#d97706)" : "var(--dsw-alias-label-secondary,#6b7280)"
+        }
+      }, entry.stateDetail),
+      // 操作行：running → 关闭/停止重连（+ 重置）；!running → 开启
+      active && onStop && React.createElement(
+        "div",
+        { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
+        React.createElement("button", {
+          style: s.btnGhost,
+          onClick: onStop
+        }, entry && entry.phase === "reconnecting" ? "\u505C\u6B62\u91CD\u8FDE" : "\u5173\u95ED"),
+        onReset && React.createElement("button", {
+          style: { ...s.btnGhost, height: 28, padding: "0 12px", fontSize: 12 },
+          onClick: onReset,
+          title: "\u5173\u95ED\u5E76\u91CD\u65B0\u5F00\u542F\uFF0C\u66F4\u6362\u4E34\u65F6\u5730\u5740"
+        }, "\u{1F504} \u91CD\u7F6E\u94FE\u63A5")
+      ),
+      // running 但无 onStop 的入口（如外部登记）：只给重置/二维码辅助，无开关
+      active && !onStop && onReset && React.createElement(
+        "div",
+        { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
+        React.createElement("button", {
+          style: { ...s.btnGhost, height: 28, padding: "0 12px", fontSize: 12 },
+          onClick: onReset,
+          title: "\u5173\u95ED\u5E76\u91CD\u65B0\u5F00\u542F\uFF0C\u66F4\u6362\u4E34\u65F6\u5730\u5740"
+        }, "\u{1F504} \u91CD\u7F6E\u94FE\u63A5")
+      ),
+      // 未运行：引导开启（连接中/下载中禁用）
+      !active && onStart && React.createElement("button", {
+        style: {
+          ...s.btnPri,
+          alignSelf: "flex-start",
+          opacity: entry && entry.configured === false ? 0.4 : 1,
+          background: entry && entry.phase === "connecting" ? "var(--dsw-alias-state-info-primary,#3b82f6)" : void 0
+        },
+        onClick: onStart,
+        disabled: Boolean(entry && entry.configured === false || entry && (entry.phase === "connecting" || entry.phase === "downloading")),
+        title: entry && entry.configured === false ? "\u8BF7\u5148\u5728\u300C\u96A7\u9053\u914D\u7F6E\u300D\u4E2D\u4FDD\u5B58\u670D\u52A1\u5668\u914D\u7F6E" : ""
+      }, entry && entry.phase === "connecting" ? "\u8FDE\u63A5\u4E2D\u2026" : entry && entry.phase === "downloading" ? "\u4E0B\u8F7D\u4E2D\u2026" : "\u5F00\u542F\u516C\u7F51\u96A7\u9053"),
+      // 二维码辅助按钮：有地址未运行时也可查看（外部登记等）
+      hasUrl && entry.qr && React.createElement(
+        "div",
+        { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
+        React.createElement("button", {
+          style: { ...s.btnGhost, height: 28, padding: "0 12px", fontSize: 12 },
+          onClick: () => setShowQr((v) => !v)
+        }, showQr ? "\u9690\u85CF\u4E8C\u7EF4\u7801" : "\u663E\u793A\u4E8C\u7EF4\u7801")
+      ),
+      showQr && hasUrl && entry.qr && React.createElement(
+        "div",
+        { style: { display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6 } },
+        React.createElement("img", { src: entry.qr, alt: "QR", style: { ...s.qr, margin: 0 } }),
+        React.createElement("div", { style: { ...s.muted, fontSize: 11 } }, "\u8BF7\u5728\u79C1\u5BC6\u73AF\u5883\u4E0B\u626B\u7801\u4F7F\u7528")
+      )
+    ),
+    onToggleAutoStart && React.createElement(
+      "label",
+      {
+        style: {
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          marginTop: 12,
+          paddingTop: 10,
+          borderTop: "1px solid var(--dsw-alias-border-l2,#e5e7eb)",
+          fontSize: 12,
+          color: "var(--dsw-alias-label-secondary,#6b7280)",
+          cursor: "pointer",
+          userSelect: "none"
+        },
+        title: "DSH \u542F\u52A8\u65F6\u81EA\u52A8\u6062\u590D\u8BE5\u96A7\u9053\u7684\u8FD0\u884C\u72B6\u6001"
+      },
+      React.createElement("input", {
+        type: "checkbox",
+        checked: Boolean(autoStart),
+        onChange: (e) => onToggleAutoStart(e.target.checked)
+      }),
+      React.createElement("span", null, "\u968F DSH \u542F\u52A8\u81EA\u52A8\u5F00\u542F")
+    )
+  );
+});
+var TunnelConfigGroup = React.memo(function TunnelConfigGroup2({ children }) {
+  const [open, setOpen] = React.useState(false);
+  return React.createElement(
+    "div",
+    { style: s.card },
+    React.createElement(
+      "div",
+      {
+        style: { display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", userSelect: "none", gap: 8 },
+        onClick: () => setOpen((v) => !v)
+      },
+      React.createElement(
+        "div",
+        { style: { display: "flex", alignItems: "center", gap: 8 } },
+        React.createElement("span", { style: { fontSize: 14 } }, "\u2699\uFE0F"),
+        React.createElement("div", { style: s.label }, "\u96A7\u9053\u914D\u7F6E"),
+        React.createElement("span", { style: { ...s.muted, fontSize: 11 } }, "Token \xB7 \u56FA\u5B9A\u57DF\u540D \xB7 \u81EA\u5EFA\u670D\u52A1\u5668 \xB7 \u5916\u90E8\u767B\u8BB0")
+      ),
+      React.createElement("span", { style: { fontSize: 12, color: "var(--dsw-alias-label-tertiary,#9ca3af)", flexShrink: 0 } }, open ? "\u6536\u8D77 \u25B4" : "\u5C55\u5F00 \u25BE")
+    ),
+    open && React.createElement("div", { style: { marginTop: 4 } }, children)
+  );
+});
 var CustomTunnelConfigForm = React.memo(function CustomTunnelConfigForm2({ serverUrl: initUrl, accessToken: initToken, onSave }) {
   const [serverUrl, setServerUrl] = React.useState(initUrl ?? "");
   const [accessToken, setAccessToken] = React.useState(initToken ?? "");
@@ -1599,7 +1897,7 @@ var TunnelCard = React.memo(function TunnelCard2({
       React.createElement(
         "div",
         { style: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 } },
-        React.createElement(StatusTag, { running }),
+        React.createElement(StatusTag, { running, status: phase === "ready" ? void 0 : phase }),
         onToggleAutoStart && React.createElement(
           "label",
           {
@@ -1628,7 +1926,7 @@ var TunnelCard = React.memo(function TunnelCard2({
       style: {
         ...s.block,
         fontSize: 12,
-        color: phase === "error" ? "var(--dsw-alias-state-error-primary,#dc2626)" : "var(--dsw-alias-label-secondary,#6b7280)"
+        color: phase === "error" ? "var(--dsw-alias-state-error-primary,#dc2626)" : phase === "reconnecting" ? "var(--dsw-alias-state-warn-primary,#d97706)" : "var(--dsw-alias-label-secondary,#6b7280)"
       }
     }, state?.detail ?? phase),
     url && React.createElement(QrBlock, { url, qr, onReset, auth, onNavigateSecurity }),
@@ -1643,7 +1941,10 @@ var TunnelCard = React.memo(function TunnelCard2({
         disabled: configured === false || phase === "connecting" || phase === "downloading",
         title: configured === false ? "\u8BF7\u5148\u4FDD\u5B58\u670D\u52A1\u5668\u914D\u7F6E" : ""
       }, phase === "connecting" ? "\u8FDE\u63A5\u4E2D\u2026" : phase === "downloading" ? "\u4E0B\u8F7D\u4E2D\u2026" : "\u5F00\u542F"),
-      running && onStop && React.createElement("button", { style: s.btnGhost, onClick: onStop }, "\u5173\u95ED")
+      running && onStop && React.createElement("button", {
+        style: s.btnGhost,
+        onClick: onStop
+      }, phase === "reconnecting" ? "\u505C\u6B62\u91CD\u8FDE" : "\u5173\u95ED")
     )
   );
 });
@@ -1705,6 +2006,12 @@ var CloudflareConfigForm = React.memo(function CloudflareConfigForm2({ token, ho
         { style: { fontSize: 12, color: "var(--dsw-alias-label-secondary, #6b7280)", marginBottom: 8, lineHeight: 1.5 } },
         "\u5728 Cloudflare Zero Trust \u63A7\u5236\u53F0\u521B\u5EFA Tunnel \u5373\u53EF\u83B7\u53D6\u4E13\u5C5E Token \u5E76\u7ED1\u5B9A\u81EA\u5DF1\u7684\u57DF\u540D\uFF08\u5982 dsh.yourname.com\uFF09\uFF0C\u6BCF\u6B21\u91CD\u542F URL \u6C38\u4E0D\u53D8\u66F4\u3002\u4E0D\u586B\u5219\u4F7F\u7528\u9ED8\u8BA4\u514D\u767B\u5F55\u4E34\u65F6\u968F\u673A\u57DF\u540D\u3002"
       ),
+      React.createElement("a", {
+        href: CLOUDFLARE_TUTORIAL_URL,
+        target: "_blank",
+        rel: "noreferrer",
+        style: { ...s.btnLink, marginBottom: 10 }
+      }, "\u{1F4D6} \u67E5\u770B\u300CCloudflare \u56FA\u5B9A\u57DF\u540D\u300D\u7533\u8BF7\u4E0E\u914D\u7F6E\u6559\u7A0B"),
       React.createElement(
         "div",
         { style: { marginBottom: 8 } },
@@ -1856,11 +2163,23 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
   const handleToggleEnabled = async () => {
     const prev = enabled;
     const next = !enabled;
+    const noPasswordYet = !auth?.hasPassword && !auth?.hasAdminPassword;
+    if (next && noPasswordYet && mode !== "token_only") {
+      if (mode === "password_only") {
+        window.alert("\u300C\u4EC5\u5BC6\u7801 / PIN \u7801\u767B\u5F55\u300D\u6A21\u5F0F\u5FC5\u987B\u5148\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\u624D\u80FD\u5F00\u542F\u5B89\u5168\u9632\u62A4\u3002\n\n\u8BF7\u5148\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801 / PIN \u7801\u300D\u8F93\u5165\u5BC6\u7801\u5E76\u70B9\u51FB\u300C\u4FDD\u5B58\u8BBF\u95EE\u5BC6\u7801\u300D\uFF0C\u7136\u540E\u518D\u5F00\u542F\u3002");
+        setTopMsg({ ok: false, text: "\u8BF7\u5148\u8BBE\u7F6E\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\uFF0C\u518D\u5F00\u542F\u5B89\u5168\u9632\u62A4" });
+        return;
+      }
+      const go = window.confirm(
+        '\u26A0\uFE0F \u60A8\u5C1A\u672A\u8BBE\u7F6E\u4EFB\u4F55\u8BBF\u95EE\u5BC6\u7801\u6216\u7BA1\u7406\u5BC6\u7801\u3002\n\n\u5F00\u542F\u5B89\u5168\u9632\u62A4\u540E\uFF0C\u4EFB\u4F55\u77E5\u9053\u5C40\u57DF\u7F51 IP / \u96A7\u9053\u5730\u5740\u7684\u8BBF\u5BA2\u4ECD\u53EF\u76F4\u63A5\u8FDB\u5165\uFF08\u5F53\u524D\u76F8\u5F53\u4E8E"\u514D\u5BC6\u5F00\u653E"\u72B6\u6001\uFF09\u3002\n\n\u662F\u5426\u4ECD\u8981\u5F00\u542F\uFF1F\u5EFA\u8BAE\u5148\u5173\u95ED\uFF0C\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\u300D\u5904\u8BBE\u7F6E\u5BC6\u7801\u540E\u518D\u5F00\u542F\u3002'
+      );
+      if (!go) return;
+    }
     setEnabled(next);
     try {
       const res = await rpcCall(BRIDGE_ENDPOINTS.authUpdateConfig, { enabled: next });
       if (!res?.ok) throw new Error(res?.error?.message || "\u66F4\u65B0\u5931\u8D25");
-      setTopMsg({ ok: true, text: next ? "\u2713 \u8BBF\u95EE\u5B89\u5168\u8BA4\u8BC1\u5DF2\u5F00\u542F\uFF08\u73B0\u6709\u767B\u5F55\u6001\u5DF2\u5237\u65B0\uFF09" : "\u2713 \u8BBF\u95EE\u5B89\u5168\u8BA4\u8BC1\u5DF2\u5173\u95ED\uFF08\u8BBF\u95EE\u514D\u5BC6\uFF0C\u7BA1\u7406\u4FDD\u62A4\u4E0D\u53D7\u5F71\u54CD\uFF09" });
+      setTopMsg({ ok: true, text: next ? noPasswordYet ? "\u2713 \u5B89\u5168\u9632\u62A4\u5DF2\u5F00\u542F\uFF08\u6CE8\u610F\uFF1A\u5C1A\u672A\u8BBE\u7F6E\u5BC6\u7801\uFF0C\u8BBF\u5BA2\u4ECD\u53EF\u514D\u5BC6\u8FDB\u5165\uFF0C\u8BF7\u7ACB\u5373\u5728\u4E0B\u65B9\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\uFF09" : "\u2713 \u8BBF\u95EE\u5B89\u5168\u8BA4\u8BC1\u5DF2\u5F00\u542F\uFF08\u73B0\u6709\u767B\u5F55\u6001\u5DF2\u5237\u65B0\uFF09" : "\u2713 \u8BBF\u95EE\u5B89\u5168\u8BA4\u8BC1\u5DF2\u5173\u95ED\uFF08\u8BBF\u95EE\u514D\u5BC6\uFF0C\u7BA1\u7406\u4FDD\u62A4\u4E0D\u53D7\u5F71\u54CD\uFF09" });
       onUpdate?.();
     } catch (e) {
       setEnabled(prev);
@@ -1882,6 +2201,11 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
     }
   };
   const handleChangeMode = async (m) => {
+    if (m === "password_only" && !auth?.hasPassword && !auth?.hasAdminPassword) {
+      window.alert("\u300C\u4EC5\u5BC6\u7801 / PIN \u7801\u767B\u5F55\u300D\u9700\u8981\u5148\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\u3002\n\n\u8BF7\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801 / PIN \u7801\u300D\u5904\u8F93\u5165\u5BC6\u7801\u5E76\u70B9\u51FB\u300C\u4FDD\u5B58\u8BBF\u95EE\u5BC6\u7801\u300D\uFF0C\u7136\u540E\u518D\u5207\u6362\u5230\u6B64\u6A21\u5F0F\u6216\u5F00\u542F\u5B89\u5168\u9632\u62A4\u3002");
+      setTopMsg({ ok: false, text: "\u8BF7\u5148\u5728\u4E0B\u65B9\u8BBE\u7F6E\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\uFF0C\u518D\u5207\u6362\u4E3A\u300C\u4EC5\u5BC6\u7801\u767B\u5F55\u300D\u6A21\u5F0F" });
+      return;
+    }
     const prev = mode;
     setMode(m);
     try {
@@ -2063,7 +2387,31 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
           background: topMsg.ok ? "var(--dsw-alias-state-success-bg,#ecfdf5)" : "var(--dsw-alias-state-error-bg,#fef2f2)",
           color: topMsg.ok ? "var(--dsw-alias-state-success-primary,#059669)" : "var(--dsw-alias-state-error-primary,#dc2626)"
         }
-      }, topMsg.text)
+      }, topMsg.text),
+      // 访问认证已开启但尚未设置任何密码/Token 保护：局域网/公网访客可免密进入，高危提示
+      enabled && !auth?.hasPassword && !auth?.hasAdminPassword && React.createElement(
+        "div",
+        {
+          style: {
+            marginTop: 12,
+            padding: "10px 14px",
+            borderRadius: 6,
+            fontSize: 12,
+            background: "var(--dsw-alias-state-error-bg,#fef2f2)",
+            border: "1px solid var(--dsw-alias-state-error-border,#fecaca)",
+            color: "var(--dsw-alias-state-error-primary,#dc2626)",
+            lineHeight: 1.6
+          }
+        },
+        "\u26A0\uFE0F ",
+        React.createElement("strong", null, "\u5C1A\u672A\u8BBE\u7F6E\u4EFB\u4F55\u8BBF\u95EE\u5BC6\u7801\u6216\u7BA1\u7406\u5BC6\u7801"),
+        " \u2014\u2014 \u6B64\u65F6\u201C\u8BBF\u95EE\u8BA4\u8BC1\u5DF2\u5F00\u542F\u201D\u4F46\u4EFB\u4F55\u77E5\u9053\u5C40\u57DF\u7F51 IP / \u96A7\u9053\u5730\u5740\u7684\u4EBA\u90FD\u80FD\u76F4\u63A5\u8FDB\u5165\uFF08\u96A7\u9053\u5165\u53E3\u81EA\u8EAB\u4E0D\u8BBE\u9632\uFF0C\u8BE6\u89C1\u4E0B\u65B9\u5B89\u5168\u987B\u77E5\uFF09\u3002",
+        "\u5EFA\u8BAE\u7ACB\u5373\u5728\u4E0B\u65B9\u8BBE\u7F6E",
+        React.createElement("strong", null, "\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801"),
+        "\u6216",
+        React.createElement("strong", null, "\u7BA1\u7406\u5BC6\u7801"),
+        "\u540E\u518D\u5BF9\u5916\u5F00\u653E\u3002"
+      )
     ),
     React.createElement(
       React.Fragment,
@@ -2071,7 +2419,10 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
       // =========================================================================
       // ---- 第一道防线：外部访问门禁（控制谁能进入 Web 界面使用 AI） ----
       // =========================================================================
-      enabled && React.createElement(
+      // 第一道防线卡片：已开启防护，或【尚未设置任何密码】时始终显示——
+      // 未设密码时必须给出密码输入框，否则用户开启防护（尤其 password_only）后
+      // 会因无密码被锁在登录墙外且找不到设密码入口（自我锁死，v2.10.5 修复）。
+      (enabled || !auth?.hasPassword) && React.createElement(
         "div",
         { style: s.card },
         React.createElement(
@@ -3495,6 +3846,7 @@ function VersionBanner({ rpcCall }) {
   }, [check]);
   const hasUpdate = info?.latest && info?.current && !info.error && semverGt(info.latest, info.current);
   const isLatest = info?.latest && info?.current && !info.error && !semverGt(info.latest, info.current);
+  const dshHasUpdate = !!(info?.dshLatest && info?.dshVersion && !info.error && semverGt(info.dshLatest, info.dshVersion));
   const handleUpgrade = React.useCallback(async () => {
     if (!info?.latest || upgrading) return;
     setUpgrading(true);
@@ -3516,6 +3868,28 @@ function VersionBanner({ rpcCall }) {
       setUpgrading(false);
     }
   }, [info?.latest, upgrading, rpcCall]);
+  const [dshUpgrading, setDshUpgrading] = React.useState(false);
+  const [dshUpgradeResult, setDshUpgradeResult] = React.useState(null);
+  const handleUpgradeDsh = React.useCallback(async () => {
+    if (!info?.dshLatest || dshUpgrading) return;
+    setDshUpgrading(true);
+    setDshUpgradeResult(null);
+    setDismissRestart(false);
+    resetRestartStatus();
+    try {
+      const r = await rpcCall(BRIDGE_ENDPOINTS.upgradeDsh, { version: info.dshLatest });
+      if (r?.ok && r.value?.ok) {
+        setDshUpgradeResult({ ok: true, message: `DSH \u5DF2\u6210\u529F\u5347\u7EA7\u5230 v${info.dshLatest}\uFF01` });
+      } else {
+        const msg = r?.value?.error || r?.error?.message || "\u5347\u7EA7\u5931\u8D25";
+        setDshUpgradeResult({ ok: false, message: msg, manual: true });
+      }
+    } catch (e) {
+      setDshUpgradeResult({ ok: false, message: e.message || "\u5347\u7EA7\u8BF7\u6C42\u5931\u8D25", manual: true });
+    } finally {
+      setDshUpgrading(false);
+    }
+  }, [info?.dshLatest, dshUpgrading, rpcCall]);
   const links = React.createElement(
     "div",
     { style: { display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" } },
@@ -3580,24 +3954,26 @@ function VersionBanner({ rpcCall }) {
           hasUpdate && React.createElement("span", { style: { fontWeight: 600, fontSize: 11 } }, `\u2794 v${info.latest}`),
           info?.error && React.createElement("span", { style: { color: "var(--dsw-alias-state-warn-primary,#d97706)", fontSize: 11 } }, "(\u7F51\u7EDC\u8D85\u65F6)")
         ),
-        // DSH 宿主版本标签
+        // DSH 宿主版本标签（有新版时黄色高亮）
         info?.dshVersion && React.createElement(
           "span",
           {
             style: {
               ...s.tag,
-              background: "var(--dsw-alias-bg-layer-2,#f3f4f6)",
-              color: "var(--dsw-alias-label-tertiary,#6b7280)",
+              background: dshHasUpdate ? "var(--dsw-alias-state-warn-bg,#fffbeb)" : "var(--dsw-alias-bg-layer-2,#f3f4f6)",
+              color: dshHasUpdate ? "var(--dsw-alias-state-warn-primary,#d97706)" : "var(--dsw-alias-label-tertiary,#6b7280)",
               padding: "3px 10px",
               fontSize: 12,
               fontWeight: 500,
               display: "inline-flex",
               alignItems: "center",
               gap: 5
-            }
+            },
+            title: dshHasUpdate ? `\u53D1\u73B0 DSH \u65B0\u7248\u672C v${info.dshLatest}` : void 0
           },
           React.createElement("span", { style: { opacity: 0.75, fontSize: 11, fontWeight: 400 } }, "DSH"),
-          `v${info.dshVersion}`
+          `v${info.dshVersion}`,
+          dshHasUpdate && React.createElement("span", { style: { fontWeight: 600, fontSize: 11 } }, `\u2794 v${info.dshLatest}`)
         ),
         // 刷新检查按钮
         React.createElement(
@@ -3787,6 +4163,109 @@ function VersionBanner({ rpcCall }) {
           )
         )
       )
+    ),
+    // ── DSH 宿主有新版本时的提示 / 一键升级卡片 ──
+    dshHasUpdate && React.createElement(
+      "div",
+      {
+        style: {
+          ...s.card,
+          background: "var(--dsw-alias-state-warn-bg,#fffbeb)",
+          border: "1px solid var(--dsw-alias-state-warn-border,#fde68a)",
+          padding: "14px 16px",
+          marginTop: 10,
+          marginBottom: 0
+        }
+      },
+      React.createElement(
+        "div",
+        { style: { display: "flex", alignItems: "flex-start", gap: 12 } },
+        React.createElement("span", { style: { fontSize: 22 } }, "\u{1F6E0}\uFE0F"),
+        React.createElement(
+          "div",
+          { style: { flex: 1, minWidth: 0 } },
+          React.createElement(
+            "div",
+            { style: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginBottom: 8 } },
+            React.createElement("div", {
+              style: { fontSize: 13, fontWeight: 600, color: "var(--dsw-alias-state-warn-primary,#92400e)" }
+            }, `DSH \u6709\u65B0\u7248\u672C v${info.dshLatest}\uFF08\u5F53\u524D v${info.dshVersion}\uFF09`),
+            info?.dshUpgradable ? React.createElement(
+              "button",
+              {
+                style: {
+                  ...s.btnPri,
+                  height: 28,
+                  fontSize: 12,
+                  padding: "0 14px",
+                  background: dshUpgradeResult?.ok ? "var(--dsw-alias-state-success-primary,#059669)" : "var(--dsw-alias-brand-primary,#4f6ef7)",
+                  opacity: dshUpgrading || restarting ? 0.6 : 1
+                },
+                onClick: handleUpgradeDsh,
+                disabled: dshUpgrading || restarting || dshUpgradeResult?.ok
+              },
+              dshUpgrading ? React.createElement(
+                "span",
+                { style: { display: "inline-flex", alignItems: "center", gap: 6 } },
+                React.createElement("span", { style: { animation: "spin 1s linear infinite", display: "inline-flex" } }, React.createElement(Icons.refresh)),
+                "\u6B63\u5728\u5347\u7EA7 DSH\u2026"
+              ) : dshUpgradeResult?.ok ? "\u2713 DSH \u5347\u7EA7\u5B8C\u6210" : `\u4E00\u952E\u5347\u7EA7 DSH \u5230 v${info.dshLatest}`
+            ) : React.createElement("a", {
+              href: GITHUB_URL,
+              target: "_blank",
+              rel: "noreferrer",
+              style: { ...s.btnLink, fontSize: 12, fontWeight: 600 }
+            }, "\u67E5\u770B\u5B98\u65B9\u5347\u7EA7\u65B9\u5F0F \u2197")
+          ),
+          React.createElement(
+            "div",
+            {
+              style: { fontSize: 12, color: "var(--dsw-alias-label-secondary,#6b7280)", lineHeight: 1.6 }
+            },
+            info?.dshUpgradable ? "\u5347\u7EA7 DSH \u547D\u4EE4\u884C\u5DE5\u5177\u540E\u9700\u91CD\u542F DSH \u670D\u52A1\u751F\u6548\u3002" : info?.dshUpgradeReason || "\u5F53\u524D DSH \u975E npm \u5168\u5C40\u5B89\u88C5\uFF0C\u65E0\u6CD5\u4E00\u952E\u81EA\u52A8\u5347\u7EA7\uFF0C\u8BF7\u6309\u5B98\u65B9\u6E20\u9053\u624B\u52A8\u66F4\u65B0\u3002"
+          ),
+          dshUpgradeResult && React.createElement("div", {
+            style: {
+              marginTop: 10,
+              fontSize: 12,
+              lineHeight: 1.6,
+              color: dshUpgradeResult.ok ? "var(--dsw-alias-state-success-primary,#059669)" : "var(--dsw-alias-state-error-primary,#dc2626)"
+            }
+          }, dshUpgradeResult.message),
+          dshUpgradeResult?.ok && !dismissRestart && React.createElement(
+            "div",
+            {
+              style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginTop: 10 }
+            },
+            React.createElement("button", {
+              style: { ...s.btnPri, height: 30, fontSize: 12, padding: "0 14px", background: "var(--dsw-alias-state-success-primary,#059669)" },
+              onClick: handleRestart
+            }, "\u{1F504} \u7ACB\u5373\u91CD\u542F DSH \u670D\u52A1"),
+            React.createElement("button", {
+              style: { ...s.btnGhost, height: 30, fontSize: 12, padding: "0 12px" },
+              onClick: () => setDismissRestart(true)
+            }, "\u7A0D\u540E\u624B\u52A8\u91CD\u542F")
+          ),
+          (restarting || restartStatus) && React.createElement(
+            "div",
+            {
+              style: {
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                fontSize: 12,
+                marginTop: 8,
+                color: restartStatus?.phase === "success" ? "var(--dsw-alias-state-success-primary,#059669)" : restartStatus?.phase === "timeout" ? "var(--dsw-alias-state-error-primary,#dc2626)" : "var(--dsw-alias-state-info-primary,#2563eb)",
+                fontWeight: 500
+              }
+            },
+            restartStatus?.phase !== "success" && restartStatus?.phase !== "timeout" && React.createElement("span", {
+              style: { animation: "spin 1s linear infinite", display: "inline-flex" }
+            }, React.createElement(Icons.refresh)),
+            restartStatus?.text || "\u6B63\u5728\u5904\u7406\u2026"
+          )
+        )
+      )
     )
   );
 }
@@ -3870,6 +4349,18 @@ function BridgePanel({ rpcCall }) {
   const [activeTab, setActiveTab] = React.useState("lan");
   const [platforms, setPlatforms] = React.useState(null);
   const [selectedPlatform, setSelectedPlatform] = React.useState("wechat");
+  const [copiedUrl, setCopiedUrl] = React.useState("");
+  const copyEntryUrl = React.useCallback((url) => {
+    const done = () => {
+      setCopiedUrl(url);
+      setTimeout(() => setCopiedUrl(""), 2e3);
+    };
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(url).then(done).catch(() => done());
+    } else {
+      done();
+    }
+  }, []);
   const isLocalhost = typeof window === "undefined" || (!window.location.hostname || window.location.hostname === "127.0.0.1" || window.location.hostname === "localhost" || window.location.hostname === "::1" || window.location.hostname === "" || window.location.protocol === "file:" || window.location.protocol === "vscode-webview:" || window.location.protocol === "app:" || window.location.hostname.endsWith(".local"));
   const [adminUnlocked, setAdminUnlocked] = React.useState(false);
   const [unlockPassword, setUnlockPassword] = React.useState("");
@@ -4092,62 +4583,122 @@ function BridgePanel({ rpcCall }) {
     );
   } else if (activeTab === "tunnel") {
     const ext = status?.externalTunnel;
+    const cf = status?.cloudflared;
+    const cfDesc = cf?.tokenConfigured ? "\u56FA\u5B9A\u57DF\u540D\u6A21\u5F0F" : "\u514D\u767B\u5F55\u4E34\u65F6\u57DF\u540D";
+    const entries = [
+      ct && ct.running && {
+        key: "custom",
+        title: "\u81EA\u5EFA\u96A7\u9053",
+        desc: "VPS \u81EA\u5EFA \xB7 \u56FA\u5B9A\u5730\u5740",
+        url: ct.url || null,
+        qr: ct.qr,
+        running: true,
+        phase: ct.state && ct.state.phase,
+        stateDetail: ct.state && ct.state.detail,
+        autoStart: ct.autoStart,
+        onToggleAutoStart: onToggleCustomAutoStart,
+        onStart: onStartCustom,
+        onStop: onStopCustom
+      },
+      cf && cf.running && {
+        key: "cloudflared",
+        title: "Cloudflare \u96A7\u9053",
+        desc: cfDesc,
+        url: cf.url || null,
+        qr: cf.qr,
+        running: true,
+        phase: cf.state && cf.state.phase,
+        stateDetail: cf.state && cf.state.detail,
+        autoStart: cf.autoStart,
+        onToggleAutoStart: onToggleCloudflaredAutoStart,
+        onStart: onStartCloudflared,
+        onStop: onStopCloudflared,
+        onReset: onResetCloudflared
+      },
+      ext && ext.configured && ext.url && {
+        key: "external",
+        title: "\u5916\u90E8\u5DF2\u90E8\u7F72\u96A7\u9053",
+        desc: "\u81EA\u884C\u90E8\u7F72\u767B\u8BB0",
+        url: ext.url,
+        qr: ext.qr,
+        running: true
+      }
+    ].filter(Boolean);
+    const primary = entries[0] || null;
+    const otherCount = primary ? entries.length - 1 : entries.length;
     tabContent = React.createElement(
       React.Fragment,
       null,
-      React.createElement(
-        TunnelCard,
-        {
-          title: "Cloudflare \u96A7\u9053",
-          desc: status?.cloudflared?.tokenConfigured ? "\u56FA\u5B9A\u57DF\u540D\u6A21\u5F0F\uFF08Token \u8FD0\u884C \xB7 \u91CD\u542F URL \u4FDD\u6301\u4E0D\u53D8\uFF09" : "\u4E00\u952E\u83B7\u53D6\u516C\u7F51\u5730\u5740\uFF08\u514D\u767B\u5F55\u4E34\u65F6\u968F\u673A\u57DF\u540D\uFF09",
-          data: {
-            running: status?.cloudflared?.running,
-            url: status?.cloudflared?.url,
-            qr: status?.cloudflared?.qr,
-            state: status?.cloudflared?.state
-          },
-          autoStart: status?.cloudflared?.autoStart,
-          onToggleAutoStart: onToggleCloudflaredAutoStart,
-          auth: status?.auth,
-          onNavigateSecurity: navSecurity,
-          onStart: onStartCloudflared,
-          onStop: onStopCloudflared,
-          onReset: status?.cloudflared?.running ? onResetCloudflared : null
-        },
-        React.createElement(CloudflareConfigForm, {
-          token: status?.cloudflared?.token ?? "",
-          hostname: status?.cloudflared?.hostname ?? "",
-          onSave: saveCloudflaredConfig
-        })
-      ),
-      React.createElement(ExternalTunnelCard, {
-        ext,
-        onSave: saveExternalTunnel
+      React.createElement(TunnelEntryCard, {
+        entry: primary,
+        onCopy: copyEntryUrl,
+        copied: Boolean(copiedUrl && primary && copiedUrl === primary.url),
+        autoStart: primary ? primary.autoStart : void 0,
+        onToggleAutoStart: primary ? primary.onToggleAutoStart : void 0,
+        onStart: primary ? primary.onStart : cf ? onStartCloudflared : null,
+        onStop: primary ? primary.onStop : void 0,
+        onReset: primary ? primary.onReset : void 0
       }),
+      otherCount > 0 && React.createElement("div", {
+        style: { ...s.muted, fontSize: 11, marginBottom: 8, textAlign: "center" }
+      }, "\u53E6\u6709 " + otherCount + " \u4E2A\u96A7\u9053\u5165\u53E3\u5728\u8FD0\u884C\uFF0C\u53EF\u5728\u4E0B\u65B9\u300C\u96A7\u9053\u914D\u7F6E\u300D\u4E2D\u67E5\u770B\u4E0E\u7BA1\u7406"),
       React.createElement(
-        TunnelCard,
-        {
-          title: "\u81EA\u5EFA\u96A7\u9053",
-          desc: "\u8FDE\u63A5\u81EA\u5DF1\u90E8\u7F72\u7684\u96A7\u9053\u670D\u52A1\u5668\uFF0C\u83B7\u5F97\u56FA\u5B9A\u57DF\u540D",
-          data: {
-            configured: ct?.configured,
-            running: ct?.running,
-            url: ct?.url,
-            qr: ct?.qr,
-            state: ct?.state
+        TunnelConfigGroup,
+        null,
+        React.createElement(
+          TunnelCard,
+          {
+            title: "Cloudflare \u96A7\u9053",
+            desc: cf && cf.tokenConfigured ? "\u56FA\u5B9A\u57DF\u540D\u6A21\u5F0F\uFF08Token \u8FD0\u884C \xB7 \u91CD\u542F URL \u4FDD\u6301\u4E0D\u53D8\uFF09" : "\u4E00\u952E\u83B7\u53D6\u516C\u7F51\u5730\u5740\uFF08\u514D\u767B\u5F55\u4E34\u65F6\u968F\u673A\u57DF\u540D\uFF09",
+            data: {
+              running: cf && cf.running,
+              url: cf && cf.url,
+              qr: cf && cf.qr,
+              state: cf && cf.state
+            },
+            autoStart: cf && cf.autoStart,
+            onToggleAutoStart: onToggleCloudflaredAutoStart,
+            auth: status && status.auth,
+            onNavigateSecurity: navSecurity,
+            onStart: onStartCloudflared,
+            onStop: onStopCloudflared,
+            onReset: cf && cf.running ? onResetCloudflared : null
           },
-          autoStart: ct?.autoStart,
-          onToggleAutoStart: onToggleCustomAutoStart,
-          auth: status?.auth,
-          onNavigateSecurity: navSecurity,
-          onStart: onStartCustom,
-          onStop: onStopCustom
-        },
-        React.createElement(CustomTunnelGuide),
-        React.createElement(CustomTunnelConfigForm, {
-          serverUrl: ct?.serverUrl ?? "",
-          accessToken: ct?.accessToken ?? "",
-          onSave: saveConfig
+          React.createElement(CloudflareConfigForm, {
+            token: cf && cf.token || "",
+            hostname: cf && cf.hostname || "",
+            onSave: saveCloudflaredConfig
+          })
+        ),
+        React.createElement(
+          TunnelCard,
+          {
+            title: "\u81EA\u5EFA\u96A7\u9053",
+            desc: "\u8FDE\u63A5\u81EA\u5DF1\u90E8\u7F72\u7684\u96A7\u9053\u670D\u52A1\u5668\uFF0C\u83B7\u5F97\u56FA\u5B9A\u57DF\u540D",
+            data: {
+              configured: ct && ct.configured,
+              running: ct && ct.running,
+              url: ct && ct.url,
+              qr: ct && ct.qr,
+              state: ct && ct.state
+            },
+            autoStart: ct && ct.autoStart,
+            onToggleAutoStart: onToggleCustomAutoStart,
+            auth: status && status.auth,
+            onNavigateSecurity: navSecurity,
+            onStart: onStartCustom,
+            onStop: onStopCustom
+          },
+          React.createElement(CustomTunnelGuide),
+          React.createElement(CustomTunnelConfigForm, {
+            serverUrl: ct && ct.serverUrl || "",
+            accessToken: ct && ct.accessToken || "",
+            onSave: saveConfig
+          })
+        ),
+        React.createElement(ExternalTunnelCard, {
+          ext,
+          onSave: saveExternalTunnel
         })
       )
     );
@@ -4242,7 +4793,11 @@ function BridgePanel({ rpcCall }) {
   }
   const auth = status?.auth;
   const policy = auth?.adminPolicy ?? "password_unlock";
-  const isLocked = !isLocalhost && auth?.adminProtection !== false && policy !== "open" && !adminUnlocked;
+  const hasAnyPassword = !!(auth?.hasPassword || auth?.hasAdminPassword);
+  const unlockUsesAdmin = !!auth?.hasAdminPassword;
+  const unlockPwdKind = unlockUsesAdmin ? "\u7BA1\u7406\u5BC6\u7801" : "\u8BBF\u95EE\u5BC6\u7801";
+  const unlockPwdHint = unlockUsesAdmin ? "\u8BF7\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\u7BA1\u7406\u6743\u9650\u3002" : "\u5F53\u524D\u672A\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801\uFF0C\u8F93\u5165\u60A8\u7684\u8BBF\u95EE\u5BC6\u7801\u5373\u53EF\u89E3\u9501\u3002";
+  const isLocked = !isLocalhost && auth?.adminProtection !== false && policy !== "open" && !adminUnlocked && (policy === "local_only" || hasAnyPassword);
   if (isLocked) {
     return React.createElement(
       "div",
@@ -4299,10 +4854,42 @@ function BridgePanel({ rpcCall }) {
           { style: { textAlign: "center", marginBottom: 20 } },
           React.createElement("div", { style: { fontSize: 40, marginBottom: 10 } }, "\u{1F512}"),
           React.createElement("div", { style: { ...s.label, fontSize: 16, fontWeight: 600 } }, "\u7BA1\u7406\u63A7\u5236\u53F0\u5DF2\u9501\u5B9A"),
+          // 醒目提示该输入哪种密码
           React.createElement(
             "div",
-            { style: { ...s.muted, fontSize: 12, marginTop: 6, lineHeight: 1.5 } },
-            "\u5F53\u524D\u8BBE\u5907\u4E3A\u8FDC\u7A0B\u8BBF\u95EE\u3002\u4E3A\u4FDD\u62A4\u60A8\u7684\u7F51\u7EDC\u4E0E\u5E73\u53F0\u914D\u7F6E\u5B89\u5168\uFF0C\u8BF7\u8F93\u5165\u7BA1\u7406\u5458\u5BC6\u7801\u89E3\u9501\u7BA1\u7406\u6743\u9650\u3002"
+            { style: { marginTop: 10, display: "flex", justifyContent: "center" } },
+            unlockUsesAdmin ? React.createElement("span", {
+              style: {
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                padding: "4px 12px",
+                borderRadius: 999,
+                fontSize: 12,
+                fontWeight: 600,
+                background: "var(--dsw-alias-state-info-bg,#eff6ff)",
+                color: "var(--dsw-alias-state-info-primary,#2563eb)",
+                border: "1px solid var(--dsw-alias-state-info-border,#bfdbfe)"
+              }
+            }, "\u{1F511} \u4F7F\u7528\u7BA1\u7406\u5BC6\u7801\u89E3\u9501") : React.createElement("span", {
+              style: {
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                padding: "4px 12px",
+                borderRadius: 999,
+                fontSize: 12,
+                fontWeight: 600,
+                background: "var(--dsw-alias-state-success-bg,#ecfdf5)",
+                color: "var(--dsw-alias-state-success-primary,#059669)",
+                border: "1px solid var(--dsw-alias-state-success-border,#a7f3d0)"
+              }
+            }, "\u{1F510} \u4F7F\u7528\u8BBF\u95EE\u5BC6\u7801\u89E3\u9501")
+          ),
+          React.createElement(
+            "div",
+            { style: { ...s.muted, fontSize: 12, marginTop: 10, lineHeight: 1.6 } },
+            "\u5F53\u524D\u8BBE\u5907\u4E3A\u8FDC\u7A0B\u8BBF\u95EE\u3002\u4E3A\u4FDD\u62A4\u60A8\u7684\u7F51\u7EDC\u4E0E\u5E73\u53F0\u914D\u7F6E\u5B89\u5168\uFF0C" + unlockPwdHint
           )
         ),
         React.createElement(
@@ -4314,7 +4901,7 @@ function BridgePanel({ rpcCall }) {
           React.createElement("input", {
             type: "password",
             style: s.input,
-            placeholder: "\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801",
+            placeholder: "\u8F93\u5165" + unlockPwdKind,
             value: unlockPassword,
             onChange: (e) => setUnlockPassword(e.target.value),
             autoFocus: true
@@ -4335,7 +4922,7 @@ function BridgePanel({ rpcCall }) {
             type: "button",
             style: { ...s.btnLink, fontSize: 12, color: "var(--dsw-alias-label-secondary,#6b7280)" },
             onClick: () => setShowForgotGuide((v) => !v)
-          }, "\u2753 \u5FD8\u8BB0\u540E\u53F0\u7BA1\u7406\u5BC6\u7801\uFF1F")
+          }, "\u2753 \u5FD8\u8BB0" + unlockPwdKind + "\uFF1F")
         ),
         showForgotGuide && React.createElement(
           "div",
@@ -4352,8 +4939,8 @@ function BridgePanel({ rpcCall }) {
               textAlign: "left"
             }
           },
-          React.createElement("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary,currentColor)", marginBottom: 4 } }, "\u{1F6DF} \u627E\u56DE\u4E0E\u91CD\u7F6E\u5BC6\u7801\u6307\u5F15\uFF1A"),
-          React.createElement("div", null, "1. ", React.createElement("strong", null, "\u7535\u8111\u672C\u673A\u76F4\u8FDE\u4FEE\u6539"), "\uFF1A\u76F4\u63A5\u5728\u8FD0\u884C\u672C\u7A0B\u5E8F\u7684\u7535\u8111\u672C\u673A\u6253\u5F00\u672C\u63A7\u5236\u53F0\uFF08127.0.0.1 \u4EAB\u6709\u7269\u7406\u514D\u9501\u7279\u6743\uFF09\uFF0C\u53EF\u968F\u65F6\u4FEE\u6539\u7BA1\u7406\u5BC6\u7801\u3002"),
+          React.createElement("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary,currentColor)", marginBottom: 4 } }, "\u{1F6DF} \u627E\u56DE\u4E0E\u91CD\u7F6E" + unlockPwdKind + "\u6307\u5F15\uFF1A"),
+          React.createElement("div", null, "1. ", React.createElement("strong", null, "\u7535\u8111\u672C\u673A\u76F4\u8FDE\u4FEE\u6539"), "\uFF1A\u76F4\u63A5\u5728\u8FD0\u884C\u672C\u7A0B\u5E8F\u7684\u7535\u8111\u672C\u673A\u6253\u5F00\u672C\u63A7\u5236\u53F0\uFF08127.0.0.1 \u4EAB\u6709\u7269\u7406\u514D\u9501\u7279\u6743\uFF09\uFF0C\u53EF\u968F\u65F6\u4FEE\u6539\u6216\u6E05\u9664\u5BC6\u7801\u3002"),
           React.createElement("div", { style: { marginTop: 4 } }, "2. ", React.createElement("strong", null, "\u670D\u52A1\u5668 / \u65E0\u5934\u73AF\u5883"), "\uFF1A\u6551\u6025\u91CD\u7F6E\u6B65\u9AA4\u53C2\u89C1 GitHub README \u7684\u300C\u4E09\u91CD\u5BB9\u707E\u4FDD\u547D\u4F53\u7CFB\u300D\u7AE0\u8282\u3002")
         )
       )
@@ -4388,7 +4975,7 @@ function BridgePanel({ rpcCall }) {
           setUnlockErr(err);
           setShowUnlockModal(true);
         }
-      }, "\u{1F511} \u7ACB\u5373\u8F93\u5165\u7BA1\u7406\u5BC6\u7801\u89E3\u9501")
+      }, "\u{1F511} \u7ACB\u5373\u8F93\u5165" + unlockPwdKind + "\u89E3\u9501")
     ),
     // 管理员解锁状态提示条
     !isLocalhost && adminUnlocked && React.createElement(
@@ -4413,7 +5000,7 @@ function BridgePanel({ rpcCall }) {
         onClick: handleLockAdmin
       }, "\u{1F512} \u91CD\u65B0\u9501\u5B9A\u540E\u53F0")
     ),
-    // 未解锁时的顶部引导条
+    // 未解锁时的顶部引导条：未设密码 → 提示先设密码；已设密码 → 提示解锁
     !isLocalhost && !adminUnlocked && auth?.enabled && policy !== "open" && React.createElement(
       "div",
       {
@@ -4430,12 +5017,20 @@ function BridgePanel({ rpcCall }) {
           color: "var(--dsw-alias-state-warn-primary,#92400e)"
         }
       },
-      React.createElement("span", null, "\u{1F512} \u540E\u53F0\u7BA1\u7406\u6743\u9650\u672A\u89E3\u9501\uFF08\u4FEE\u6539\u654F\u611F\u914D\u7F6E\u9700\u5148\u89E3\u9501\uFF09"),
-      React.createElement("button", {
+      React.createElement(
+        "span",
+        null,
+        hasAnyPassword ? "\u{1F512} \u540E\u53F0\u7BA1\u7406\u6743\u9650\u672A\u89E3\u9501\uFF08\u4FEE\u6539\u654F\u611F\u914D\u7F6E\u9700\u5148\u89E3\u9501\uFF09" : "\u26A0\uFE0F \u5C1A\u672A\u8BBE\u7F6E\u4EFB\u4F55\u8BBF\u95EE\u5BC6\u7801 / \u7BA1\u7406\u5BC6\u7801\uFF0C\u8FDC\u7A0B\u8BBF\u5BA2\u53EF\u514D\u5BC6\u8FDB\u5165\uFF01"
+      ),
+      hasAnyPassword ? React.createElement("button", {
         type: "button",
         style: { ...s.btnPri, height: 24, fontSize: 11, padding: "0 10px", background: "#d97706" },
         onClick: () => setShowUnlockModal(true)
-      }, "\u{1F511} \u89E3\u9501\u7BA1\u7406\u6743\u9650")
+      }, "\u{1F511} \u89E3\u9501\u7BA1\u7406\u6743\u9650") : React.createElement("button", {
+        type: "button",
+        style: { ...s.btnPri, height: 24, fontSize: 11, padding: "0 10px", background: "#d97706" },
+        onClick: () => setActiveTab("security")
+      }, "\u{1F510} \u7ACB\u5373\u8BBE\u7F6E\u5BC6\u7801")
     ),
     React.createElement(VersionBanner, { rpcCall: authRpcCall }),
     React.createElement(TabBar, { active: activeTab, onChange: setActiveTab, dots }),
@@ -4488,7 +5083,7 @@ function BridgePanel({ rpcCall }) {
         React.createElement(
           "div",
           { style: { fontSize: 13, color: "var(--dsw-alias-label-secondary,#4b5563)", marginBottom: 16, lineHeight: 1.5 } },
-          "\u5F53\u524D\u64CD\u4F5C\u9700\u8981\u540E\u53F0\u7BA1\u7406\u5458\u6743\u9650\u3002\u4E3A\u4FDD\u62A4\u60A8\u7684\u7F51\u7EDC\u914D\u7F6E\u4E0E\u673A\u5668\u4EBA\u5E73\u53F0\u5B89\u5168\uFF0C\u8BF7\u8F93\u5165\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\uFF1A"
+          unlockUsesAdmin ? "\u5F53\u524D\u64CD\u4F5C\u9700\u8981\u540E\u53F0\u7BA1\u7406\u5458\u6743\u9650\u3002\u4E3A\u4FDD\u62A4\u60A8\u7684\u7F51\u7EDC\u914D\u7F6E\u4E0E\u673A\u5668\u4EBA\u5E73\u53F0\u5B89\u5168\uFF0C\u8BF7\u8F93\u5165\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\uFF1A" : "\u5F53\u524D\u64CD\u4F5C\u9700\u8981\u540E\u53F0\u7BA1\u7406\u6743\u9650\u3002\u672A\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801\uFF0C\u8F93\u5165\u60A8\u7684\u8BBF\u95EE\u5BC6\u7801\u5373\u53EF\u89E3\u9501\uFF1A"
         ),
         React.createElement(
           "form",
@@ -4499,7 +5094,7 @@ function BridgePanel({ rpcCall }) {
           React.createElement("input", {
             type: "password",
             style: s.input,
-            placeholder: "\u8BF7\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801",
+            placeholder: "\u8F93\u5165" + unlockPwdKind,
             value: unlockPassword,
             onChange: (e) => setUnlockPassword(e.target.value),
             autoFocus: true
@@ -4699,7 +5294,7 @@ function setupMobileExperience(rpcCall, ctx) {
           return;
         }
       }
-      const sessionRow = e.target.closest('a, div[class*="sessionRow"], div[role="treeitem"]');
+      const sessionRow = e.target.closest('a, div[class*="sessionRow"]');
       if (sessionRow) {
         setTimeout(() => {
           if (document.body.classList.contains("dsh-drawer-open")) {
@@ -4722,7 +5317,7 @@ function setupMobileExperience(rpcCall, ctx) {
     if (!document.body.classList.contains("dsh-drawer-open")) return;
     const sidebar = document.querySelector('div[class*="_sidebarCol"]');
     if (!sidebar || !sidebar.contains(e.target)) return;
-    const sessionRow = e.target.closest('div[class*="sessionRow"], div[role="treeitem"]');
+    const sessionRow = e.target.closest('div[class*="sessionRow"]');
     if (!sessionRow) return;
     longPressTimer = setTimeout(() => {
       lastLongPressTime = Date.now();
@@ -4832,13 +5427,27 @@ function setupMobileExperience(rpcCall, ctx) {
         hideEscape();
       }
     };
-    const pollTimer = setInterval(checkActiveTab, 600);
+    const relocateFoldButton = () => {
+      if (!isMobileNow()) return;
+      const btn = document.querySelector(".dsh-header-fold-btn");
+      const header2 = document.querySelector(".dsh-mobile-app-header");
+      if (!btn || !header2) return;
+      if (btn.parentElement === header2) return;
+      const newBtn = header2.querySelector(".dsh-header-new-btn");
+      if (newBtn) header2.insertBefore(btn, newBtn);
+      else header2.appendChild(btn);
+    };
+    const tick = () => {
+      checkActiveTab();
+      relocateFoldButton();
+    };
+    const pollTimer = setInterval(tick, 600);
     if (typeof pollTimer.unref === "function") pollTimer.unref();
-    window.addEventListener("resize", checkActiveTab);
-    checkActiveTab();
+    window.addEventListener("resize", tick);
+    tick();
     ctx.effect(() => () => {
       clearInterval(pollTimer);
-      window.removeEventListener("resize", checkActiveTab);
+      window.removeEventListener("resize", tick);
       hideEscape();
     }, "dsh-bridge: mobile trajectory escape cleanup");
   };
@@ -4938,7 +5547,7 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
           <form id="dsh-ws-unlock-form" style="display: flex; gap: 8px;">
             <input id="dsh-ws-unlock-input" type="password" placeholder="\u8BF7\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801" value="${escapeHtml(unlockInput)}"
               style="flex: 1; font: inherit; font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, currentColor); outline: none; box-sizing: border-box;" />
-            <button type="submit" style="border: none; background: var(--dsw-alias-brand-primary, #4f6ef7); color: #fff; border-radius: 8px; padding: 0 14px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;" ${unlocking ? "disabled" : ""}>${unlocking ? "\u89E3\u9501\u4E2D\u2026" : "\u89E3\u9501"}</button>
+            <button type="submit" style="border: none; background: var(--dsw-static-blue-600, #4f6ef7); color: #fff; border-radius: 8px; padding: 0 14px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;" ${unlocking ? "disabled" : ""}>${unlocking ? "\u89E3\u9501\u4E2D\u2026" : "\u89E3\u9501"}</button>
           </form>
           ${unlockErr ? `<div style="font-size: 11px; color: var(--dsw-alias-state-error-primary, #dc2626); margin-top: 6px;">${escapeHtml(unlockErr)}</div>` : ""}
         </div>
@@ -4958,7 +5567,7 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
           ${(drives || []).map((d) => {
       const isActive = currentPath.startsWith(d.path) || currentPath === d.path;
       return `
-              <button class="dsh-ws-quick-btn" data-path="${escapeHtml(d.path)}" style="border: 1px solid ${isActive ? "var(--dsw-alias-brand-primary, #4f6ef7)" : "var(--dsw-alias-border-l2, #d1d5db)"}; background: ${isActive ? "var(--dsw-alias-brand-primary, #4f6ef7)" : "var(--dsw-alias-bg-layer-2, #f9fafb)"}; color: ${isActive ? "#fff" : "var(--dsw-alias-label-primary, #111827)"}; border-radius: 14px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-weight: 500; flex-shrink: 0; transition: all 0.1s;">
+              <button class="dsh-ws-quick-btn" data-path="${escapeHtml(d.path)}" style="border: 1px solid ${isActive ? "var(--dsw-static-blue-600, #4f6ef7)" : "var(--dsw-alias-border-l2, #d1d5db)"}; background: ${isActive ? "var(--dsw-static-blue-600, #4f6ef7)" : "var(--dsw-alias-bg-layer-2, #f9fafb)"}; color: ${isActive ? "#fff" : "var(--dsw-alias-label-primary, #111827)"}; border-radius: 14px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-weight: 500; flex-shrink: 0; transition: all 0.1s;">
                 \u{1F4BE} ${escapeHtml(d.name)}
               </button>
             `;
@@ -5005,9 +5614,9 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
         <div style="background: var(--dsw-alias-state-info-bg, #eff6ff); border: 1px solid var(--dsw-alias-state-info-border, #bfdbfe); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
             <span style="font-size: 11px; font-weight: 600; color: var(--dsw-alias-brand-primary, #2563eb); flex-shrink: 0;">\u5F53\u524D\u76EE\u5F55:</span>
-            <span style="font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--dsw-alias-label-primary, #1e3a8a); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; text-align: right; font-weight: 600;">${escapeHtml(currentPath)}</span>
+            <span style="font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--dsw-alias-label-primary, var(--dsw-alias-brand-primary, #1e3a8a)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; text-align: right; font-weight: 600;">${escapeHtml(currentPath)}</span>
           </div>
-          <button id="dsh-ws-add-current-btn" style="border: none; background: var(--dsw-alias-brand-primary, #2563eb); color: #fff; height: 36px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; box-shadow: 0 2px 4px rgba(37,99,235,0.25); transition: opacity 0.1s;" ${isSubmitting ? "disabled" : ""}>
+          <button id="dsh-ws-add-current-btn" style="border: none; background: var(--dsw-static-blue-600, #2563eb); color: #fff; height: 36px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; box-shadow: 0 2px 4px rgba(37,99,235,0.25); transition: opacity 0.1s;" ${isSubmitting ? "disabled" : ""}>
             ${isSubmitting ? "\u6B63\u5728\u6DFB\u52A0\u5E76\u5207\u6362\u2026" : "\u{1F449} \u8BBE\u4E3A\u5F53\u524D\u5DE5\u4F5C\u533A\u5E76\u8FDB\u5165"}
           </button>
         </div>
@@ -5066,7 +5675,7 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
               <button id="dsh-ws-manual-jump-btn" style="border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-2, #f9fafb); color: var(--dsw-alias-label-primary, #111827); padding: 0 10px; border-radius: 8px; font-size: 11px; cursor: pointer; white-space: nowrap;">
                 \u524D\u5F80
               </button>
-              <button id="dsh-ws-manual-add-btn" style="border: none; background: var(--dsw-alias-brand-primary, #4f6ef7); color: #fff; padding: 0 12px; border-radius: 8px; font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap;">
+              <button id="dsh-ws-manual-add-btn" style="border: none; background: var(--dsw-static-blue-600, #4f6ef7); color: #fff; padding: 0 12px; border-radius: 8px; font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap;">
                 \u6DFB\u52A0\u5E76\u8FDB\u5165
               </button>
             </div>
@@ -5508,10 +6117,196 @@ function RemoteDirectoryFlow(props) {
   }, [open, pick]);
   return null;
 }
+function setupIosKeyboardAdapter() {
+  if (typeof window === "undefined" || !window.visualViewport) return;
+  if (!/iPhone|iPad|iPod/.test(navigator.userAgent || "")) return;
+  const vv = window.visualViewport;
+  const isEditable = (el) => el && (el.isContentEditable || el.tagName === "TEXTAREA" || el.tagName === "INPUT");
+  let keyboardOpen = false;
+  let pinnedEl = null;
+  let pinnedH = null;
+  let pinnedInline = null;
+  const findScrollContainer = (el) => {
+    let n = el;
+    while (n && n !== document.body) {
+      const cs = getComputedStyle(n);
+      if ((cs.overflowY === "auto" || cs.overflowY === "scroll") && n.scrollHeight > n.clientHeight) {
+        return n;
+      }
+      n = n.parentElement;
+    }
+    return null;
+  };
+  vv.addEventListener("resize", () => {
+    const ratio = vv.height / window.innerHeight;
+    const nowOpen = ratio < 0.75;
+    if (nowOpen === keyboardOpen) return;
+    keyboardOpen = nowOpen;
+    const el = document.activeElement;
+    if (nowOpen) {
+      const scroller = isEditable(el) ? findScrollContainer(el) : null;
+      if (scroller) {
+        pinnedEl = scroller;
+        pinnedInline = scroller.style.height || "";
+        pinnedH = scroller.getBoundingClientRect().height;
+        scroller.style.height = `${Math.round(pinnedH)}px`;
+      }
+      requestAnimationFrame(() => {
+        if (isEditable(el)) {
+          try {
+            el.scrollIntoView({ block: "nearest" });
+          } catch {
+          }
+        }
+      });
+    } else {
+      if (pinnedEl) {
+        pinnedEl.style.height = pinnedInline;
+        pinnedEl = null;
+        pinnedH = null;
+        pinnedInline = null;
+      }
+    }
+  });
+}
+function setupComposerCollapse() {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+  if (window.innerWidth > 768) return;
+  const LS_KEY = "dsh-composer-fold";
+  let bar = null;
+  let busy = false;
+  let lastHadSeat = null;
+  const getFoldBtn = () => {
+    const existing = document.querySelector(".dsh-header-fold-btn");
+    if (existing) return existing;
+    const utils = document.querySelector('div[class*="wSkVaW_headerUtilities"], div[class*="headerUtilities"]');
+    const logBtn = document.querySelector('button[class*="sessionLogButton"], button[class*="nL4_yW_sessionLogButton"]');
+    if (!utils) return null;
+    const btn = document.createElement("button");
+    btn.className = "dsh-header-fold-btn";
+    btn.setAttribute("aria-label", "\u6536\u8D77/\u5C55\u5F00\u8F93\u5165\u6846");
+    btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="18" x2="21" y2="18"></line><polyline points="6 9 12 15 18 9"></polyline></svg>';
+    if (logBtn && logBtn.parentElement === utils) utils.insertBefore(btn, logBtn);
+    else utils.appendChild(btn);
+    return btn;
+  };
+  const isCollapsed = () => document.body.classList.contains("dsh-composer-collapsed");
+  const readPref = () => {
+    try {
+      return localStorage.getItem(LS_KEY) === "1";
+    } catch {
+      return false;
+    }
+  };
+  const ensureBar = () => {
+    if (bar && document.body.contains(bar)) return bar;
+    const seat = document.querySelector('div[class*="composerSeat"]');
+    const scrollBody = seat ? seat.parentElement : null;
+    if (!scrollBody) return null;
+    bar = document.createElement("div");
+    bar.className = "dsh-composer-collapsed-bar";
+    bar.textContent = "\u270F\uFE0F \u70B9\u51FB\u8F93\u5165\u6D88\u606F\u2026";
+    scrollBody.insertBefore(bar, seat);
+    bar.addEventListener("click", () => setCollapsed(false));
+    return bar;
+  };
+  const removeBar = () => {
+    if (bar) {
+      try {
+        bar.remove();
+      } catch {
+      }
+      bar = null;
+    }
+  };
+  const setCollapsed = (collapsed) => {
+    if (busy) return;
+    busy = true;
+    try {
+      if (isCollapsed() !== collapsed) {
+        document.body.classList.toggle("dsh-composer-collapsed", collapsed);
+        try {
+          localStorage.setItem(LS_KEY, collapsed ? "1" : "0");
+        } catch {
+        }
+        updateButton(collapsed);
+      }
+      if (collapsed) ensureBar();
+      else removeBar();
+    } finally {
+      busy = false;
+    }
+  };
+  const updateButton = (collapsed) => {
+    const btn = getFoldBtn();
+    if (!btn) return;
+    btn.title = collapsed ? "\u5C55\u5F00\u8F93\u5165\u6846" : "\u6536\u8D77\u8F93\u5165\u6846\uFF0C\u6700\u5927\u5316\u5BF9\u8BDD\u9605\u8BFB\u533A";
+    const icon = collapsed ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="6" width="20" height="12" rx="2"></rect><line x1="6" y1="10" x2="6.01" y2="10"></line><line x1="10" y1="10" x2="10.01" y2="10"></line><line x1="14" y1="10" x2="14.01" y2="10"></line><line x1="6" y1="14" x2="10" y2="14"></line><line x1="14" y1="14" x2="18" y2="14"></line></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="18" x2="21" y2="18"></line><polyline points="6 9 12 15 18 9"></polyline></svg>';
+    const existing = btn.querySelector("svg");
+    if (!existing || existing.outerHTML !== icon) btn.innerHTML = icon;
+  };
+  const handleSeatPresent = () => {
+    const btn = getFoldBtn();
+    if (!btn) return false;
+    btn.style.display = "inline-flex";
+    if (!btn._dshFoldWired) {
+      btn._dshFoldWired = true;
+      btn.onclick = (e) => {
+        e.stopPropagation();
+        setCollapsed(!isCollapsed());
+      };
+    }
+    document.body.classList.add("dsh-composer-active");
+    const want = readPref();
+    if (want !== isCollapsed()) {
+      setCollapsed(want);
+    } else {
+      updateButton(isCollapsed());
+    }
+    return true;
+  };
+  const handleSeatAbsent = () => {
+    const btn = getFoldBtn();
+    if (btn) {
+      btn.style.display = "none";
+    }
+    document.body.classList.remove("dsh-composer-active");
+    removeBar();
+  };
+  const onComposerChange = () => {
+    const hasSeat = !!document.querySelector('div[class*="composerSeat"]');
+    const hasBtn = !!document.querySelector(".dsh-header-fold-btn");
+    if (busy) return;
+    if (hasSeat === lastHadSeat && hasSeat === hasBtn) return;
+    busy = true;
+    try {
+      if (hasSeat) {
+        lastHadSeat = handleSeatPresent();
+      } else {
+        handleSeatAbsent();
+        lastHadSeat = false;
+      }
+    } finally {
+      busy = false;
+    }
+  };
+  const observer = new MutationObserver(() => {
+    observer.disconnect();
+    try {
+      onComposerChange();
+    } finally {
+      observer.observe(document.body, { childList: true, subtree: true });
+    }
+  });
+  observer.observe(document.body, { childList: true, subtree: true });
+  onComposerChange();
+}
 function apply(ctx) {
   window.__dshClientCtx = ctx;
   const rpcCall = (endpoint, payload, signal) => ctx.connection.rpc.call(BRIDGE_RPC_CHANNEL, endpoint, payload, signal);
   window.__dshOpenRemoteWorkspaceModal = (onAdded, onPickDirect, onCancel) => showRemoteWorkspaceDialog(rpcCall, onAdded, ctx, onPickDirect, onCancel);
+  setupIosKeyboardAdapter();
+  setupComposerCollapse();
   setupMobileExperience(rpcCall, ctx);
   const injected = () => ({ pick: () => ctx.workspaces?.pickDirectory?.() });
   ctx.slots.inject(

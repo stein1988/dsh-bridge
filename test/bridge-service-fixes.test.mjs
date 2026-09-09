@@ -66,3 +66,64 @@ test('getStatus 暴露 externalTunnel（含二维码）', async () => {
   assert.equal(status.externalTunnel.url, 'https://ext.example.com')
   assert.ok(status.externalTunnel.qr, '登记后应生成二维码')
 })
+
+test('stripSessionProjections 剥离 session.list/history 大投影字段（共享逻辑）', async () => {
+  const { stripSessionProjections } = await import('../lib/session-strip.js')
+
+  // session.list: items[].projections.values
+  const listBody = Buffer.from(JSON.stringify({
+    result: { ok: true, value: { items: [
+      { id: 'a', projections: { values: { contextHeaders: 'x'.repeat(100), contextTimeline: 'y', title: '保留' } } },
+      { id: 'b', projections: { values: { contextHeaders: 'big' } } },
+    ] } },
+  }))
+  const r1 = stripSessionProjections('/api/session.list', listBody)
+  assert.equal(r1.stripped, true)
+  const j1 = JSON.parse(r1.body.toString())
+  assert.equal(j1.result.value.items[0].projections.values.contextHeaders, undefined)
+  assert.equal(j1.result.value.items[0].projections.values.contextTimeline, undefined)
+  assert.equal(j1.result.value.items[0].projections.values.title, '保留', '不应误删其他字段')
+  assert.equal(j1.result.value.items[1].projections.values.contextHeaders, undefined)
+
+  // session.history: projections.values
+  const historyBody = Buffer.from(JSON.stringify({
+    result: { ok: true, value: { projections: { values: { contextHeaders: 'big', title: 'h' } } } },
+  }))
+  const r2 = stripSessionProjections('/api/session.history', historyBody)
+  assert.equal(r2.stripped, true)
+  const j2 = JSON.parse(r2.body.toString())
+  assert.equal(j2.result.value.projections.values.contextHeaders, undefined)
+  assert.equal(j2.result.value.projections.values.title, 'h')
+
+  // 非目标路径 / 解析失败 / 无投影 → 原样返回
+  const other = Buffer.from('plain')
+  assert.equal(stripSessionProjections('/api/other', other).stripped, false)
+  assert.equal(stripSessionProjections('/api/session.list', Buffer.from('not-json')).stripped, false)
+  const noProj = Buffer.from(JSON.stringify({ result: { ok: true, value: { items: [{ id: 'c' }] } } }))
+  assert.equal(stripSessionProjections('/api/session.list', noProj).stripped, false)
+})
+
+
+test('stripSessionProjections 支持 gzip 编码的 session.list 响应（PR #29 gzip-aware）', async () => {
+  const { stripSessionProjections } = await import('../lib/session-strip.js')
+  const { gzipSync } = await import('node:zlib')
+
+  const raw = Buffer.from(JSON.stringify({
+    result: { ok: true, value: { items: [
+      { id: 'a', projections: { values: { contextHeaders: 'x'.repeat(64), title: 'keep' } } },
+    ] } },
+  }))
+  const gz = gzipSync(raw)
+
+  // 传入 content-encoding: gzip 时应先解压再剥离
+  const r = stripSessionProjections('/api/session.list', gz, 'gzip')
+  assert.equal(r.stripped, true, 'gzip 响应应能成功剥离')
+  const j = JSON.parse(r.body.toString())
+  assert.equal(j.result.value.items[0].projections.values.contextHeaders, undefined)
+  assert.equal(j.result.value.items[0].projections.values.title, 'keep')
+
+  // 未声明 gzip 却传入 gzip 数据 → 解析失败 → 原样返回（不破坏响应）
+  const r2 = stripSessionProjections('/api/session.list', gz, undefined)
+  assert.equal(r2.stripped, false)
+  assert.equal(r2.body, gz)
+})

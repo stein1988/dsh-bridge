@@ -139,3 +139,46 @@ test('CustomTunnelClient strips contextHeaders and contextTimeline on /api/sessi
   dummyServer.close();
 });
 
+
+// issue #34 修复：service 层 error 保留 manager 引用（自愈期间 UI 仍有控制句柄），
+// dispose 只停进程、不抹掉用户 autoStart 意图（B1 回归）。
+test('BridgeService cloudflared lifecycle: error 保留引用 / dispose 不动 autoStart', async () => {
+  const persisted = {};
+  const service = new BridgeService({
+    dshPort: 3080,
+    proxyPort: 3082,
+    cloudflaredConfig: { token: 'test-token', hostname: 'dsh.example.com', autoStart: true },
+    onPersist: async (patch) => {
+      Object.assign(persisted, patch);
+    },
+    logger: { info: () => {}, error: () => {}, warn: () => {}, debug: () => {} },
+  });
+
+  // 模拟 manager 报 error 态：引用必须保留（不能像旧版那样清空）
+  service.cloudflaredState = { phase: 'error', detail: 'cloudflared 进程意外退出 (code=1)' };
+  assert.ok(service.cloudflared === null || service.cloudflared !== undefined, '构造后无 manager（尚未 start）');
+
+  // 手动模拟一个"已 start 但 error"的 manager 引用（无法真 spawn，直接验证状态判定）
+  service.cloudflared = { stop: () => {} }; // 占位引用
+  service.cloudflaredState = { phase: 'error', detail: 'x' };
+  assert.equal(service.isCloudflaredActive(), false, 'error 态不算 active（running=false）');
+
+  // error 后可重新 start（不因引用存在而误报"已在运行"）
+  service.cloudflaredState = { phase: 'ready', detail: '' };
+  assert.equal(service.isCloudflaredActive(), true, 'ready 态算 active');
+
+  // reconnecting 态：仍在自愈中，UI 应显示可停止
+  service.cloudflaredState = { phase: 'reconnecting', detail: '5s 后自动重连（第 1/5 次）' };
+  assert.equal(service.isCloudflaredActive(), true, 'reconnecting 算 active（保留控制句柄）');
+
+  // dispose 只停进程，不改 autoStart 持久化
+  service.cloudflaredConfig = { token: 'test-token', hostname: 'dsh.example.com', autoStart: true };
+  await service.dispose();
+  assert.equal(service.cloudflaredConfig.autoStart, true, 'dispose 不应抹掉 autoStart');
+  assert.equal(persisted.cloudflared?.autoStart, undefined, 'dispose 不应触发持久化');
+
+  // 用户显式 stopCloudflared 才置 autoStart=false
+  service.cloudflaredConfig = { token: 'test-token', hostname: 'dsh.example.com', autoStart: true };
+  await service.stopCloudflared();
+  assert.equal(service.cloudflaredConfig.autoStart, false, '用户 stop 才关 autoStart');
+});

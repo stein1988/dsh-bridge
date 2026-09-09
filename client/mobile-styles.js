@@ -95,6 +95,23 @@ export const MOBILE_STYLES_CSS = `
         opacity: 0.6;
       }
 
+      /* 上游 v2.10.8 的输入框折叠按钮被搬到移动顶栏里（见 client/index.js relocateFoldButton）：
+         与顶栏其它按钮同规格（40px 触控区、透明底），保证可点且不额外占行高 */
+      .dsh-mobile-app-header .dsh-header-fold-btn {
+        width: 40px !important;
+        height: 40px !important;
+        min-width: 40px !important;
+        border: none !important;
+        background: transparent !important;
+        color: var(--dsw-alias-label-primary, #111827) !important;
+        box-shadow: none !important;
+        pointer-events: auto !important;
+      }
+      .dsh-mobile-app-header .dsh-header-fold-btn svg {
+        width: 20px !important;
+        height: 20px !important;
+      }
+
       /* 中间动态会话标题 (单行居中打点截断，100% 还原原生 App 导航体验) */
       .dsh-mobile-header-title {
         flex: 1 1 auto !important;
@@ -397,6 +414,74 @@ export const MOBILE_STYLES_CSS = `
       /* 输入框底座：DeepSeek App 居中及底部固定 (底距收紧让输入框贴底下移) */
       div[class*="wSkVaW_scrollBody"] {
         padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
+      }
+
+      /* ── 移动端输入框折叠模式（body.dsh-composer-collapsed）──────────────
+         折叠后隐藏吸底输入区，让消息 viewArea 自动伸展到全高，最大化阅读区。
+         入口：聊天头部工具栏（Session 下载钮旁）的折叠按钮，或折叠态底部细输入条点它唤回。
+         状态持久化到 localStorage。 */
+      body.dsh-composer-collapsed div[class*="wSkVaW_composerSeat"] {
+        display: none !important;
+      }
+      body.dsh-composer-collapsed div[class*="wSkVaW_viewArea"] {
+        flex: 1 1 auto !important;
+        height: auto !important;
+        min-height: 0 !important;
+      }
+      /* 折叠时滚动区底部对齐 safe-area，避免内容被 iPhone 底部横条遮挡 */
+      body.dsh-composer-collapsed div[class*="wSkVaW_scrollBody"] {
+        padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+      }
+
+      /* 折叠输入框按钮：注入在聊天头部工具栏（Session 下载钮旁），
+         与 DSH sessionLogButton 同规格（28px 圆形图标钮），视觉与原生一致 */
+      .dsh-header-fold-btn {
+        min-width: 28px !important;
+        width: 28px !important;
+        height: 28px !important;
+        padding: 0 !important;
+        border-radius: 50% !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        flex-shrink: 0 !important;
+        border: 1px solid var(--dsw-alias-border-l2, rgba(0, 0, 0, 0.1)) !important;
+        background: var(--dsw-alias-bg-layer-2, rgba(0, 0, 0, 0.03)) !important;
+        color: var(--dsw-alias-label-secondary, #6b7280) !important;
+        cursor: pointer !important;
+        transition: opacity 0.15s !important;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03) !important;
+        -webkit-tap-highlight-color: transparent !important;
+      }
+      .dsh-header-fold-btn:active {
+        opacity: 0.6 !important;
+      }
+      .dsh-header-fold-btn svg {
+        width: 15px !important;
+        height: 15px !important;
+      }
+
+      /* 折叠态底部细输入条：点击唤起输入框（位于原输入区位置，sticky 底部） */
+      .dsh-composer-collapsed-bar {
+        display: none !important;
+        position: sticky !important;
+        bottom: 0 !important;
+        margin: 8px 12px max(8px, env(safe-area-inset-bottom, 0px)) 12px !important;
+        padding: 11px 16px !important;
+        border-radius: 22px !important;
+        background: var(--dsw-alias-bg-layer-2, #f4f4f7) !important;
+        border: 1px solid rgba(0, 0, 0, 0.07) !important;
+        color: var(--dsw-alias-label-tertiary, #8b93a1) !important;
+        font-size: 13.5px !important;
+        line-height: 1.4 !important;
+        cursor: pointer !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04) !important;
+        -webkit-tap-highlight-color: transparent !important;
+        z-index: 40 !important;
+        box-sizing: border-box !important;
+      }
+      body.dsh-composer-collapsed .dsh-composer-collapsed-bar {
+        display: block !important;
       }
 
       /* 输入卡片：圆角胶囊造型，内边距左右对称留白 */
@@ -860,6 +945,38 @@ export const MOBILE_STYLES_CSS = `
     @keyframes dshBottomSheetUp {
       from { transform: translateY(100%); }
       to { transform: translateY(0); }
+    }
+
+    /* 深色模式适配：dsh-bridge 目录浏览器弹窗使用了 DSH 主题系统未定义的
+       state-*-bg / state-*-border / state-*-primary 变量，补上深色模式值，避免浅色 fallback 永远生效 */
+    body[data-ds-dark-theme] {
+      --dsw-alias-state-info-bg: rgba(65, 118, 230, 0.12);
+      --dsw-alias-state-info-border: rgba(65, 118, 230, 0.25);
+      --dsw-alias-state-info-primary: #60a5fa;
+      --dsw-alias-state-success-bg: rgba(34, 197, 94, 0.12);
+      --dsw-alias-state-success-border: rgba(34, 197, 94, 0.25);
+      --dsw-alias-state-success-primary: #4ade80;
+      --dsw-alias-state-warn-bg: rgba(245, 158, 11, 0.12);
+      --dsw-alias-state-warn-border: rgba(245, 158, 11, 0.25);
+      --dsw-alias-state-warn-primary: #fbbf24;
+      --dsw-alias-state-error-bg: rgba(239, 68, 68, 0.12);
+      --dsw-alias-state-error-border: rgba(239, 68, 68, 0.25);
+      --dsw-alias-state-error-primary: #f87171;
+    }
+
+    /* 深色模式：直接覆盖弹窗内所有使用 #fff/#ffffff fallback 的内联背景，
+       确保即使 CSS 变量未正确继承，弹窗也不会显示白色背景 */
+    body[data-ds-dark-theme] #dsh-remote-workspace-modal .dsh-ws-dialog-card,
+    body[data-ds-dark-theme] #dsh-remote-workspace-modal .dsh-ws-dialog-card * {
+      --dsw-alias-bg-layer-1: #1b1b1c;
+      --dsw-alias-bg-layer-2: #2c2c2e;
+      --dsw-alias-bg-layer-3: #353638;
+      --dsw-alias-border-l2: #3c3c3d;
+      --dsw-alias-label-primary: #f9fafb;
+      --dsw-alias-label-secondary: #adb2b8;
+      --dsw-alias-label-tertiary: #81858c;
+      --dsw-alias-brand-primary: #f9fafb;
+      --dsw-alias-label-primary-foreground: #0f1115;
     }
 
     @media (min-width: 769px) {

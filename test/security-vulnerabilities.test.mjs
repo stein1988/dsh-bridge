@@ -1,11 +1,12 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { AuthManager } from '../lib/auth/manager.js'
+import { makeSessionsFile } from './helpers.mjs'
 import { installBridgeRpc, BRIDGE_ENDPOINTS } from '../lib/bridge-rpc.js'
 import { BridgeService } from '../lib/index.js'
 
 test('P0-1: Custom Tunnel Authentication - prevents loopback bypass when forwarding', () => {
-  const auth = new AuthManager({
+  const auth = new AuthManager({ sessionsFile: makeSessionsFile(),
     config: {
       enabled: true,
       mode: 'token_and_password',
@@ -53,7 +54,7 @@ test('P0-1: Custom Tunnel Authentication - prevents loopback bypass when forward
 })
 
 test('P0-2: Secret Token 严格脱敏与公开状态隔离', () => {
-  const auth = new AuthManager({
+  const auth = new AuthManager({ sessionsFile: makeSessionsFile(),
     config: {
       enabled: true,
       mode: 'token_and_password',
@@ -77,7 +78,7 @@ test('P0-2: Secret Token 严格脱敏与公开状态隔离', () => {
 })
 
 test('P0-3: token_only 模式严格禁止密码登录', async () => {
-  const auth = new AuthManager({
+  const auth = new AuthManager({ sessionsFile: makeSessionsFile(),
     config: {
       enabled: true,
       mode: 'token_only',
@@ -106,7 +107,7 @@ test('P0-3: token_only 模式严格禁止密码登录', async () => {
 })
 
 test('P0-4: RPC 服务端管理员权限校验与主动重新锁定', async () => {
-  const auth = new AuthManager({
+  const auth = new AuthManager({ sessionsFile: makeSessionsFile(),
     config: {
       enabled: true,
       adminPolicy: 'password_unlock',
@@ -208,7 +209,7 @@ test('P0-5: 升级插件命令注入防范与版本正则白名单', async () =>
 })
 
 test('P0-6: Scope 防护范围 Header 伪造防范', () => {
-  const auth = new AuthManager({
+  const auth = new AuthManager({ sessionsFile: makeSessionsFile(),
     config: {
       enabled: true,
       scope: 'lan_only', // 仅对局域网访客开启防护
@@ -232,7 +233,7 @@ test('P0-6: Scope 防护范围 Header 伪造防范', () => {
 })
 
 test('P0-7: Loopback 物理特权 Token 签发与远程/伪造拦截', async () => {
-  const auth = new AuthManager({
+  const auth = new AuthManager({ sessionsFile: makeSessionsFile(),
     config: {
       enabled: true,
       adminPolicy: 'password_unlock',
@@ -255,7 +256,7 @@ test('P0-7: Loopback 物理特权 Token 签发与远程/伪造拦截', async () 
 })
 
 test('P0-8: Workspace RPC checkAdminAuth 权限校验与访客拦截', async () => {
-  const auth = new AuthManager({
+  const auth = new AuthManager({ sessionsFile: makeSessionsFile(),
     config: {
       enabled: true,
       adminPolicy: 'password_unlock',
@@ -321,7 +322,7 @@ test('P0-8: Workspace RPC checkAdminAuth 权限校验与访客拦截', async () 
 })
 
 test('P0-8b: 管理保护独立开关（adminProtection）控制管理操作放行', async () => {
-  const auth = new AuthManager({
+  const auth = new AuthManager({ sessionsFile: makeSessionsFile(),
     config: {
       enabled: false, // 访问认证关闭，但管理保护默认开启
       adminPolicy: 'password_unlock',
@@ -425,3 +426,40 @@ test('P0-10: Rate Limiter 滑动窗口频率限制防护', async () => {
 })
 
 
+test('v2.10.5: authUpdateConfig 守卫 —— 无密码时禁止开启 password_only 防护（防自我锁死）', async () => {
+  const auth = new AuthManager({ sessionsFile: makeSessionsFile(), config: { mode: 'token_and_password' } }) // 无任何密码
+  let handlerFn = null
+  const mockCtx = {
+    connection: {
+      rpc: {
+        handle: (channel, fn) => { handlerFn = fn },
+      },
+    },
+  }
+  installBridgeRpc(mockCtx, {
+    service: { getStatus: async () => ({ auth: auth.getStatus({ masked: false }) }) },
+    authManager: auth,
+    logger: { error: () => {}, warn: () => {} },
+  })
+
+  // 1. 无密码 + 切到 password_only 模式 → 拒绝（需先设密码）
+  const switchMode = await handlerFn(BRIDGE_ENDPOINTS.authUpdateConfig, { mode: 'password_only' })
+  assert.equal(switchMode.ok, false, '无密码切到 password_only 应被拒绝')
+
+  // 2. 无密码 + password_only 模式下开启 enabled → 拒绝
+  const enableRes = await handlerFn(BRIDGE_ENDPOINTS.authUpdateConfig, { mode: 'password_only', enabled: true })
+  assert.equal(enableRes.ok, false, 'password_only 无密码开启应被拒绝')
+
+  // 3. 同请求携带 password 一起设置 → 允许（密码就位，防护可开）
+  const withPw = await handlerFn(BRIDGE_ENDPOINTS.authUpdateConfig, { mode: 'password_only', enabled: true, password: 'my-new-pass' })
+  assert.equal(withPw.ok, true, '同请求设置密码 + 开启应被允许')
+  assert.equal(auth.hasPassword, true)
+
+  // 4. 已设密码后再单独开/关 enabled → 正常
+  const toggleOff = await handlerFn(BRIDGE_ENDPOINTS.authUpdateConfig, { enabled: false })
+  assert.equal(toggleOff.ok, true)
+  const toggleOn = await handlerFn(BRIDGE_ENDPOINTS.authUpdateConfig, { enabled: true })
+  assert.equal(toggleOn.ok, true)
+
+  auth.dispose()
+})

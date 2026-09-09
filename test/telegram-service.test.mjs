@@ -284,3 +284,30 @@ test('TelegramGateway registerCommands requests setMyCommands API', async () => 
   assert.ok(setCommandsPayload.commands.some(c => c.command === 'new'))
   assert.ok(setCommandsPayload.commands.some(c => c.command === 'sessions'))
 })
+
+test('issue #32: createConnectProxyAgent createConnection is an own instance property (Node >=24 Agent constructor ignores it)', () => {
+  const agent = createConnectProxyAgent('http://127.0.0.1:7890')
+  try {
+    assert.ok(agent, 'agent created')
+    assert.equal(agent.constructor.name, 'Agent')
+    // Node >=24: https.Agent({ createConnection }) constructor option is silently dropped;
+    // the fix assigns after construction so the CONNECT tunnel is actually used.
+    assert.ok(
+      Object.prototype.hasOwnProperty.call(agent, 'createConnection'),
+      'createConnection must be an own property on the agent instance'
+    )
+    assert.notEqual(
+      agent.createConnection,
+      agent.constructor.prototype.createConnection,
+      'must not fall back to the prototype default (direct connection)'
+    )
+  } finally {
+    agent?.destroy()
+  }
+})
+
+test('issue #32: no proxy URL returns undefined agent', () => {
+  assert.equal(createConnectProxyAgent(undefined), undefined)
+  assert.equal(createConnectProxyAgent(''), undefined)
+  assert.equal(createConnectProxyAgent('not a url'), undefined)
+})

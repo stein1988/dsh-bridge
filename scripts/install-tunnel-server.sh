@@ -242,7 +242,12 @@ const httpServer = createServer((req, res) => {
       res.end('No tunnel client connected. Please enable the custom tunnel in dsh-bridge.');
       return;
     }
-    const stripped = url.slice(PATH_PREFIX.length) || '/';
+    // 剥离前缀。注意：/PATH?auth=x 这种「无尾斜杠 + query」形态 slice 后会得到 ?auth=x
+    // （以 ? 开头、缺 /），http 客户端会把它作为请求行 GET ?auth=x HTTP/1.1 → 上游 400。
+    // 以 ? 开头时补回 /，保证转发路径永远是合法的 origin-form。
+    let stripped = url.slice(PATH_PREFIX.length);
+    if (stripped.startsWith('?')) stripped = '/' + stripped;
+    if (stripped === '') stripped = '/';
     forwardRequest(ws, req, res, stripped);
     return;
   }
@@ -277,10 +282,12 @@ httpServer.on('upgrade', (req, socket, head) => {
   const [, tunnelWs] = [...tunnelClients.entries()][0] ?? [];
   if (!tunnelWs) { socket.destroy(); return; }
 
-  // 剥前缀
+  // 剥前缀（与 HTTP 分支相同处理：/PATH?query 无尾斜杠时补回 /，避免非法 origin-form）
   let forwardPath = url;
   if (url === PATH_PREFIX || url.startsWith(PATH_PREFIX + '/') || url.startsWith(PATH_PREFIX + '?')) {
-    forwardPath = url.slice(PATH_PREFIX.length) || '/';
+    forwardPath = url.slice(PATH_PREFIX.length);
+    if (forwardPath.startsWith('?')) forwardPath = '/' + forwardPath;
+    if (forwardPath === '') forwardPath = '/';
   }
 
   const wsId = `ws-${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
@@ -314,7 +321,7 @@ wss.on('connection', (ws, req) => {
     try {
       const msg = JSON.parse(raw.toString());
 
-      // HTTP 响应
+      // HTTP 响应（非流式：一次性返回完整 body）
       if (msg.type === 'response') {
         const p = pending.get(msg.requestId);
         if (!p) return;
@@ -329,31 +336,74 @@ wss.on('connection', (ws, req) => {
         return;
       }
 
+      // ── SSE 流式响应（response-start / response-chunk / response-end）──
+      // 向后兼容：老客户端不发这三类消息，走上面的 response 路径不受影响.
+
+      // 流式响应开始：写头，清除超时（SSE 长连接不设超时）
+      if (msg.type === 'response-start') {
+        const p = pending.get(msg.requestId);
+        if (!p) return;
+        clearTimeout(p.timer);
+        p.timer = null;
+        const HOP_BY_HOP = new Set(['transfer-encoding', 'connection', 'keep-alive', 'te', 'trailer', 'upgrade']);
+        const headers = Object.fromEntries(
+          Object.entries(msg.headers ?? {}).filter(([k]) => !HOP_BY_HOP.has(k.toLowerCase()))
+        );
+        p.res.writeHead(msg.statusCode ?? 200, headers);
+        return;
+      }
+
+      // 流式响应 chunk：逐块写入
+      if (msg.type === 'response-chunk') {
+        const p = pending.get(msg.requestId);
+        if (!p) return;
+        p.res.write(Buffer.from(msg.body || '', 'base64'));
+        return;
+      }
+
+      // 流式响应结束：end 并清理
+      if (msg.type === 'response-end') {
+        const p = pending.get(msg.requestId);
+        if (!p) return;
+        if (p.timer) clearTimeout(p.timer);
+        pending.delete(msg.requestId);
+        try { p.res.end(); } catch {}
+        return;
+      }
+
       // WebSocket 握手成功，完成升级并接管 socket
       if (msg.type === 'ws-accept') {
-        const { wsId, replyHeaders } = msg;
+        const { wsId, replyHeaders, statusCode, statusMessage } = msg;
         const upgrade = pendingWsUpgrades.get(wsId);
         if (!upgrade) return;
         pendingWsUpgrades.delete(wsId);
 
         const { socket } = upgrade;
-        // 回写 101 Switching Protocols
-        const lines = ['HTTP/1.1 101 Switching Protocols'];
+        // 使用隧道客户端传来的实际状态码（非 101 时浏览器能看到真实错误）
+        const code = statusCode || 101;
+        const reason = statusMessage || (code === 101 ? 'Switching Protocols' : '');
+        const lines = [`HTTP/1.1 ${code} ${reason}`.trim()];
         for (const [k, v] of Object.entries(replyHeaders ?? {})) lines.push(`${k}: ${v}`);
         lines.push('', '');
         socket.write(lines.join('\r\n'));
-        browserWsSockets.set(wsId, socket);
 
-        socket.on('data', chunk => {
-          if (ws.readyState === ws.OPEN) {
-            ws.send(JSON.stringify({ type: 'ws-frame', wsId, data: chunk.toString('base64') }));
-          }
-        });
-        socket.on('close', () => {
-          if (ws.readyState === ws.OPEN) ws.send(JSON.stringify({ type: 'ws-close', wsId }));
-          browserWsSockets.delete(wsId);
-        });
-        socket.on('error', () => socket.destroy());
+        // 仅 101 时才接管为 WebSocket 隧道
+        if (code === 101) {
+          browserWsSockets.set(wsId, socket);
+          socket.on('data', chunk => {
+            if (ws.readyState === ws.OPEN) {
+              ws.send(JSON.stringify({ type: 'ws-frame', wsId, data: chunk.toString('base64') }));
+            }
+          });
+          socket.on('close', () => {
+            if (ws.readyState === ws.OPEN) ws.send(JSON.stringify({ type: 'ws-close', wsId }));
+            browserWsSockets.delete(wsId);
+          });
+          socket.on('error', () => socket.destroy());
+        } else {
+          // 非 101：结束连接，不接管为 WebSocket
+          socket.end();
+        }
         return;
       }
 
@@ -379,6 +429,12 @@ wss.on('connection', (ws, req) => {
     tunnelClients.delete(id);
     // 清理所有挂在这个 client 上的 browser socket
     for (const [wsId, sock] of browserWsSockets) { sock.destroy(); browserWsSockets.delete(wsId); }
+    // 清理所有流式/待响应的 HTTP 响应
+    for (const [requestId, p] of pending) {
+      if (p.timer) clearTimeout(p.timer);
+      try { p.res.end(); } catch {}
+    }
+    pending.clear();
     console.log(`[dsh-tunnel] client disconnected  id=${id}  code=${code}  remaining=${tunnelClients.size}`);
   });
   ws.on('error', err => console.error(`[dsh-tunnel] client error id=${id}: ${err.message}`));
