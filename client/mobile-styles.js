@@ -550,6 +550,19 @@ export const MOBILE_STYLES_CSS = `
         min-width: 0 !important;
       }
 
+      /* 输入框下方的统计胶囊条（StatsPills：轮次/步数 · tok/s · 累计 token · 缓存命中）
+         手机屏幕纵向空间宝贵，直接不显示，输入框自然下移填补空位。
+         结构确认：StatsPills 注册在 conversation.composer.dock 槽位，
+         在 wSkVaW_composerStack 内渲染于输入框（composerSeat）**之后**，
+         因此隐藏它即可让输入框往下移，无需额外补偿 margin。
+         选择器用宿主构建产物里稳定的 data-composer-stats 属性 +
+         CSS-module 哈希类名双保险（宿主升级换哈希时仍能命中）。 */
+      div[data-composer-stats="true"],
+      div[class*="bOPqQW_root"] {
+        display: none !important;
+        padding: 0 !important;
+      }
+
       /* 4. 原生侧边栏抽屉化 (Drawer) */
       div[class*="_sidebarCol"] {
         position: fixed !important;

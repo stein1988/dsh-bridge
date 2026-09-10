@@ -581,6 +581,19 @@ var MOBILE_STYLES_CSS = `
         min-width: 0 !important;
       }
 
+      /* \u8F93\u5165\u6846\u4E0B\u65B9\u7684\u7EDF\u8BA1\u80F6\u56CA\u6761\uFF08StatsPills\uFF1A\u8F6E\u6B21/\u6B65\u6570 \xB7 tok/s \xB7 \u7D2F\u8BA1 token \xB7 \u7F13\u5B58\u547D\u4E2D\uFF09
+         \u624B\u673A\u5C4F\u5E55\u7EB5\u5411\u7A7A\u95F4\u5B9D\u8D35\uFF0C\u76F4\u63A5\u4E0D\u663E\u793A\uFF0C\u8F93\u5165\u6846\u81EA\u7136\u4E0B\u79FB\u586B\u8865\u7A7A\u4F4D\u3002
+         \u7ED3\u6784\u786E\u8BA4\uFF1AStatsPills \u6CE8\u518C\u5728 conversation.composer.dock \u69FD\u4F4D\uFF0C
+         \u5728 wSkVaW_composerStack \u5185\u6E32\u67D3\u4E8E\u8F93\u5165\u6846\uFF08composerSeat\uFF09**\u4E4B\u540E**\uFF0C
+         \u56E0\u6B64\u9690\u85CF\u5B83\u5373\u53EF\u8BA9\u8F93\u5165\u6846\u5F80\u4E0B\u79FB\uFF0C\u65E0\u9700\u989D\u5916\u8865\u507F margin\u3002
+         \u9009\u62E9\u5668\u7528\u5BBF\u4E3B\u6784\u5EFA\u4EA7\u7269\u91CC\u7A33\u5B9A\u7684 data-composer-stats \u5C5E\u6027 +
+         CSS-module \u54C8\u5E0C\u7C7B\u540D\u53CC\u4FDD\u9669\uFF08\u5BBF\u4E3B\u5347\u7EA7\u6362\u54C8\u5E0C\u65F6\u4ECD\u80FD\u547D\u4E2D\uFF09\u3002 */
+      div[data-composer-stats="true"],
+      div[class*="bOPqQW_root"] {
+        display: none !important;
+        padding: 0 !important;
+      }
+
       /* 4. \u539F\u751F\u4FA7\u8FB9\u680F\u62BD\u5C49\u5316 (Drawer) */
       div[class*="_sidebarCol"] {
         position: fixed !important;
