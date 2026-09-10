@@ -7,21 +7,23 @@ import { makeSessionsFile } from './helpers.mjs'
 
 test('ConversationBridge /rename command renames active session', async () => {
   const sentTexts = [];
-  const updatedRecords = [];
+  const renamed = [];
 
   const mockSession = {
     id: 'session-12345678',
     title: '旧标题',
   };
 
+  // 真实宿主契约：标题由 `sessionTitle` 服务负责（rename 会 append `session/title` 事件
+  // 到会话日志，从而持久化）。SessionPersistence 只有 create/open/flush/stat/list，
+  // **没有** update —— 旧测试给了一个不存在的 `update` 替身，属于假绿。
   const mockCtx = {
     on: () => () => {},
     effect: () => () => {},
     sessions: new Map([['session-12345678', mockSession]]),
+    get: (name) => (name === 'sessionTitle' ? { rename: (session, title) => { renamed.push({ id: session.id, title }); session.title = title; } } : undefined),
     sessionPersistence: {
-      update: async (id, data) => {
-        updatedRecords.push({ id, data });
-      },
+      // 故意保留一个「什么都没有」的对象：验证实现不再依赖 persistence 的写标题能力
     },
   };
 
@@ -51,8 +53,8 @@ test('ConversationBridge /rename command renames active session', async () => {
   // 2. 发送有效 /rename
   await bridge.handleInbound({ senderId: 'user1', text: '/rename 优化登录交互' });
   assert.equal(mockSession.title, '优化登录交互');
-  assert.equal(updatedRecords.length, 1);
-  assert.equal(updatedRecords[0].data.title, '优化登录交互');
+  assert.equal(renamed.length, 1, '必须经由 sessionTitle.rename 持久化，而不是写 sessionPersistence');
+  assert.deepEqual(renamed[0], { id: 'session-12345678', title: '优化登录交互' });
   assert.match(sentTexts[1], /会话重命名成功/);
 
   // 3. 无活动会话时

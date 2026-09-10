@@ -454,23 +454,43 @@ test('ConversationBridge listSessions 严格过滤已归档会话（内存与持
     { id: 'live-s1', header: { createdAt: 100, cwd: '/app' }, events: [{ type: 'session/title', data: { title: '活跃会话1' } }] },
     { id: 'archived-s1', header: { createdAt: 90, cwd: '/app' }, events: [{ type: 'session/title', data: { title: '已归档会话1' } }] },
   ]
+  // 真实宿主契约（DSH 0.1.5）：
+  //   - list() 返回 snapshot：{ header: { id, createdAt, cwd }, revision, ... }，**不含 events**
+  //   - 事件内容只能 open(id, 'read') → handle.read() → { events } 读取
+  //   - SessionPersistence **没有** load()/update()（旧代码调用它们，被 catch 吞掉，
+  //     表现为冷会话标题永远折叠不出来）
+  // 这里额外混入一条旧的扁平形态，验证归一化兼容。
+  const openedIds = []
   ctx.sessionPersistence = {
     list: async () => [
-      { id: 'cold-s1', cwd: '/app', createdAt: 80 },
-      { id: 'archived-s2', cwd: '/app', createdAt: 70 },
+      { header: { id: 'cold-s1', cwd: '/app', createdAt: 80 }, revision: 'r1' },
+      { header: { id: 'archived-s2', cwd: '/app', createdAt: 70 }, revision: 'r2' },
+      { id: 'cold-s2', cwd: '/app', createdAt: 60 }, // 扁平兜底形态
     ],
-    load: async (id) => ({
-      events: [{ type: 'session/title', data: { title: id === 'cold-s1' ? '冷会话1' : '归档冷会话' } }],
-    }),
+    open: async (id) => {
+      openedIds.push(id)
+      return {
+        id,
+        read: async () => ({
+          events: [{ type: 'session/title', data: { title: id === 'cold-s1' ? '冷会话1' : `冷-${id}` } }],
+        }),
+        close: async () => {},
+      }
+    },
   }
 
   const { listSessions } = conversationBridgeHelpers
   const result = await listSessions(bridge)
   const resultIds = result.map((s) => s.id)
 
-  assert.deepEqual(resultIds, ['live-s1', 'cold-s1'])
+  assert.deepEqual(resultIds, ['live-s1', 'cold-s1', 'cold-s2'])
   assert.ok(!resultIds.includes('archived-s1'))
   assert.ok(!resultIds.includes('archived-s2'))
+
+  // 关键回归：冷会话标题必须能从官方 open/read 路径折叠出来
+  assert.equal(result.find((s) => s.id === 'cold-s1')?.title, '冷会话1')
+  assert.equal(result.find((s) => s.id === 'cold-s2')?.title, '冷-cold-s2', '扁平形态也应走 open/read 拿标题')
+  assert.deepEqual(openedIds.sort(), ['cold-s1', 'cold-s2'])
 
   bridge.dispose()
   platform.dispose()
