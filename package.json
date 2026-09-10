@@ -36,7 +36,8 @@
     "ws": "^8.18.0"
   },
   "devDependencies": {
-    "@deepseek-ai/dsh-llm": "0.1.0-rc.6",
+    "@deepseek-ai/cordis": "^4.0.2",
+    "@deepseek-ai/dsh-llm": "0.1.5-rc.1",
     "@eslint/js": "^10.0.1",
     "@larksuiteoapi/node-sdk": "^1.73.0",
     "esbuild": "^0.25.9",
