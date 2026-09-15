@@ -408,3 +408,82 @@ IM 里所有「冷会话」（不在内存里的）标题都退化成「新会�
    写类端点如果连续两次敏感写入，第二次会因为 token 被上一步吊销而报「需要管理员权限」，
    需重新解锁。这是既定的安全语义，不是回归。
 
+
+---
+
+## 9. 与官方主线合流（2026-09-15，合并 upstream v2.10.10）
+
+上面 §3/§4 记录的是我们在本地**自己摸索出来**的适配方案（自注册 webServer 路由 +
+复刻信封协议）。官方随后在 **v2.10.9** 用另一种方式修了同一个问题，**v2.10.10** 又修了
+`/rename` 与会话恢复。本次已把官方主线合并进来（merge `fb5edd5`），并**放弃自建传输层**。
+
+### 9.1 两条路线的取舍
+
+| | 我们的方案（已弃用） | 官方的方案（已采用，`lib/connection-compat.js`） |
+|---|---|---|
+| 做法 | 插件自己的 ctx 直连 `webServer.register()`，自行实现 `client-request`/`server-response` 信封 | 仍调公开 API `ctx.connection.rpc.handle()`，仅在这一次注册调用期间于 root 的 `internal/get` 瀑布事件上补一个 `webServer` 解析兜底 |
+| 协议 | **复制**宿主私有线协议，宿主改协议即失配 | 零复制，协议始终由宿主提供 |
+| 上游修好后 | 需要我们手工删代码 | 自动空转（首次调用不再抛错，兜底分支不进入） |
+| 中间件 | 绕过宿主 RPC 层的任何后续处理 | 全程走宿主公开路径 |
+
+**结论：官方方案更优**，已采用。我们新增的 `createRpcRouteHandler` / `isRpcRequestEnvelope`
+/ `readRequestBody` / `writeJson` 及 `test/bridge-rpc-transport.test.mjs` 已全部删除。
+
+### 9.2 垫片的关键前提（已在本机实测核对）
+
+垫片依赖 cordis 4 的两个内部行为，**不能只看官方注释**，已逐条核实：
+
+1. `internal/get` 确实是**瀑布事件**，参数序为 `(ctx, prop, error, next)`，
+   且交给 listener 的 `error` 与默认解析抛出的是**同一个对象**
+   （`cordis/lib/index.js:680`，垫片靠 `err !== error` 区分"默认解析失败"与"真实故障"）。
+2. `ctx.on(name, cb, { global: true })` 能绕过作用域过滤：
+   `hook.global || !filter || filter.call(thisArg, hook.ctx)`
+   （`cordis/lib/index.js:263`）——所以本插件 ctx 上的监听器对 connection 插件 ctx 的查找生效。
+
+**真 cordis 端到端探针**（用真 `Service` 复刻 `dsh-client-connection@0.1.5-rc.1` 第 618 行）：
+
+```
+1) 裸调用抛错: cannot get property "webServer" without inject
+   命中 isMissingWebServerInjectError: true
+2) 垫片注册成功: routes = 1 | path = /dsh-bridge | authority = loopback
+   handler 可调用: {"ok":true,"value":"getStatus"}
+3) 第二次裸调用仍抛错（说明兜底监听器已摘除，对宿主零副作用）: true
+4) dispose 后 routes = 0
+```
+
+> 注意：官方自带的 `test/connection-compat.test.mjs` 用的是**忠实假 ctx**，
+> 不是真 cordis。上面这个探针是额外的交叉验证，两者互补。
+
+### 9.3 官方修了、但我们发现它还漏了一处
+
+官方 v2.10.10 新增 `sessionHeaderOf()`，修好了 `list()` 返回 snapshot 导致的
+`session "..." already exists`（issue #39）——**和我们独立发现的 §7.2 是同一个 bug**。
+
+但它**没有修** §7.1 的另一半：折叠冷会话标题时仍在调用 `sessionPersistence.load()`，
+而该方法在 DSH 0.1.5 并不存在。合并时保留了我们的 `readStoredEvents()`
+（走官方 `open(id,'read')` → `handle.read()` → `close()`）补上这一环。
+
+同理 `/rename`：官方改用了 `sessionTitle.rename()`（与 §7.3 结论一致），
+且**额外**处理了我们没覆盖的一种情况——会话尚未在内存恢复时明确报错而不是假装成功。
+合并采用官方版本。
+
+### 9.4 本次合并的验证结果
+
+| 检查 | 结果 |
+|---|---|
+| 测试套件 | ✅ **248/248**（合并前 211 + 官方新增 37） |
+| lint | ✅ 0 error（24 warning） |
+| `client/client.js` 重建 | ✅ 含官方客户端改动 **且** 我们的统计条规则（`data-composer-stats`） |
+| 全部改动模块独立导入 | ✅ 含新增的 `connection-compat` / `session-config` / `config-restore` / `dsh-native-cookie` |
+| 插件 `inject` 含 `webServer` | ✅ 垫片前提满足（`lib/index.js:35`） |
+| `cordis.patch.yml` 行 id 对齐 | ✅ 官方未改该文件，profile 用户层补丁照常命中 |
+| `conversation-bridge.js` | ✅ 与官方**完全一致**（官方新的 agent-preset `setup` 挂载未被我们的改动污染） |
+| 真 cordis 垫片探针 | ✅ 见 §9.2 |
+| **重启宿主后插件实际加载** | ⬜ **未做** —— 需要重启正在运行的 `dsh web`（会短暂断开隧道），由使用者决定时机 |
+
+### 9.5 复盘：定期合流比"憋大招"省事
+
+我们在 §3/§4 自建的那套传输层能用，但官方随后用十分之一的代码量修了同一问题，
+并且修得更干净。**教训：适配类改动应尽快回流上游或至少定期对账**，
+否则会积累出"两条实现同一件事"的合流成本（本次冲突 4 个文件，其中 `bridge-rpc.js`
+的两套实现需要人工取舍）。
