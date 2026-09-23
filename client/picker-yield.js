@@ -23,12 +23,22 @@
 // 不能换成官方 picker（会绕过插件的访问限制）。
 //
 // 为什么探测用 ctx.get() 而不是 ctx.uiWorkspace：
-//   @deepseek-ai/dsh-cordis-client-runner 的 guard 对**属性访问**要求服务已在插件
-//   `inject` 中声明，未声明但确实存在的服务会直接 rejectGuard 抛错：
-//     `service "uiWorkspace" is not declared by your plugin. Declare it on the plugin ...`
-//   而 `ctx.get(name)` 是它明确允许的「可选查找」（optional ctx.get() lookup）。
-//   又因为把 uiWorkspace 写进 inject 会让旧版 DSH（无该 seat）把整个插件 park 掉
+//   cordis 本体对**未在插件 inject 中声明**的服务做属性访问会直接抛错：
+//     cannot get property "uiWorkspace" without inject   （cordis/lib/index.js）
+//   —— dsh-bridge 的 client half 是静态 client 插件，其 ctx 是真 cordis Context
+//   （不是动态包的 runner guard facade），所以拦在这里的是 cordis 本体的规则。
+//   而 `ctx.get(name)` 是允许的「可选查找」，不要求声明。
+//   又不能把 uiWorkspace 写进 inject：旧版 DSH（无该 seat）会因此把整个插件 park 掉
 //   （provider 缺失即不 apply），所以只能用 ctx.get() 探测。
+//
+// ⚠️ 已知时序依赖（独立验收记录，真机 6/6 冷启动实测未触发）：
+//   cordis 的 ctx.get() 在 provider fiber 尚未进入 ACTIVE 时会返回 undefined。理论上若
+//   本判定早于 ui-workspace 插件 apply 完成，就会把「有官方 picker」误判为「无」而仍然
+//   注册，让位失效。当前稳定是因为 dsh-bridge 自身 inject 的 workspaces / sessions 由
+//   roster 中排在 ui-workspace **之后**的插件提供，插件真正激活时 ui-workspace 早已
+//   apply 完成 —— 这是对 roster 顺序的**隐式耦合，不是显式保证**。若将来调整 roster
+//   顺序或去掉 workspaces 依赖，需重新评估（加固思路：注册后等 uiWorkspace 可用时
+//   再撤销自己的注册）。
 
 /** 官方 workspace seat 的服务名（DSH 0.1.5 起提供 pickDirectory） */
 export const OFFICIAL_WORKSPACE_SEAT = 'uiWorkspace';
@@ -37,20 +47,23 @@ export const OFFICIAL_WORKSPACE_SEAT = 'uiWorkspace';
  * 探测 DSH 是否已提供官方目录选择器。
  *
  * 用 `ctx.get()` 做可选查找：seat 不存在（旧版 DSH）、宿主未暴露 pickDirectory、
- * 或 guard 拒绝时一律返回 false —— 探测本身绝不抛错影响插件加载。
+ * 查询或属性读取抛错时一律返回 false —— 探测本身绝不外抛影响插件加载。
  *
  * @param {{ get?: (name: string) => unknown }} [ctx] cordis 客户端 context
  * @returns {boolean} 官方 picker 是否可用
  */
 export function hasOfficialDirectoryPicker(ctx) {
-  let seat;
   try {
-    seat = typeof ctx?.get === 'function' ? ctx.get(OFFICIAL_WORKSPACE_SEAT) : null;
+    if (typeof ctx?.get !== 'function') return false;
+    const seat = ctx.get(OFFICIAL_WORKSPACE_SEAT);
+    // typeof 也放在 try 内：seat 可能是带异常 getter 的对象或 Proxy，
+    // 读 pickDirectory 本身就可能抛错。
+    return typeof seat?.pickDirectory === 'function';
   } catch {
-    // 查询被 guard 拒绝或宿主异常：按「无官方 picker」处理，保持插件原有兜底行为
+    // ctx.get 抛错（宿主异常），或属性读取抛错（异常 getter / Proxy）：
+    // 一律按「无官方 picker」处理，保持插件原有兜底行为，探测绝不外抛。
     return false;
   }
-  return typeof seat?.pickDirectory === 'function';
 }
 
 /**

@@ -76,16 +76,39 @@ test('seat 不存在 / 无 pickDirectory / pickDirectory 非函数 → 判为不
   assert.equal(hasOfficialDirectoryPicker({ get: () => ({ pickDirectory: 'nope' }) }), false);
 });
 
-test('ctx.get 抛错（guard 拒绝）→ 按不可用处理，探测本身不抛错', () => {
+test('查询或属性读取抛错 → 一律按不可用处理，探测本身绝不外抛', () => {
+  // cordis 本体对未声明服务做属性访问时的真实报错形态
   const throwing = {
     get() {
-      throw new Error('service "uiWorkspace" is not declared by your plugin');
+      throw new Error('cannot get property "uiWorkspace" without inject');
     },
   };
   assert.equal(hasOfficialDirectoryPicker(throwing), false);
   assert.equal(hasOfficialDirectoryPicker(null), false);
   assert.equal(hasOfficialDirectoryPicker(undefined), false);
   assert.equal(hasOfficialDirectoryPicker({}), false, '缺 get 时也不应抛错');
+
+  // seat 本身是带异常 getter 的对象 / Proxy 时，读取 pickDirectory 也会抛 ——
+  // 故 typeof 判断必须在 try 内（独立验收指出过这个缺口）。
+  const badGetterSeat = {
+    get: () =>
+      Object.defineProperty({}, 'pickDirectory', {
+        get() {
+          throw new Error('getter boom');
+        },
+      }),
+  };
+  assert.equal(hasOfficialDirectoryPicker(badGetterSeat), false);
+
+  const throwingProxySeat = {
+    get: () =>
+      new Proxy({}, {
+        get() {
+          throw new Error('proxy boom');
+        },
+      }),
+  };
+  assert.equal(hasOfficialDirectoryPicker(throwingProxySeat), false);
 });
 
 test('探测绝不使用属性访问（未声明服务的属性访问会被 guard 直接拒绝）', () => {
@@ -176,10 +199,7 @@ test('源码：不得把 uiWorkspace 写进 inject（旧版 DSH 会 park 整个�
 
 // ---------- 4. 产物同步断言 ----------
 
-test('打包产物已同步让位逻辑（含判定函数，且注册仍在其后）', () => {
-  const body = sidebarGeneratorBody(unescapedBundle);
-  assert.ok(body, '产物缺少 directoryFlow generator，疑似忘记运行 npm run build:client');
-
+test('打包产物已同步让位逻辑（与源码同语义：return / 两个 Slot / guard 参数）', () => {
   assert.ok(
     unescapedBundle.includes('shouldYieldToOfficialPicker'),
     '产物未包含让位判定，请运行 npm run build:client',
@@ -189,8 +209,30 @@ test('打包产物已同步让位逻辑（含判定函数，且注册仍在其�
     '产物未包含官方 picker 探测，请运行 npm run build:client',
   );
 
+  // 生产实际下发的是产物，必须与源码跑同一套语义断言。只检查「函数名出现过」
+  // 不够：独立验收的产物变异测试（只改 client/client.js、源码保持正确）证明，
+  // 漏掉 return、少注册一个 Slot、或把 guard 参数写死，旧断言都会 12/12 全绿
+  // 而本机问题原样复现。
+  const body = sidebarGeneratorBody(unescapedBundle);
+  assert.ok(body, '产物缺少 directoryFlow generator，疑似忘记运行 npm run build:client');
+
   const guardAt = body.indexOf('shouldYieldToOfficialPicker');
   const firstYieldAt = body.indexOf('yield ctx.slots.register');
   assert.ok(guardAt >= 0 && firstYieldAt >= 0, '产物中的判定/注册缺失');
   assert.ok(guardAt < firstYieldAt, '产物中让位判定必须早于注册，请重新 build');
+  assert.match(
+    body.slice(guardAt, firstYieldAt),
+    /\)\)\s*return\s*;/,
+    '产物中让位判定为真时没有 return（不注册才能让位），请重新 build',
+  );
+  assert.equal(
+    body.split('yield ctx.slots.register').length - 1,
+    2,
+    '产物中两个 directoryFlow Slot 都应位于让位判定之后，请重新 build',
+  );
+  assert.match(
+    body,
+    /officialPicker\s*:\s*hasOfficialDirectoryPicker\(ctx\)/,
+    '产物中 guard 未真正调用 hasOfficialDirectoryPicker(ctx)，请重新 build',
+  );
 });

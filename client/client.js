@@ -1070,13 +1070,13 @@ async function unlockAdmin(rpcCall, password) {
 // client/picker-yield.js
 var OFFICIAL_WORKSPACE_SEAT = "uiWorkspace";
 function hasOfficialDirectoryPicker(ctx) {
-  let seat;
   try {
-    seat = typeof ctx?.get === "function" ? ctx.get(OFFICIAL_WORKSPACE_SEAT) : null;
+    if (typeof ctx?.get !== "function") return false;
+    const seat = ctx.get(OFFICIAL_WORKSPACE_SEAT);
+    return typeof seat?.pickDirectory === "function";
   } catch {
     return false;
   }
-  return typeof seat?.pickDirectory === "function";
 }
 function shouldYieldToOfficialPicker(facts) {
   return Boolean(facts?.local) && Boolean(facts?.officialPicker);
