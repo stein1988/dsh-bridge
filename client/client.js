@@ -5997,7 +5997,6 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
             if (!switched && res?.sessionId && clientCtx?.sessions?.open) {
               try {
                 clientCtx.sessions.open(res.sessionId);
-                switched = true;
               } catch (e) {
               }
             }
@@ -6108,7 +6107,6 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
         if (!switched && clientCtx?.sessions?.open && res.sessionId) {
           try {
             clientCtx.sessions.open(res.sessionId);
-            switched = true;
           } catch (e) {
             console.warn("[dsh-bridge] sessions.open failed:", e);
           }

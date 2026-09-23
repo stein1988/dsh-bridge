@@ -4587,8 +4587,9 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
             }
             if (!switched && res?.sessionId && clientCtx?.sessions?.open) {
               try {
+                // 最后手段：直接打开会话。成功后无需再置位 switched ——
+                // 此后不再有基于 switched 的分支（CodeQL js/useless-assignment-to-local）。
                 clientCtx.sessions.open(res.sessionId);
-                switched = true;
               } catch (e) {}
             }
           }
@@ -4717,8 +4718,9 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
         
         if (!switched && clientCtx?.sessions?.open && res.sessionId) {
           try {
+            // 最后手段：直接打开会话。此后不再读取 switched
+            // （CodeQL js/useless-assignment-to-local），故不再置位。
             clientCtx.sessions.open(res.sessionId);
-            switched = true;
           } catch (e) {
             console.warn('[dsh-bridge] sessions.open failed:', e);
           }
