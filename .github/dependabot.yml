@@ -19,18 +19,22 @@ updates:
     labels:
       - dependencies
     groups:
-      # 生产依赖（qrcode / ws）：直接影响运行时，单独一组便于优先验证
-      production:
-        dependency-type: production
       # DSH 宿主包：与宿主版本强耦合，必须同批升级、同批验证。
-      # 注意本组必须排在 development 之前 —— 同一个依赖只进入第一个匹配的组。
+      # 必须排在最前 —— 官方文档的规则是「匹配多个组时进第一个匹配的组」，
+      # 且实测把该组放在中间时，作为 devDependency 的 @deepseek-ai/dsh-llm 仍被
+      # 判进了 development 组；故这里前置，并在 development 组用 exclude-patterns 兜底。
       dsh-host:
         patterns:
           - "@deepseek-ai/*"
+      # 生产依赖（qrcode / ws）：直接影响运行时，单独一组便于优先验证
+      production:
+        dependency-type: production
       # 开发与构建依赖（esbuild / eslint / puppeteer-core / lark SDK 等）：
       # 合为一个 PR 降噪
       development:
         dependency-type: development
+        exclude-patterns:
+          - "@deepseek-ai/*"
 
   # ---- GitHub Actions：每月检查 ----
   - package-ecosystem: github-actions
