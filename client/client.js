@@ -49,6 +49,12 @@ var MOBILE_STYLES_CSS = `
       --dsh-mobile-header-h: 52px;
       --dsh-mobile-safe-top: env(safe-area-inset-top, 0px);
       --dsh-mobile-safe-bottom: env(safe-area-inset-bottom, 0px);
+      /* \u9876\u680F\u5B9E\u9645\u5360\u7528\u7684\u603B\u9AD8\u5EA6 = \u5185\u5BB9\u9AD8\u5EA6 + \u9876\u90E8\u5B89\u5168\u533A\u3002
+         \u624B\u673A\u6D4F\u89C8\u5668\u91CC safe-area-inset-top \u901A\u5E38\u4E3A 0\uFF0C\u4E8E\u662F\u9000\u5316\u6210 52px\uFF0C\u4E0E\u65E7\u884C\u4E3A\u5B8C\u5168\u4E00\u81F4\uFF1B
+         \u4F46\u5728 edge-to-edge \u7684\u539F\u751F\u58F3\uFF08\u5982 dsh-bridge-app\uFF09\u91CC\u5B83\u975E 0\uFF0C\u9876\u680F\u5FC5\u987B**\u6574\u4F53\u957F\u9AD8**\uFF1A
+         \u5426\u5219\u56FA\u5B9A height \u51CF\u6389 padding-top \u540E\u5185\u5BB9\u76D2\u88AB\u538B\u6241\uFF0840px \u7684\u6309\u94AE\u585E\u8FDB\u4E0D\u8DB3 30px \u7684\u76D2\u5B50\uFF09\uFF0C
+         \u800C\u4E14\u4E3B\u6846\u67B6\u53EA\u9884\u7559 52px \u4E5F\u63A5\u4E0D\u4F4F\u88AB\u9876\u4E0B\u53BB\u7684\u9876\u680F\u3002 */
+      --dsh-mobile-header-total: calc(var(--dsh-mobile-header-h) + var(--dsh-mobile-safe-top));
     }
 
     /* \u65AD\u70B9\u4E0E\u5BBF\u4E3B\u5224\u636E\u5BF9\u9F50\uFF1A\u5BBF\u4E3B\u7528 viewportWidth < 768 \u51B3\u5B9A\u53F3\u4FA7\u680F\u81EA\u52A8\u5168\u5C4F
@@ -62,7 +68,7 @@ var MOBILE_STYLES_CSS = `
         width: 100vw !important;
         height: 100dvh !important;
         margin: 0 !important;
-        padding-top: var(--dsh-mobile-header-h) !important;
+        padding-top: var(--dsh-mobile-header-total) !important;
         position: relative !important;
         grid-template-columns: 1fr !important;
         overflow: hidden !important;
@@ -77,9 +83,9 @@ var MOBILE_STYLES_CSS = `
          \u5BBF\u4E3B\u5F53\u524D\u7528 inset:0\uFF08\u65E0\u663E\u5F0F\u9AD8\u5EA6\uFF09\u65F6 top \u5355\u72EC\u5373\u53EF\uFF0C\u4F46\u5BBF\u4E3B\u5C06\u6765\u82E5\u7ED9\u51FA\u663E\u5F0F\u9AD8\u5EA6\uFF0C
          \u663E\u5F0F height \u4ECD\u80FD\u628A\u76D2\u5B50\u6536\u5728\u9876\u680F\u4E4B\u4E0B\u3002 */
       [data-sidebar-right-panel="fullscreen"] {
-        top: var(--dsh-mobile-header-h, 52px) !important;
-        height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
-        max-height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
+        top: var(--dsh-mobile-header-total) !important;
+        height: calc(100dvh - var(--dsh-mobile-header-total) - var(--dsh-mobile-safe-bottom)) !important;
+        max-height: calc(100dvh - var(--dsh-mobile-header-total) - var(--dsh-mobile-safe-bottom)) !important;
       }
 
       /* 2. \u9876\u90E8\u539F\u751F\u5BFC\u822A\u6761\uFF1A100% \u8FD8\u539F DeepSeek App (\u5DE6\u4FA7\u53CC\u6A2A\u7EBF\uFF0C\u53F3\u4FA7(+)\uFF0C\u4E2D\u95F4\u7559\u767D\uFF0C\u65E0\u591A\u4F59\u8BBE\u7F6E\u6309\u94AE) */
@@ -88,7 +94,7 @@ var MOBILE_STYLES_CSS = `
         top: 0 !important;
         left: 0 !important;
         right: 0 !important;
-        height: var(--dsh-mobile-header-h) !important;
+        height: var(--dsh-mobile-header-total) !important;
         padding-top: var(--dsh-mobile-safe-top) !important;
         background: transparent !important;
         display: flex !important;
@@ -193,7 +199,7 @@ var MOBILE_STYLES_CSS = `
       div[class*="toggleCluster"],
       div[class*="W-zNGW_toggleCluster"] {
         display: flex !important;
-        top: calc(var(--dsh-mobile-header-h, 52px) + 4px) !important;
+        top: calc(var(--dsh-mobile-header-total) + 4px) !important;
         right: 12px !important;
       }
 
@@ -222,9 +228,9 @@ var MOBILE_STYLES_CSS = `
         display: flex !important;
         visibility: visible !important;
         pointer-events: auto !important;
-        top: var(--dsh-mobile-header-h, 52px) !important;
-        height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
-        max-height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
+        top: var(--dsh-mobile-header-total) !important;
+        height: calc(100dvh - var(--dsh-mobile-header-total) - var(--dsh-mobile-safe-bottom)) !important;
+        max-height: calc(100dvh - var(--dsh-mobile-header-total) - var(--dsh-mobile-safe-bottom)) !important;
         z-index: 50 !important;
         box-sizing: border-box !important;
         background: var(--dsw-alias-bg-layer-1, #ffffff) !important;
@@ -460,7 +466,7 @@ var MOBILE_STYLES_CSS = `
 
       /* \u8F93\u5165\u6846\u5E95\u5EA7\uFF1ADeepSeek App \u5C45\u4E2D\u53CA\u5E95\u90E8\u56FA\u5B9A (\u5E95\u8DDD\u6536\u7D27\u8BA9\u8F93\u5165\u6846\u8D34\u5E95\u4E0B\u79FB) */
       div[class*="wSkVaW_scrollBody"] {
-        padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
+        padding-bottom: max(8px, var(--dsh-mobile-safe-bottom)) !important;
       }
 
       /* \u2500\u2500 \u79FB\u52A8\u7AEF\u8F93\u5165\u6846\u6298\u53E0\u6A21\u5F0F\uFF08body.dsh-composer-collapsed\uFF09\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500
@@ -477,7 +483,7 @@ var MOBILE_STYLES_CSS = `
       }
       /* \u6298\u53E0\u65F6\u6EDA\u52A8\u533A\u5E95\u90E8\u5BF9\u9F50 safe-area\uFF0C\u907F\u514D\u5185\u5BB9\u88AB iPhone \u5E95\u90E8\u6A2A\u6761\u906E\u6321 */
       body.dsh-composer-collapsed div[class*="wSkVaW_scrollBody"] {
-        padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+        padding-bottom: max(16px, var(--dsh-mobile-safe-bottom)) !important;
       }
 
       /* \u6298\u53E0\u8F93\u5165\u6846\u6309\u94AE\uFF1A\u6CE8\u5165\u5728\u804A\u5929\u5934\u90E8\u5DE5\u5177\u680F\uFF08Session \u4E0B\u8F7D\u94AE\u65C1\uFF09\uFF0C
@@ -513,7 +519,7 @@ var MOBILE_STYLES_CSS = `
         display: none !important;
         position: sticky !important;
         bottom: 0 !important;
-        margin: 8px 12px max(8px, env(safe-area-inset-bottom, 0px)) 12px !important;
+        margin: 8px 12px max(8px, var(--dsh-mobile-safe-bottom)) 12px !important;
         padding: 11px 16px !important;
         border-radius: 22px !important;
         background: var(--dsw-alias-bg-layer-2, #f4f4f7) !important;

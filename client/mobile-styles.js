@@ -18,6 +18,12 @@ export const MOBILE_STYLES_CSS = `
       --dsh-mobile-header-h: 52px;
       --dsh-mobile-safe-top: env(safe-area-inset-top, 0px);
       --dsh-mobile-safe-bottom: env(safe-area-inset-bottom, 0px);
+      /* 顶栏实际占用的总高度 = 内容高度 + 顶部安全区。
+         手机浏览器里 safe-area-inset-top 通常为 0，于是退化成 52px，与旧行为完全一致；
+         但在 edge-to-edge 的原生壳（如 dsh-bridge-app）里它非 0，顶栏必须**整体长高**：
+         否则固定 height 减掉 padding-top 后内容盒被压扁（40px 的按钮塞进不足 30px 的盒子），
+         而且主框架只预留 52px 也接不住被顶下去的顶栏。 */
+      --dsh-mobile-header-total: calc(var(--dsh-mobile-header-h) + var(--dsh-mobile-safe-top));
     }
 
     /* 断点与宿主判据对齐：宿主用 viewportWidth < 768 决定右侧栏自动全屏
@@ -31,7 +37,7 @@ export const MOBILE_STYLES_CSS = `
         width: 100vw !important;
         height: 100dvh !important;
         margin: 0 !important;
-        padding-top: var(--dsh-mobile-header-h) !important;
+        padding-top: var(--dsh-mobile-header-total) !important;
         position: relative !important;
         grid-template-columns: 1fr !important;
         overflow: hidden !important;
@@ -46,9 +52,9 @@ export const MOBILE_STYLES_CSS = `
          宿主当前用 inset:0（无显式高度）时 top 单独即可，但宿主将来若给出显式高度，
          显式 height 仍能把盒子收在顶栏之下。 */
       [data-sidebar-right-panel="fullscreen"] {
-        top: var(--dsh-mobile-header-h, 52px) !important;
-        height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
-        max-height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
+        top: var(--dsh-mobile-header-total) !important;
+        height: calc(100dvh - var(--dsh-mobile-header-total) - var(--dsh-mobile-safe-bottom)) !important;
+        max-height: calc(100dvh - var(--dsh-mobile-header-total) - var(--dsh-mobile-safe-bottom)) !important;
       }
 
       /* 2. 顶部原生导航条：100% 还原 DeepSeek App (左侧双横线，右侧(+)，中间留白，无多余设置按钮) */
@@ -57,7 +63,7 @@ export const MOBILE_STYLES_CSS = `
         top: 0 !important;
         left: 0 !important;
         right: 0 !important;
-        height: var(--dsh-mobile-header-h) !important;
+        height: var(--dsh-mobile-header-total) !important;
         padding-top: var(--dsh-mobile-safe-top) !important;
         background: transparent !important;
         display: flex !important;
@@ -162,7 +168,7 @@ export const MOBILE_STYLES_CSS = `
       div[class*="toggleCluster"],
       div[class*="W-zNGW_toggleCluster"] {
         display: flex !important;
-        top: calc(var(--dsh-mobile-header-h, 52px) + 4px) !important;
+        top: calc(var(--dsh-mobile-header-total) + 4px) !important;
         right: 12px !important;
       }
 
@@ -191,9 +197,9 @@ export const MOBILE_STYLES_CSS = `
         display: flex !important;
         visibility: visible !important;
         pointer-events: auto !important;
-        top: var(--dsh-mobile-header-h, 52px) !important;
-        height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
-        max-height: calc(100dvh - var(--dsh-mobile-header-h, 52px)) !important;
+        top: var(--dsh-mobile-header-total) !important;
+        height: calc(100dvh - var(--dsh-mobile-header-total) - var(--dsh-mobile-safe-bottom)) !important;
+        max-height: calc(100dvh - var(--dsh-mobile-header-total) - var(--dsh-mobile-safe-bottom)) !important;
         z-index: 50 !important;
         box-sizing: border-box !important;
         background: var(--dsw-alias-bg-layer-1, #ffffff) !important;
@@ -429,7 +435,7 @@ export const MOBILE_STYLES_CSS = `
 
       /* 输入框底座：DeepSeek App 居中及底部固定 (底距收紧让输入框贴底下移) */
       div[class*="wSkVaW_scrollBody"] {
-        padding-bottom: max(8px, env(safe-area-inset-bottom)) !important;
+        padding-bottom: max(8px, var(--dsh-mobile-safe-bottom)) !important;
       }
 
       /* ── 移动端输入框折叠模式（body.dsh-composer-collapsed）──────────────
@@ -446,7 +452,7 @@ export const MOBILE_STYLES_CSS = `
       }
       /* 折叠时滚动区底部对齐 safe-area，避免内容被 iPhone 底部横条遮挡 */
       body.dsh-composer-collapsed div[class*="wSkVaW_scrollBody"] {
-        padding-bottom: max(16px, env(safe-area-inset-bottom)) !important;
+        padding-bottom: max(16px, var(--dsh-mobile-safe-bottom)) !important;
       }
 
       /* 折叠输入框按钮：注入在聊天头部工具栏（Session 下载钮旁），
@@ -482,7 +488,7 @@ export const MOBILE_STYLES_CSS = `
         display: none !important;
         position: sticky !important;
         bottom: 0 !important;
-        margin: 8px 12px max(8px, env(safe-area-inset-bottom, 0px)) 12px !important;
+        margin: 8px 12px max(8px, var(--dsh-mobile-safe-bottom)) 12px !important;
         padding: 11px 16px !important;
         border-radius: 22px !important;
         background: var(--dsw-alias-bg-layer-2, #f4f4f7) !important;

@@ -13,7 +13,8 @@
 //      `[data-sidebar-right-panel="fullscreen"][data-sidebar-right-open]{top:0}`）
 //      会让实际让位失效，而本文件的文本断言仍然全绿；
 //   2. 规则被放进不生效的媒体上下文（如误嵌 `@media print`）；
-//   3. `--dsh-mobile-header-h` 被后置规则重定义（例如在 frame 上覆盖为 0px）。
+//   3. `--dsh-mobile-header-total`（或它依赖的 `--dsh-mobile-header-h` /
+//      `--dsh-mobile-safe-top`）被后置规则重定义（例如在 frame 上覆盖为 0px）。
 // 判别这些只能靠真实浏览器几何/命中测试。
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -82,20 +83,23 @@ test('fixed 全屏面板在移动端块内单独让位 header 高度', () => {
   const body = ruleBody(mobile, '[data-sidebar-right-panel="fullscreen"]');
   assert.ok(body, '移动端块内应有 [data-sidebar-right-panel="fullscreen"] 让位规则');
 
+  // 让位量来自 --dsh-mobile-header-total（= 内容高度 52px + 顶部安全区）。
+  // 顶栏在 edge-to-edge 的原生壳（dsh-bridge-app）里会整体长高，让位量必须跟着长，
+  // 否则面板顶部会被顶栏压住。
   assert.match(
     body,
-    /[;{\s]top:\s*var\(--dsh-mobile-header-h,\s*52px\)\s*!important/,
-    '应把面板自身 top 顶到 header 高度（!important 覆盖宿主的 inset:0）',
+    /[;{\s]top:\s*var\(--dsh-mobile-header-total\)\s*!important/,
+    '应把面板自身 top 顶到顶栏总高度（!important 覆盖宿主的 inset:0）',
   );
   // 注意前置字符类：`max-height:` 里也含 "height:"，不加边界会漏掉 height 被删的回归
   assert.match(
     body,
-    /[;{\s]height:\s*calc\(100dvh - var\(--dsh-mobile-header-h,\s*52px\)\)\s*!important/,
-    '应同步收窄高度，避免面板超出视口底部',
+    /[;{\s]height:\s*calc\(100dvh - var\(--dsh-mobile-header-total\) - var\(--dsh-mobile-safe-bottom\)\)\s*!important/,
+    '应同步收窄高度，避免面板超出视口底部（并扣掉底部安全区，不被导航栏压住）',
   );
   assert.match(
     body,
-    /[;{\s]max-height:\s*calc\(100dvh - var\(--dsh-mobile-header-h,\s*52px\)\)\s*!important/,
+    /[;{\s]max-height:\s*calc\(100dvh - var\(--dsh-mobile-header-total\) - var\(--dsh-mobile-safe-bottom\)\)\s*!important/,
     '应同步收窄 max-height（与工作台面板让位写法一致）',
   );
 
@@ -115,19 +119,28 @@ test('让位量与实际顶栏盒高同源（52px 变量未被改成 0 或脱离
   assert.ok(header, '应存在顶栏规则');
   assert.match(
     header,
-    /[;{\s]height:\s*var\(--dsh-mobile-header-h\)\s*!important/,
-    '顶栏高度必须与被让位的 52px 用同一个变量，二者才不会各自漂移',
+    /[;{\s]height:\s*var\(--dsh-mobile-header-total\)\s*!important/,
+    '顶栏盒高必须用总高度变量（含顶部安全区），否则 padding-top 会把内容盒压扁',
   );
 
   const frame = ruleBody(mediaBlock(structureCss, '(max-width: 767px)'), 'div[class*="_frame"]');
   assert.match(
     frame,
-    /[;{\s]padding-top:\s*var\(--dsh-mobile-header-h\)\s*!important/,
+    /[;{\s]padding-top:\s*var\(--dsh-mobile-header-total\)\s*!important/,
     '流内内容的让位也必须用同一个变量',
   );
 
   const panel = ruleBody(mediaBlock(structureCss, '(max-width: 767px)'), '[data-sidebar-right-panel="fullscreen"]');
-  assert.match(panel, /var\(--dsh-mobile-header-h,\s*52px\)/, '面板让位量必须来自同一个变量');
+  assert.match(panel, /var\(--dsh-mobile-header-total\)/, '面板让位量必须来自同一个变量');
+
+  // 「同源」的真正含义是**推导关系**，而不是"两处写同一个变量名"：
+  // 顶栏盒高 = 内容高度 + 顶部安全区，一旦这个推导断了，让位量与顶栏实际高度就会各自漂移。
+  // （edge-to-edge 之前 safe-top 恒为 0，两者等价；现在必须显式校验推导本身。）
+  assert.match(
+    structureCss,
+    /--dsh-mobile-header-total:\s*calc\(\s*var\(--dsh-mobile-header-h\)\s*\+\s*var\(--dsh-mobile-safe-top\)\s*\)/,
+    '--dsh-mobile-header-total 必须等于 内容高度 + 顶部安全区',
+  );
 });
 
 test('运行时断点常量与 CSS 一致，且不再散落魔法值', () => {
