@@ -4,6 +4,19 @@
 
 ---
 
+## [v2.10.12] - 2026-09-16
+
+> 本版汇总 v2.10.11 的修复内容，并含 4 处可靠性加固（systemctl 退出码判定、单元名解析、助手失败日志、注入分段判重）。
+
+### 🐞 修复
+
+- **iOS 16 / 旧 Safari 打不开 DSH**（红屏 `Failed to load plugins … Can't find variable: Iterator`）：代理注入 HTML 时补齐 `Promise.withResolvers` 与 `Iterator` 垫片（Safari 分别是 17.4 / 18.4 才有），只在缺失时安装，其它浏览器零改动。
+- **鸿蒙（HuaweiBrowser / ArkWeb）文档预览一直显示「文件资源服务不可用。」**：该内核解析 `dsh-resource://` 地址取不到 hostname，新增 URL 兼容层兜底；引擎正常时不介入。
+- **移动端顶栏压住全屏面板顶部 52px（#41）**：改为直接位移面板容器本身，并让移动端断点与宿主判据对齐（`≤767px`）。
+- **「重启 DSH」在 systemd 托管下点了没用、DSH 不再自动起来**：改为识别 systemd 单元并交给 `systemctl restart`，按退出码判定成败；失败时保持运行并提示手动重启命令。
+
+---
+
 ## [v2.10.10] - 2026-09-14
 
 ### ✨ 新功能
