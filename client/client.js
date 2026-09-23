@@ -1067,6 +1067,21 @@ async function unlockAdmin(rpcCall, password) {
   }
 }
 
+// client/picker-yield.js
+var OFFICIAL_WORKSPACE_SEAT = "uiWorkspace";
+function hasOfficialDirectoryPicker(ctx) {
+  let seat;
+  try {
+    seat = typeof ctx?.get === "function" ? ctx.get(OFFICIAL_WORKSPACE_SEAT) : null;
+  } catch {
+    return false;
+  }
+  return typeof seat?.pickDirectory === "function";
+}
+function shouldYieldToOfficialPicker(facts) {
+  return Boolean(facts?.local) && Boolean(facts?.officialPicker);
+}
+
 // lib/bridge-rpc-constants.js
 var BRIDGE_RPC_CHANNEL = "/dsh-bridge";
 var BRIDGE_ENDPOINTS = {
@@ -6392,6 +6407,10 @@ function apply(ctx) {
   ctx.slots.inject(
     "conversation.hero.workspace.directoryFlow",
     () => ctx.slots.inject("sidebar.workspaces.directoryFlow", function* () {
+      if (shouldYieldToOfficialPicker({
+        local: isLocalEnvironment(),
+        officialPicker: hasOfficialDirectoryPicker(ctx)
+      })) return;
       yield ctx.slots.register(
         {
           name: "conversation.hero.workspace.directoryFlow",

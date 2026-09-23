@@ -4,6 +4,7 @@ import {
   queuePendingOperation, unlockAdmin, onUnlocked,
   fetchLoopbackTokenOnce,
 } from './unlock-manager.js'
+import { hasOfficialDirectoryPicker, shouldYieldToOfficialPicker } from './picker-yield.js'
 // dsh-bridge 客户端插件：设置页「远程访问」面板
 
 // 兼容非 HTTPS 环境（如手机局域网 HTTP 访问）：为非安全上下文补齐 crypto.randomUUID
@@ -5049,9 +5050,22 @@ function apply(ctx) {
 
   const injected = () => ({ pick: () => ctx.workspaces?.pickDirectory?.() });
 
-  // 注册至 DSH 原生目录选择 Slot（设置 priority: -10 覆盖原生 Electron 选择器，在远程/移动网页端生效）
+  // 注册至 DSH 原生目录选择 Slot（priority: -10 覆盖原生 Electron 选择器，在远程/移动网页端生效）
+  //
+  // 但 DSH 0.1.5 起自带官方目录选择器（@deepseek-ai/dsh-host-directory-picker-auto
+  // 按宿主能力分发 native / browse），且注册到完全相同的两个 Slot。DSH 的 slots 是
+  // shadow 语义（动态注册的插件天然覆盖内置实现，详见 client/picker-yield.js），
+  // 因此本机 + 官方 picker 可用时必须「不注册」才能让位 —— 用低优先级注册是无效的，
+  // 否则本机 127.0.0.1 点「添加工作区」弹的是插件的远程抽屉（issue #28 第 2 条）。
+  // 旧版 DSH（无官方 picker）与远程/移动访问继续由插件接管，后者保留管理密码解锁
+  // 与 local_only 目录策略（换成官方 picker 会绕过插件的访问限制）。
   ctx.slots.inject('conversation.hero.workspace.directoryFlow', () =>
     ctx.slots.inject('sidebar.workspaces.directoryFlow', function* () {
+      if (shouldYieldToOfficialPicker({
+        local: isLocalEnvironment(),
+        officialPicker: hasOfficialDirectoryPicker(ctx),
+      })) return;
+
       yield ctx.slots.register(
         {
           name: 'conversation.hero.workspace.directoryFlow',
