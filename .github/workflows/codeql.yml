@@ -1,0 +1,50 @@
+# CodeQL 静态安全扫描
+#
+# 与 test.yml 的分工：test.yml 跑功能回归，本文件跑安全与代码质量静态分析，
+# 结果进入仓库 Security → Code scanning alerts。
+# 查询集用 security-and-quality（在安全规则之外多一类正确性/可维护性规则）。
+name: CodeQL
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    - cron: '0 3 * * 1'   # 每周一 03:00 UTC 定时扫描
+
+permissions:
+  actions: read
+  contents: read
+  security-events: write
+
+jobs:
+  analyze:
+    name: CodeQL 静态安全扫描
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    strategy:
+      fail-fast: false
+      matrix:
+        language: [ javascript-typescript ]
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 初始化 CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: ${{ matrix.language }}
+          queries: security-and-quality
+          # 排除构建产物：client/client.js 由 esbuild 打包、lib/feishu/lark-bundled.mjs
+          # 由 scripts/bundle-lark.mjs 生成（6MB）。扫描生成代码既慢又只会产出无意义
+          # 告警（真正的问题在对应源码里），故一并排除。
+          config: |
+            paths-ignore:
+              - client/client.js
+              - lib/feishu/lark-bundled.mjs
+
+      - name: 执行 CodeQL 分析
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:${{ matrix.language }}"
