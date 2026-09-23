@@ -5629,7 +5629,7 @@ function setupMobileExperience(rpcCall, ctx) {
     }
   }, true);
   const setupTrajectoryEscape = () => {
-    const isMobileNow = () => window.innerWidth <= 768;
+    const isMobileNow = () => window.innerWidth <= MOBILE_MAX_WIDTH;
     let escapeBtn = null;
     const hideEscape = () => {
       if (escapeBtn) {

@@ -4083,7 +4083,9 @@ function setupMobileExperience(rpcCall, ctx) {
   //    需要一个「回到对话」的返回入口。检测激活 tab 文案，非「对话」时注入悬浮返回钮，
   //    点击时触发对话 tab（即使 tab 被 CSS 隐藏，JS click 依然有效）。
   const setupTrajectoryEscape = () => {
-    const isMobileNow = () => window.innerWidth <= 768;
+    // 断点走官方 MOBILE_MAX_WIDTH(=767)：原硬编码 768 会在 768px 单点上与宿主
+    // 桌面布局错位，且撞上官方 v2.10.11 的「产物不得残留旧断点字面量」守卫测试。
+    const isMobileNow = () => window.innerWidth <= MOBILE_MAX_WIDTH;
     let escapeBtn = null;
 
     const hideEscape = () => {

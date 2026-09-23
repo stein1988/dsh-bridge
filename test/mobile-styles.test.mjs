@@ -5,7 +5,7 @@ import { MOBILE_STYLES_CSS } from '../client/mobile-styles.js';
 // 这套 CSS 靠硬编码宿主构建产物的 CSS-module 哈希类名命中元素，宿主一升级就可能失效。
 // 这里只钉住"用户可见行为"层面的关键规则，避免以后被误删：
 //   1) 输入框下方的统计胶囊条（StatsPills）在移动端必须隐藏
-//   2) 该隐藏必须落在 @media (max-width: 768px) 内，不能污染桌面端
+//   2) 该隐藏必须与移动端主断点同处一个 @media 内（不断言具体像素值，避免官方调断点就过期）
 //   3) 同时保留 data-composer-stats 属性选择器（宿主换哈希后仍能命中）
 
 /** 取出包含给定片段的那个 @media 块的头部，用于判断作用域。 */
@@ -38,8 +38,18 @@ test('移动端隐藏输入框下方的统计胶囊条（StatsPills）', () => {
 });
 
 test('统计条隐藏规则限定在移动端断点内，不影响桌面端', () => {
-  const media = enclosingMediaQuery(MOBILE_STYLES_CSS, 'data-composer-stats="true"');
-  assert.match(media, /max-width:\s*768px/, `统计条隐藏规则应在 768px 移动端断点内，实际: ${media}`);
+  // 不写死断点像素值：官方会调（如 768→767，见 v2.10.11 #41），写死则每次都要跟改。
+  // 改为断言"与移动端主断点同处一个 @media 块"：以移动端专属选择器 .dsh-mobile-app-header
+  // 作锚点反查它所在的断点块，要求统计条规则也在同一个块里。
+  const headerMedia = enclosingMediaQuery(MOBILE_STYLES_CSS, '.dsh-mobile-app-header');
+  const statsMedia = enclosingMediaQuery(MOBILE_STYLES_CSS, 'data-composer-stats="true"');
+
+  assert.equal(statsMedia, headerMedia,
+    `统计条规则应与移动端主断点同处一个 @media 块。\n统计条所在: ${statsMedia}\n主断点所在: ${headerMedia}`);
+
+  // 必须是 max-width 型（即移动端小屏生效），不能是 min-width（那会在桌面端生效）
+  assert.match(statsMedia, /max-width/,
+    `统计条规则应在 max-width 类型断点内（移动端生效），实际: ${statsMedia}`);
 });
 
 test('统计条隐藏同时覆盖 CSS-module 哈希类名与稳定属性选择器', () => {
