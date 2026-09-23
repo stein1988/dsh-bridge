@@ -19,22 +19,17 @@ updates:
     labels:
       - dependencies
     groups:
-      # DSH 宿主包：与宿主版本强耦合，必须同批升级、同批验证。
-      #
-      # 这里刻意用「显式包名」而不是 scoped glob `@deepseek-ai/*`：实测该 glob 对
-      # scoped 依赖名匹配不上，会导致宿主包反而落进 development 组；而一旦再用
-      # exclude-patterns 把它从 development 排除，更新就会彻底消失（没有 PR）。
-      # 显式列名最可靠，且失败时的降级方向是安全的（落回 development 组，仍有 PR）。
-      # 新增宿主依赖时记得补进这里。
-      dsh-host:
-        patterns:
-          - "@deepseek-ai/dsh-llm"
-          - "@deepseek-ai/cordis"
       # 生产依赖（qrcode / ws）：直接影响运行时，单独一组便于优先验证
       production:
         dependency-type: production
-      # 开发与构建依赖（esbuild / eslint / puppeteer-core / lark SDK 等）：
-      # 合为一个 PR 降噪
+      # 开发与构建依赖（esbuild / eslint / puppeteer-core / lark SDK 等）合为一个 PR 降噪。
+      #
+      # 注意：本组也会包含 @deepseek-ai/dsh-llm（DSH 宿主包，与宿主版本强耦合）。
+      # 曾尝试用 patterns 把它拆成单独一组，但两类写法实测都未被 dependabot 匹配：
+      # scoped glob `@deepseek-ai/*` 与显式包名 `@deepseek-ai/dsh-llm` 均无效，
+      # 依赖仍落回本组；叠加 exclude-patterns 后更新更是彻底消失（一个 PR 都没有）。
+      # 故维持"跟随本组"——合并该组 PR 时请单独确认 dsh-llm 的升级与当前支持的
+      # DSH 版本兼容（README 声明兼容 0.1.0~0.1.5 全系列）。
       development:
         dependency-type: development
 
