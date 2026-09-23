@@ -64,3 +64,36 @@ test('统计条隐藏同时覆盖 CSS-module 哈希类名与稳定属性选择�
     '缺少 bOPqQW_root 哈希类名选择器（宿主升级后需同步新哈希）'
   );
 });
+
+// ---------------------------------------------------------------------------
+// 输入框工具区（附件按钮）：曾经整行 display:none，导致移动端无法发送文件。
+// 宿主把「命令菜单(aria-haspopup)」与「附件上传」两个按钮一起放在 .uV2eYG_tools 里，
+// 而宿主自己没有为这个容器提供任何样式 —— 因此这里必须同时满足：
+//   1) 容器可见且是横向 flex（否则两个 28px 按钮会块级上下堆叠）
+//   2) 附件按钮保留（即不能把整行隐藏）
+//   3) 命令菜单按钮仍隐藏（用 aria-haspopup 定位，与界面语言无关）
+// ---------------------------------------------------------------------------
+
+test('输入框工具区不再整行隐藏（否则附件按钮会消失）', () => {
+  const block = ruleBlockFor(MOBILE_STYLES_CSS, 'div[class*="uV2eYG_tools"] {');
+
+  assert.doesNotMatch(block, /display:\s*none/,
+    '工具区不能整行 display:none —— 附件上传按钮就在这一行里，隐藏后移动端无法发送文件');
+  assert.match(block, /display:\s*flex\s*!important/,
+    '工具区应为横向 flex：宿主没有为它提供样式，不加 flex 两个按钮会上下堆叠');
+});
+
+test('工具区只隐藏命令菜单按钮，保留附件按钮', () => {
+  // 命令菜单按钮是二者中唯一带 aria-haspopup 的（见 dsh-client-ui-conversation 的 InputBar）
+  const hiddenRule = 'div[class*="uV2eYG_tools"] button[aria-haspopup]';
+  assert.ok(MOBILE_STYLES_CSS.includes(hiddenRule),
+    '缺少按 aria-haspopup 隐藏命令菜单按钮的规则');
+
+  const block = ruleBlockFor(MOBILE_STYLES_CSS, hiddenRule);
+  assert.match(block, /display:\s*none\s*!important/,
+    '命令菜单按钮应被隐藏');
+
+  // 反向断言：不得出现"隐藏工具区内所有 button"这种会连带干掉附件按钮的写法
+  assert.doesNotMatch(MOBILE_STYLES_CSS, /uV2eYG_tools[^{]*button\s*\{[^}]*display:\s*none/,
+    '不能隐藏工具区内全部按钮 —— 那会把附件按钮一起干掉');
+});

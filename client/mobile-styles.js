@@ -520,7 +520,21 @@ export const MOBILE_STYLES_CSS = `
         box-sizing: border-box !important;
       }
 
+      /* 输入框左下角工具区（.uV2eYG_tools）：宿主把「命令菜单」与「附件上传」两个按钮都放
+         在这里，而宿主自己**没有**给这个容器写任何样式 —— 不加 flex，两个 28px 的按钮会
+         退化成块级上下堆叠。
+
+         此前这里整行 display:none，副作用是移动端**完全看不到附件上传按钮**（发不了文件）。
+         现在只隐藏命令菜单按钮、保留附件按钮：命令按钮是两者中唯一带 aria-haspopup 的，
+         用它定位与界面语言无关，也不依赖按钮顺序（宿主若调整顺序仍能命中）。 */
       div[class*="uV2eYG_tools"] {
+        display: flex !important;
+        align-items: center !important;
+        gap: 2px !important;
+        flex: 0 0 auto !important;
+      }
+
+      div[class*="uV2eYG_tools"] button[aria-haspopup] {
         display: none !important;
       }
 
