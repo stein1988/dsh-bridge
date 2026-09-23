@@ -21,6 +21,8 @@ coverage/
 
 # Testing
 .jest/
+# 探针测试在 Windows 上运行时生成的 .cmd 包装（见 cloudflared-health-probe.test.mjs）
+test/fixtures/fake-cloudflared.cmd
 
 # Build outputs
 dist/

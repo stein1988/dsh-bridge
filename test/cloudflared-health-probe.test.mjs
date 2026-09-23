@@ -28,12 +28,18 @@ import { spawnSync } from 'node:child_process';
 import { CloudflaredManager, parseMetricsAddress } from '../lib/cloudflared-manager.mjs';
 
 const FIXTURES = join(dirname(fileURLToPath(import.meta.url)), 'fixtures');
-const FAKE_BIN = join(FIXTURES, 'fake-cloudflared.mjs');
 const IS_WIN = process.platform === 'win32';
-const FAKE_SPAWN_OPTS = IS_WIN ? { shell: true } : null;
+// Windows 无法直接执行 .mjs（既没有 shebang 语义，也没有可执行位），必须走 .cmd 包装；
+// Linux/macOS 下 .mjs 带 shebang 且已置可执行位，可直接 spawn。
+// 此前 .cmd 包装写了却从未被使用（FAKE_BIN 恒指 .mjs），导致 Windows CI 上假 cloudflared
+// 秒退 code=0、8 条探针测试全部超时。
+const FAKE_MJS = join(FIXTURES, 'fake-cloudflared.mjs');
+const FAKE_CMD = join(FIXTURES, 'fake-cloudflared.cmd');
 if (IS_WIN) {
-  writeFileSync(join(FIXTURES, 'fake-cloudflared.cmd'), '@echo off\r\nnode "%~dp0fake-cloudflared.mjs" %*\r\n');
+  writeFileSync(FAKE_CMD, '@echo off\r\nnode "%~dp0fake-cloudflared.mjs" %*\r\n');
 }
+const FAKE_BIN = IS_WIN ? FAKE_CMD : FAKE_MJS;
+const FAKE_SPAWN_OPTS = IS_WIN ? { shell: true } : null;
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
