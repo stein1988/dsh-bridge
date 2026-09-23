@@ -20,12 +20,16 @@ updates:
       - dependencies
     groups:
       # DSH 宿主包：与宿主版本强耦合，必须同批升级、同批验证。
-      # 必须排在最前 —— 官方文档的规则是「匹配多个组时进第一个匹配的组」，
-      # 且实测把该组放在中间时，作为 devDependency 的 @deepseek-ai/dsh-llm 仍被
-      # 判进了 development 组；故这里前置，并在 development 组用 exclude-patterns 兜底。
+      #
+      # 这里刻意用「显式包名」而不是 scoped glob `@deepseek-ai/*`：实测该 glob 对
+      # scoped 依赖名匹配不上，会导致宿主包反而落进 development 组；而一旦再用
+      # exclude-patterns 把它从 development 排除，更新就会彻底消失（没有 PR）。
+      # 显式列名最可靠，且失败时的降级方向是安全的（落回 development 组，仍有 PR）。
+      # 新增宿主依赖时记得补进这里。
       dsh-host:
         patterns:
-          - "@deepseek-ai/*"
+          - "@deepseek-ai/dsh-llm"
+          - "@deepseek-ai/cordis"
       # 生产依赖（qrcode / ws）：直接影响运行时，单独一组便于优先验证
       production:
         dependency-type: production
@@ -33,8 +37,6 @@ updates:
       # 合为一个 PR 降噪
       development:
         dependency-type: development
-        exclude-patterns:
-          - "@deepseek-ai/*"
 
   # ---- GitHub Actions：每月检查 ----
   - package-ecosystem: github-actions
