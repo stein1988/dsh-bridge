@@ -4,6 +4,7 @@ import {
   queuePendingOperation, unlockAdmin, onUnlocked,
   fetchLoopbackTokenOnce,
 } from './unlock-manager.js'
+import { hasOfficialDirectoryPicker, shouldYieldToOfficialPicker } from './picker-yield.js'
 // dsh-bridge 客户端插件：设置页「远程访问」面板
 
 // 兼容非 HTTPS 环境（如手机局域网 HTTP 访问）：为非安全上下文补齐 crypto.randomUUID
@@ -4633,60 +4634,69 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
   async function switchToWorkspace(wsId, wsPath) {
     if (isSubmitting) return;
     isSubmitting = true;
-    statusMessage = `正在切换工作区…`;
-    isErrorMessage = false;
-    render();
+    try {
+      statusMessage = `正在切换工作区…`;
+      isErrorMessage = false;
+      render();
 
-    if (typeof onPicked === 'function' && wsPath) {
-      try {
-        onPicked(wsPath);
-      } catch (e) {}
-    }
-
-    let switched = false;
-    if (clientCtx?.workspaces?.startSession && wsId) {
-      try {
-        clientCtx.workspaces.startSession(wsId);
-        switched = true;
-      } catch (e) {
-        console.warn('[dsh-bridge] startSession failed:', e);
+      if (typeof onPicked === 'function' && wsPath) {
+        try {
+          onPicked(wsPath);
+        } catch (e) {}
       }
-    }
 
-    if (!switched && wsPath) {
-      try {
-        if (clientCtx?.workspaces?.create) {
-          const ws = await clientCtx.workspaces.create({ path: wsPath });
-          if (ws?.workspaceId && clientCtx?.workspaces?.startSession) {
-            clientCtx.workspaces.startSession(ws.workspaceId);
-            switched = true;
-          }
+      let switched = false;
+      if (clientCtx?.workspaces?.startSession && wsId) {
+        try {
+          clientCtx.workspaces.startSession(wsId);
+          switched = true;
+        } catch (e) {
+          console.warn('[dsh-bridge] startSession failed:', e);
         }
-        if (!switched) {
-          const raw = await authRpc(BRIDGE_ENDPOINTS.addRemoteWorkspace, { path: wsPath });
-          const res = raw?.value || raw;
-          if (res?.workspaceId && clientCtx?.workspaces?.startSession) {
-            try {
-              clientCtx.workspaces.startSession(res.workspaceId);
-              switched = true;
-            } catch (e) {}
-          }
-          if (!switched && res?.sessionId && clientCtx?.sessions?.open) {
-            try {
-              clientCtx.sessions.open(res.sessionId);
-              switched = true;
-            } catch (e) {}
-          }
-        }
-      } catch (e) {}
-    }
+      }
 
-    statusMessage = `✓ 已切换至工作区！`;
-    render();
-    setTimeout(() => {
-      closeModal();
-      document.body.classList.remove('dsh-drawer-open');
-    }, 400);
+      if (!switched && wsPath) {
+        try {
+          if (clientCtx?.workspaces?.create) {
+            const ws = await clientCtx.workspaces.create({ path: wsPath });
+            if (ws?.workspaceId && clientCtx?.workspaces?.startSession) {
+              clientCtx.workspaces.startSession(ws.workspaceId);
+              switched = true;
+            }
+          }
+          if (!switched) {
+            const raw = await authRpc(BRIDGE_ENDPOINTS.addRemoteWorkspace, { path: wsPath });
+            const res = raw?.value || raw;
+            if (res?.workspaceId && clientCtx?.workspaces?.startSession) {
+              try {
+                clientCtx.workspaces.startSession(res.workspaceId);
+                switched = true;
+              } catch (e) {}
+            }
+            if (!switched && res?.sessionId && clientCtx?.sessions?.open) {
+              try {
+                // 最后手段：直接打开会话。成功后无需再置位 switched ——
+                // 此后不再有基于 switched 的分支（CodeQL js/useless-assignment-to-local）。
+                clientCtx.sessions.open(res.sessionId);
+              } catch (e) {}
+            }
+          }
+        } catch (e) {}
+      }
+
+      statusMessage = `✓ 已切换至工作区！`;
+      render();
+      setTimeout(() => {
+        closeModal();
+        document.body.classList.remove('dsh-drawer-open');
+      }, 400);
+    } finally {
+      // 与 doSubmit 对称：本函数此前只置位、从不复位，导致点过一次「已注册工作区」后，
+      // 同一弹窗实例的 isSubmitting 永久为 true，loadDirectory/doSubmit 的守卫
+      // 让整个弹窗彻底无响应（点目录、点添加都没反应）。用 finally 兜住所有路径，
+      // 包括 render() 抛错以及将来新增的提前 return。
+      isSubmitting = false;
+    }
   }
 
   async function loadDirectory(targetPath) {
@@ -4796,8 +4806,9 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
         
         if (!switched && clientCtx?.sessions?.open && res.sessionId) {
           try {
+            // 最后手段：直接打开会话。此后不再读取 switched
+            // （CodeQL js/useless-assignment-to-local），故不再置位。
             clientCtx.sessions.open(res.sessionId);
-            switched = true;
           } catch (e) {
             console.warn('[dsh-bridge] sessions.open failed:', e);
           }
@@ -5129,9 +5140,22 @@ function apply(ctx) {
 
   const injected = () => ({ pick: () => ctx.workspaces?.pickDirectory?.() });
 
-  // 注册至 DSH 原生目录选择 Slot（设置 priority: -10 覆盖原生 Electron 选择器，在远程/移动网页端生效）
+  // 注册至 DSH 原生目录选择 Slot（priority: -10 覆盖原生 Electron 选择器，在远程/移动网页端生效）
+  //
+  // 但 DSH 0.1.5 起自带官方目录选择器（@deepseek-ai/dsh-host-directory-picker-auto
+  // 按宿主能力分发 native / browse），且注册到完全相同的两个 Slot。DSH 的 slots 是
+  // shadow 语义（动态注册的插件天然覆盖内置实现，详见 client/picker-yield.js），
+  // 因此本机 + 官方 picker 可用时必须「不注册」才能让位 —— 用低优先级注册是无效的，
+  // 否则本机 127.0.0.1 点「添加工作区」弹的是插件的远程抽屉（issue #28 第 2 条）。
+  // 旧版 DSH（无官方 picker）与远程/移动访问继续由插件接管，后者保留管理密码解锁
+  // 与 local_only 目录策略（换成官方 picker 会绕过插件的访问限制）。
   ctx.slots.inject('conversation.hero.workspace.directoryFlow', () =>
     ctx.slots.inject('sidebar.workspaces.directoryFlow', function* () {
+      if (shouldYieldToOfficialPicker({
+        local: isLocalEnvironment(),
+        officialPicker: hasOfficialDirectoryPicker(ctx),
+      })) return;
+
       yield ctx.slots.register(
         {
           name: 'conversation.hero.workspace.directoryFlow',

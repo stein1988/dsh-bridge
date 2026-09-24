@@ -1,0 +1,42 @@
+# Dependabot 依赖更新配置
+#
+# 作用：自动发现依赖的新版本与已知漏洞，并按下面的分组开 PR。
+# 需要留意的版本耦合点（决定了分组方式）：
+#   - `@deepseek-ai/*` 是 DSH 宿主的包（dsh-llm / cordis），版本与宿主强绑定。
+#     本插件声明兼容 DSH 0.1.0~0.1.5 全系列，自动跟进可能破坏兼容性，
+#     故单独成组、单独审核，不与其它依赖混在一个 PR 里。
+#   - 升级构建链依赖（esbuild / globals 等）后必须重跑 `npm run build:client`
+#     并提交产物；升级 lark SDK 后需重跑 `npm run build:lark`。
+version: 2
+updates:
+  # ---- npm 依赖：每周一检查 ----
+  - package-ecosystem: npm
+    directory: "/"
+    schedule:
+      interval: weekly
+      day: monday
+    open-pull-requests-limit: 10
+    labels:
+      - dependencies
+    groups:
+      # 生产依赖（qrcode / ws）：直接影响运行时，单独一组便于优先验证
+      production:
+        dependency-type: production
+      # 开发与构建依赖（esbuild / eslint / puppeteer-core / lark SDK 等）合为一个 PR 降噪。
+      #
+      # 注意：本组也会包含 @deepseek-ai/dsh-llm（DSH 宿主包，与宿主版本强耦合）。
+      # 曾尝试用 patterns 把它拆成单独一组，但两类写法实测都未被 dependabot 匹配：
+      # scoped glob `@deepseek-ai/*` 与显式包名 `@deepseek-ai/dsh-llm` 均无效，
+      # 依赖仍落回本组；叠加 exclude-patterns 后更新更是彻底消失（一个 PR 都没有）。
+      # 故维持"跟随本组"——合并该组 PR 时请单独确认 dsh-llm 的升级与当前支持的
+      # DSH 版本兼容（README 声明兼容 0.1.0~0.1.5 全系列）。
+      development:
+        dependency-type: development
+
+  # ---- GitHub Actions：每月检查 ----
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: monthly
+    labels:
+      - dependencies

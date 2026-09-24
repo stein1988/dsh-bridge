@@ -487,3 +487,47 @@ IM 里所有「冷会话」（不在内存里的）标题都退化成「新会�
 并且修得更干净。**教训：适配类改动应尽快回流上游或至少定期对账**，
 否则会积累出"两条实现同一件事"的合流成本（本次冲突 4 个文件，其中 `bridge-rpc.js`
 的两套实现需要人工取舍）。
+
+## 10. 第二次合流（2026-09-24，合并 upstream v2.10.13）
+
+§9 之后官方又发了 **v2.10.13**（15 个提交，`c18bdd8..4dd3fe8`）。本次再次合流，
+**冲突面比 §9 小得多**：只剩清单文件需要人工取舍，源码全部自动合并。
+
+### 10.1 官方这次带了什么
+
+| 方向 | 内容 | 涉及文件 |
+|---|---|---|
+| 可靠性 | cloudflared 运行时健康探针（每 30s 探活 `/ready`，连续 3 次失败面板降级、10 次判定假死强制重建）＋ 子进程输出落盘 `~/.dsh/dsh-bridge/cloudflared.log`（5MB 轮转、Token 跨 chunk 脱敏） | `lib/cloudflared-manager.mjs`、`lib/index.js` |
+| 兼容 | 「本机访问 且 官方 picker 可用」时**不注册**目录选择 Slot，让位给 DSH 0.1.5 自带选择器（issue #28 第 2 条）；远程/移动仍由插件兜底 | `client/picker-yield.js`（新增）、`client/index.js` |
+| 修复 | 添加工作区弹窗 `isSubmitting` 只置位不复位导致永久卡死（PR #42）；CodeQL `js/useless-assignment-to-local` | `client/index.js` |
+| 工程 | Dependabot 分组、CodeQL 工作流、actions/checkout·setup-node 4→7、devDeps 升级、Windows CI 修复 | `.github/**`、`package.json` |
+
+`cordis.patch.yml` 官方未动，profile 用户层补丁照常命中。
+
+### 10.2 冲突与取舍
+
+| 文件 | 冲突原因 | 处理 |
+|---|---|---|
+| `package.json` | 双方都改 `devDependencies` | 版本号与 `releaseNotes` 取官方 v2.10.13；`esbuild` 取官方 `^0.28.2`；`@deepseek-ai/cordis ^4.0.2` 与 `@deepseek-ai/dsh-llm 0.1.5-rc.1` **保留我们的**（对齐本机宿主 DSH 0.1.5-rc.1，且满足官方 peer 区间 `>=0.1.0-rc.6`） |
+| `package-lock.json` | 同上，且依赖树已整体分叉 | 以上游 lock 为基底，按解析后的 `package.json` 重跑 `npm install` |
+| `client/client.js` | **打包产物**，双方都改 | **不手工合并**，改由 `npm run build:client` 从合并后的源码重建——官方 `picker-yield-official.test.mjs` 自带「产物必须由源码重建」断言，正是防这一类漂移 |
+| `client/index.js` | 双方都改，但区域不重叠 | 自动合并成功：官方改的是 `switchToWorkspace` / Slot 注册，我们改的是 `setupMobileExperience`（移动端轨迹自救 + 折叠按钮搬运） |
+
+### 10.3 验证结果
+
+| 检查 | 结果 |
+|---|---|
+| 测试套件 | ✅ **314/314**（合流前 281 + 官方新增 33） |
+| lint | ✅ 0 error（24 warning，与合流前逐条一致） |
+| `client/client.js` 重建 | ✅ esbuild 0.28.2 重建；产物同时含官方让位判定与我们的移动规则（`shouldYieldToOfficialPicker` / `setupTrajectoryEscape` / `data-composer-stats` / `MOBILE_MAX_WIDTH = 767`） |
+| 产物同步断言 | ✅ 官方两条「打包产物与源码同步」测试通过 |
+| 全部改动模块独立导入 | ✅ `lib/index.js`、`lib/cloudflared-manager.mjs`、`client/picker-yield.js`、`client/mobile-styles.js` |
+| 依赖树 | ✅ `npm ls` 无 invalid（`esbuild@0.28.2`、`@deepseek-ai/cordis@4.0.2`、`@deepseek-ai/dsh-llm@0.1.5-rc.1`） |
+| `cordis.patch.yml` 行 id 对齐 | ✅ 官方未改该文件 |
+| **重启宿主后插件实际加载** | ⬜ **未做** —— 需重启 `dsh web`（会短暂断开隧道），由使用者决定时机；v2.10.13 本身也要求重启才生效 |
+
+### 10.4 复盘：§9.5 的结论被这次验证
+
+§9 放弃自建传输层后，本次合流的成本从「4 个文件人工取舍」降到「只剩 `package.json`
+与 lock 需要决策」——源码全部自动合并，产物交给构建。**定期合流（约一周一次）
+确实比攒到一起省事**，尤其产出物（`client/client.js`）永远不要手工合并。

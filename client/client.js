@@ -1187,6 +1187,21 @@ async function unlockAdmin(rpcCall, password) {
   }
 }
 
+// client/picker-yield.js
+var OFFICIAL_WORKSPACE_SEAT = "uiWorkspace";
+function hasOfficialDirectoryPicker(ctx) {
+  try {
+    if (typeof ctx?.get !== "function") return false;
+    const seat = ctx.get(OFFICIAL_WORKSPACE_SEAT);
+    return typeof seat?.pickDirectory === "function";
+  } catch {
+    return false;
+  }
+}
+function shouldYieldToOfficialPicker(facts) {
+  return Boolean(facts?.local) && Boolean(facts?.officialPicker);
+}
+
 // lib/bridge-rpc-constants.js
 var BRIDGE_RPC_CHANNEL = "/dsh-bridge";
 var BRIDGE_ENDPOINTS = {
@@ -6138,60 +6153,63 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
   async function switchToWorkspace(wsId, wsPath) {
     if (isSubmitting) return;
     isSubmitting = true;
-    statusMessage = `\u6B63\u5728\u5207\u6362\u5DE5\u4F5C\u533A\u2026`;
-    isErrorMessage = false;
-    render();
-    if (typeof onPicked === "function" && wsPath) {
-      try {
-        onPicked(wsPath);
-      } catch (e) {
-      }
-    }
-    let switched = false;
-    if (clientCtx?.workspaces?.startSession && wsId) {
-      try {
-        clientCtx.workspaces.startSession(wsId);
-        switched = true;
-      } catch (e) {
-        console.warn("[dsh-bridge] startSession failed:", e);
-      }
-    }
-    if (!switched && wsPath) {
-      try {
-        if (clientCtx?.workspaces?.create) {
-          const ws = await clientCtx.workspaces.create({ path: wsPath });
-          if (ws?.workspaceId && clientCtx?.workspaces?.startSession) {
-            clientCtx.workspaces.startSession(ws.workspaceId);
-            switched = true;
-          }
+    try {
+      statusMessage = `\u6B63\u5728\u5207\u6362\u5DE5\u4F5C\u533A\u2026`;
+      isErrorMessage = false;
+      render();
+      if (typeof onPicked === "function" && wsPath) {
+        try {
+          onPicked(wsPath);
+        } catch (e) {
         }
-        if (!switched) {
-          const raw = await authRpc(BRIDGE_ENDPOINTS.addRemoteWorkspace, { path: wsPath });
-          const res = raw?.value || raw;
-          if (res?.workspaceId && clientCtx?.workspaces?.startSession) {
-            try {
-              clientCtx.workspaces.startSession(res.workspaceId);
+      }
+      let switched = false;
+      if (clientCtx?.workspaces?.startSession && wsId) {
+        try {
+          clientCtx.workspaces.startSession(wsId);
+          switched = true;
+        } catch (e) {
+          console.warn("[dsh-bridge] startSession failed:", e);
+        }
+      }
+      if (!switched && wsPath) {
+        try {
+          if (clientCtx?.workspaces?.create) {
+            const ws = await clientCtx.workspaces.create({ path: wsPath });
+            if (ws?.workspaceId && clientCtx?.workspaces?.startSession) {
+              clientCtx.workspaces.startSession(ws.workspaceId);
               switched = true;
-            } catch (e) {
             }
           }
-          if (!switched && res?.sessionId && clientCtx?.sessions?.open) {
-            try {
-              clientCtx.sessions.open(res.sessionId);
-              switched = true;
-            } catch (e) {
+          if (!switched) {
+            const raw = await authRpc(BRIDGE_ENDPOINTS.addRemoteWorkspace, { path: wsPath });
+            const res = raw?.value || raw;
+            if (res?.workspaceId && clientCtx?.workspaces?.startSession) {
+              try {
+                clientCtx.workspaces.startSession(res.workspaceId);
+                switched = true;
+              } catch (e) {
+              }
+            }
+            if (!switched && res?.sessionId && clientCtx?.sessions?.open) {
+              try {
+                clientCtx.sessions.open(res.sessionId);
+              } catch (e) {
+              }
             }
           }
+        } catch (e) {
         }
-      } catch (e) {
       }
+      statusMessage = `\u2713 \u5DF2\u5207\u6362\u81F3\u5DE5\u4F5C\u533A\uFF01`;
+      render();
+      setTimeout(() => {
+        closeModal();
+        document.body.classList.remove("dsh-drawer-open");
+      }, 400);
+    } finally {
+      isSubmitting = false;
     }
-    statusMessage = `\u2713 \u5DF2\u5207\u6362\u81F3\u5DE5\u4F5C\u533A\uFF01`;
-    render();
-    setTimeout(() => {
-      closeModal();
-      document.body.classList.remove("dsh-drawer-open");
-    }, 400);
   }
   async function loadDirectory(targetPath) {
     if (isSubmitting) return;
@@ -6286,7 +6304,6 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
         if (!switched && clientCtx?.sessions?.open && res.sessionId) {
           try {
             clientCtx.sessions.open(res.sessionId);
-            switched = true;
           } catch (e) {
             console.warn("[dsh-bridge] sessions.open failed:", e);
           }
@@ -6585,6 +6602,10 @@ function apply(ctx) {
   ctx.slots.inject(
     "conversation.hero.workspace.directoryFlow",
     () => ctx.slots.inject("sidebar.workspaces.directoryFlow", function* () {
+      if (shouldYieldToOfficialPicker({
+        local: isLocalEnvironment(),
+        officialPicker: hasOfficialDirectoryPicker(ctx)
+      })) return;
       yield ctx.slots.register(
         {
           name: "conversation.hero.workspace.directoryFlow",
