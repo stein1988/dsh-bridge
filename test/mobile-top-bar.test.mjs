@@ -91,10 +91,13 @@ test('加号隐藏，右栏代理按钮占用它的位置且可点', () => {
   assert.match(indexSource, /bar\.insertBefore\(btn, anchor\)/, '代理按钮应插在加号原来的位置');
 });
 
-test('右栏按钮用宿主语义属性做展开/收起切换，且不再被误判为工作台', () => {
+test('右栏按钮：展开保留工作台联动（better-sidebar 面板靠它显示），收起时清掉状态', () => {
   assert.match(indexSource, /button\[data-sidebar-right-expand\]/, '展开应点宿主的 [data-sidebar-right-expand]');
   assert.match(indexSource, /button\[data-sidebar-right-toggle\]/, '收起应点面板内的 [data-sidebar-right-toggle]');
-  assert.match(indexSource, /isSidebarRightControl/, '捕获型 click 监听必须排除右栏按钮，否则会误加 dsh-workbench-open');
+  // 点开右栏时桥的捕获型监听会给 body 加 dsh-workbench-open，better-sidebar 面板正是靠这个类显示；
+  // 不能把右栏按钮排除掉，否则面板不会出现（这是使用者明确要的行为）。
+  assert.doesNotMatch(indexSource, /isSidebarRightControl/, '右栏按钮必须保留工作台联动');
+  assert.match(indexSource, /classList\.remove\('dsh-workbench-open'\)/, '收起右栏时必须摘掉 dsh-workbench-open，否则面板会留在屏幕上');
 });
 
 test('轨迹返回按钮按 aria-selected 判断，不读界面文案', () => {
