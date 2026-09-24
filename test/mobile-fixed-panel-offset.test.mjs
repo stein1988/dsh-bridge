@@ -119,11 +119,19 @@ test('让位量与实际顶栏盒高同源（52px 变量未被改成 0 或脱离
     '顶栏高度必须与被让位的 52px 用同一个变量，二者才不会各自漂移',
   );
 
-  const frame = ruleBody(mediaBlock(structureCss, '(max-width: 767px)'), 'div[class*="_frame"]');
+  const mobileBlock = mediaBlock(structureCss, '(max-width: 767px)');
+  const frame = ruleBody(mobileBlock, 'div:has(> [data-shell-overlay])');
+  assert.ok(frame, '移动端块内应有主框架让位规则（语义锚点 div:has(> [data-shell-overlay])）');
   assert.match(
     frame,
     /[;{\s]padding-top:\s*var\(--dsh-mobile-header-h\)\s*!important/,
     '流内内容的让位也必须用同一个变量',
+  );
+  // 旧写法实测跨 8 个包误匹配（layout/chat/attachment/subagent/user-questions×2/documentpreview×2）
+  assert.equal(
+    ruleBody(mobileBlock, 'div[class*="_frame"]'),
+    null,
+    'div[class*="_frame"] 会误伤其它包的 *_frame 元素，应已换成语义锚点',
   );
 
   const panel = ruleBody(mediaBlock(structureCss, '(max-width: 767px)'), '[data-sidebar-right-panel="fullscreen"]');

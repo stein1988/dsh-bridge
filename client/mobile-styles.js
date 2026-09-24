@@ -24,8 +24,21 @@ export const MOBILE_STYLES_CSS = `
        （dsh-client-ui-sidebar-right/lib/client.js），故移动端样式取 <=767px，
        768px 起彻底交还桌面布局，避免"桥渲染顶栏、宿主却未全屏"的错位。 */
     @media (max-width: 767px) {
-      /* 1. 主框架为 Header 腾出顶部空间 */
-      div[class*="_frame"] {
+      /* 0. 顶栏占位高度：把顶部安全区算进同一个变量，全块共用（官方 #41 回归测试要求的"同源"）。
+         手机浏览器里 safe-area-inset-top 通常为 0，退化成 52px，与旧行为完全一致；
+         edge-to-edge 原生壳里它非 0：顶栏整体长高（height 含安全区 + padding-top 消化安全区，
+         box-sizing 下内容盒仍是 52px），主框架留白与 fixed 面板让位自动跟着同一个变量走，
+         不需要第二套数值。 */
+      :root {
+        --dsh-mobile-header-h: calc(52px + var(--dsh-mobile-safe-top));
+      }
+
+      /* 1. 主框架为 Header 腾出顶部空间。
+         锚点：宿主 AppFrame 的唯一直接子节点 [data-shell-overlay]（全宿主仅 1 处），
+         用 :has(> …) 反向命中主框架本身，零哈希（宿主自己的 CSS 也在用 :has()）。
+         旧写法 div[class*="_frame"] 实测跨 8 个包误匹配（layout / chat / attachment /
+         subagent / user-questions×2 / sidebar-documentpreview×2），已废弃。 */
+      div:has(> [data-shell-overlay]) {
         display: flex !important;
         flex-direction: column !important;
         width: 100vw !important;
@@ -91,8 +104,12 @@ export const MOBILE_STYLES_CSS = `
         opacity: 0.6;
       }
 
-      /* 右侧 (+) 新建会话按钮 (DeepSeek App 原生图标) */
+      /* 顶栏右侧按钮：加号（新建会话）隐藏，位置让给「右栏展开/收起」按钮。
+         两个类都是桥自己注入的（client/index.js），用自有锚点，最稳。 */
       .dsh-header-new-btn {
+        display: none !important;
+      }
+      .dsh-header-expand-btn {
         width: 40px;
         height: 40px;
         border-radius: 50%;
@@ -107,8 +124,32 @@ export const MOBILE_STYLES_CSS = `
         transition: opacity 0.15s;
         pointer-events: auto !important;
       }
-      .dsh-header-new-btn:active {
+      .dsh-header-expand-btn:active {
         opacity: 0.6;
+      }
+
+      /* 轨迹视图返回按钮：整条会话头部（含「对话/轨迹」tab 栏）被隐藏后，
+         用户从工具卡进入「轨迹」就没有 tab 可点回来了。显示与否由 JS 按 tab 的
+         aria-selected 判定（不读界面文案），见 client/index.js 的 setupTrajectoryBack()。 */
+      .dsh-trajectory-back-btn {
+        position: fixed !important;
+        left: 16px !important;
+        top: calc(var(--dsh-mobile-header-h, 52px) + 6px) !important;
+        z-index: 10010 !important;
+        height: 30px !important;
+        padding: 0 14px !important;
+        border-radius: 999px !important;
+        border: 1px solid var(--dsw-alias-border-l2, #e5e7eb) !important;
+        background: var(--dsw-alias-bg-layer-1, #ffffff) !important;
+        color: var(--dsw-alias-label-primary, #111827) !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        pointer-events: auto !important;
       }
 
       /* 中间动态会话标题 (单行居中打点截断，100% 还原原生 App 导航体验) */
@@ -126,6 +167,15 @@ export const MOBILE_STYLES_CSS = `
         user-select: none !important;
         pointer-events: none !important;
         letter-spacing: -0.2px !important;
+      }
+
+      /* 3.0 顶部精简：整条会话头部隐藏 —— 它同时装着 Preset 徽标所在的行与「对话/轨迹」tab 栏。
+         锚点用宿主的槽锚点契约 [data-slot="<槽名>"]（渲染器为每个槽渲染点输出，display:contents），
+         不写宿主 CSS-module 哈希兜底（宿主升级时宁可显式失效，也不要静默命中错误元素）。
+         连带影响（已与使用者确认）：同一条头部里的「折叠输入框」按钮与 Session 日志导出
+         按钮一并隐藏；右栏展开按钮由顶栏的代理按钮接管。 */
+      [data-slot="conversation.session.header"] {
+        display: none !important;
       }
 
       /* 3. 中间主内容区与输入框 */
@@ -911,7 +961,8 @@ export const MOBILE_STYLES_CSS = `
     @media (min-width: 768px) {
       .dsh-mobile-app-header,
       .dsh-mobile-backdrop,
-      .dsh-mobile-panel-close-btn {
+      .dsh-mobile-panel-close-btn,
+      .dsh-trajectory-back-btn {
         display: none !important;
       }
     }

@@ -3820,6 +3820,34 @@ function setupMobileExperience(rpcCall, ctx) {
     document.body.appendChild(header);
   }
 
+  // 顶栏右侧「右栏展开/收起」代理按钮：加号（.dsh-header-new-btn）已由 CSS 隐藏，位置让给它。
+  // 不搬动宿主 React 管理的节点（宿主在右栏展开时会直接不渲染 expand 按钮），
+  // 只做转发点击的代理 —— 与左侧菜单键、加号是同一套路；锚点用宿主语义属性，与界面语言无关。
+  const ensureExpandButton = (bar) => {
+    if (!bar || bar.querySelector('.dsh-header-expand-btn')) return;
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'dsh-header-expand-btn';
+    btn.title = '展开/收起右侧边栏';
+    btn.innerHTML = `
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="16" rx="2.5"></rect>
+        <line x1="15" y1="4" x2="15" y2="20"></line>
+      </svg>
+    `;
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      // 折叠态：宿主渲染 expand 按钮 → 展开；展开态：宿主改渲染面板内的收起按钮 → 收起
+      const target = document.querySelector('button[data-sidebar-right-expand]')
+        ?? document.querySelector('button[data-sidebar-right-toggle]');
+      if (target) target.click();
+    };
+    const anchor = bar.querySelector('.dsh-header-new-btn');
+    if (anchor && anchor.parentElement === bar) bar.insertBefore(btn, anchor);
+    else bar.appendChild(btn);
+  };
+  ensureExpandButton(header);
+
   // 绑定会话标题实时同步 (切换会话或收到首条回复自动更新)
   const syncMobileTitle = () => {
     if (!titleEl) titleEl = document.querySelector('.dsh-mobile-header-title');
@@ -3886,7 +3914,10 @@ function setupMobileExperience(rpcCall, ctx) {
   document.addEventListener('click', (e) => {
     if (typeof window === 'undefined' || window.innerWidth > MOBILE_MAX_WIDTH) return;
     const trigger = e.target.closest('button[aria-label*="面板"], button[aria-label*="工作区"], div[class*="toggleCluster"] button, button[class*="subagent"], div[class*="headerActions"] button, div[class*="titleRow"] button');
-    if (trigger && !trigger.classList.contains('dsh-mobile-panel-close-btn') && !trigger.classList.contains('dsh-header-menu-btn') && !trigger.classList.contains('dsh-header-new-btn')) {
+    // 右侧栏的展开/收起按钮就在 titleRow 内，但它打开的是右栏而不是工作台：
+    // 必须排除，否则点它会误加 body.dsh-workbench-open（桥的 CSS 据此显示 better-sidebar 面板）。
+    const isSidebarRightControl = Boolean(trigger?.matches?.('[data-sidebar-right-expand], [data-sidebar-right-toggle]'));
+    if (trigger && !isSidebarRightControl && !trigger.classList.contains('dsh-mobile-panel-close-btn') && !trigger.classList.contains('dsh-header-menu-btn') && !trigger.classList.contains('dsh-header-new-btn')) {
       document.body.classList.add('dsh-workbench-open');
     }
   }, true);
@@ -5037,6 +5068,82 @@ function setupComposerCollapse() {
 }
 
 
+// 移动端「轨迹」视图的返回入口。
+//
+// 背景：移动样式隐藏了整条会话头部（含「对话/轨迹」tab 栏），用户从工具卡的「查看」
+// 进入轨迹视图后没有 tab 可以点回来。这里按 tab 的 aria-selected 判断当前视图
+// （不读界面文案 —— 旧实现比较中文文案，英文界面下按钮常驻且点不掉），
+// 非「对话」视图时在左上角显示一个返回按钮。
+//
+// 触发方式：视图切换由点击驱动，因此用「点击捕获 + resize + 头部窄范围 MutationObserver」
+// 复检，不做轮询。宿主当前只注册两个会话视图（chat order 0 / trajectory order 10），
+// 所以「第一个 tab」就是对话视图；若将来有第三方视图排在 chat 之前，这里要改为按视图身份判断。
+function setupTrajectoryBack(ctx) {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  // 锚点用渲染器的槽锚点契约（与 mobile-styles.js 隐藏头部用的是同一个），不用宿主哈希
+  const HEADER_SLOT = '[data-slot="conversation.session.header"]';
+  const BTN_CLASS = 'dsh-trajectory-back-btn';
+  let btn = null;
+  let observed = null;
+  let observer = null;
+
+  const isMobileNow = () => window.innerWidth <= MOBILE_MAX_WIDTH;
+  const tabsOf = () => Array.prototype.slice.call(document.querySelectorAll(HEADER_SLOT + ' [role="tab"]'));
+
+  const hide = () => {
+    if (!btn) return;
+    btn.remove();
+    btn = null;
+  };
+
+  const show = () => {
+    if (btn || !isMobileNow()) return;
+    btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = BTN_CLASS;
+    btn.textContent = '← 对话';
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const chatTab = tabsOf()[0];
+      if (chatTab) chatTab.click();
+      hide();
+    };
+    document.body.appendChild(btn);
+  };
+
+  const check = () => {
+    if (!isMobileNow()) { hide(); return; }
+    const tabs = tabsOf();
+    // 只有一个视图时无处可去，也不需要返回入口
+    if (tabs.length < 2) { hide(); return; }
+    if (tabs[0].getAttribute('aria-selected') === 'true') hide();
+    else show();
+  };
+
+  // 头部可能被宿主整体重渲染：每次复检都确认观察目标没变，变了就改挂
+  const rescan = () => {
+    const host = document.querySelector(HEADER_SLOT);
+    if (host && host !== observed) {
+      if (observer) observer.disconnect();
+      observer = new MutationObserver(check);
+      observer.observe(host, { subtree: true, childList: true, attributes: true, attributeFilter: ['aria-selected'] });
+      observed = host;
+    }
+    check();
+  };
+
+  const onClickCapture = () => setTimeout(rescan, 0);
+  document.addEventListener('click', onClickCapture, true);
+  window.addEventListener('resize', rescan);
+  ctx.effect(() => () => {
+    document.removeEventListener('click', onClickCapture, true);
+    window.removeEventListener('resize', rescan);
+    if (observer) observer.disconnect();
+    hide();
+  }, 'dsh-bridge: mobile trajectory back button cleanup');
+  rescan();
+}
+
 function apply(ctx) {
   window.__dshClientCtx = ctx;
   const rpcCall = (endpoint, payload, signal) =>
@@ -5049,6 +5156,7 @@ function apply(ctx) {
   setupComposerCollapse();
 
   setupMobileExperience(rpcCall, ctx);
+  setupTrajectoryBack(ctx);
 
   const injected = () => ({ pick: () => ctx.workspaces?.pickDirectory?.() });
 

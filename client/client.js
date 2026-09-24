@@ -55,8 +55,21 @@ var MOBILE_STYLES_CSS = `
        \uFF08dsh-client-ui-sidebar-right/lib/client.js\uFF09\uFF0C\u6545\u79FB\u52A8\u7AEF\u6837\u5F0F\u53D6 <=767px\uFF0C
        768px \u8D77\u5F7B\u5E95\u4EA4\u8FD8\u684C\u9762\u5E03\u5C40\uFF0C\u907F\u514D"\u6865\u6E32\u67D3\u9876\u680F\u3001\u5BBF\u4E3B\u5374\u672A\u5168\u5C4F"\u7684\u9519\u4F4D\u3002 */
     @media (max-width: 767px) {
-      /* 1. \u4E3B\u6846\u67B6\u4E3A Header \u817E\u51FA\u9876\u90E8\u7A7A\u95F4 */
-      div[class*="_frame"] {
+      /* 0. \u9876\u680F\u5360\u4F4D\u9AD8\u5EA6\uFF1A\u628A\u9876\u90E8\u5B89\u5168\u533A\u7B97\u8FDB\u540C\u4E00\u4E2A\u53D8\u91CF\uFF0C\u5168\u5757\u5171\u7528\uFF08\u5B98\u65B9 #41 \u56DE\u5F52\u6D4B\u8BD5\u8981\u6C42\u7684"\u540C\u6E90"\uFF09\u3002
+         \u624B\u673A\u6D4F\u89C8\u5668\u91CC safe-area-inset-top \u901A\u5E38\u4E3A 0\uFF0C\u9000\u5316\u6210 52px\uFF0C\u4E0E\u65E7\u884C\u4E3A\u5B8C\u5168\u4E00\u81F4\uFF1B
+         edge-to-edge \u539F\u751F\u58F3\u91CC\u5B83\u975E 0\uFF1A\u9876\u680F\u6574\u4F53\u957F\u9AD8\uFF08height \u542B\u5B89\u5168\u533A + padding-top \u6D88\u5316\u5B89\u5168\u533A\uFF0C
+         box-sizing \u4E0B\u5185\u5BB9\u76D2\u4ECD\u662F 52px\uFF09\uFF0C\u4E3B\u6846\u67B6\u7559\u767D\u4E0E fixed \u9762\u677F\u8BA9\u4F4D\u81EA\u52A8\u8DDF\u7740\u540C\u4E00\u4E2A\u53D8\u91CF\u8D70\uFF0C
+         \u4E0D\u9700\u8981\u7B2C\u4E8C\u5957\u6570\u503C\u3002 */
+      :root {
+        --dsh-mobile-header-h: calc(52px + var(--dsh-mobile-safe-top));
+      }
+
+      /* 1. \u4E3B\u6846\u67B6\u4E3A Header \u817E\u51FA\u9876\u90E8\u7A7A\u95F4\u3002
+         \u951A\u70B9\uFF1A\u5BBF\u4E3B AppFrame \u7684\u552F\u4E00\u76F4\u63A5\u5B50\u8282\u70B9 [data-shell-overlay]\uFF08\u5168\u5BBF\u4E3B\u4EC5 1 \u5904\uFF09\uFF0C
+         \u7528 :has(> \u2026) \u53CD\u5411\u547D\u4E2D\u4E3B\u6846\u67B6\u672C\u8EAB\uFF0C\u96F6\u54C8\u5E0C\uFF08\u5BBF\u4E3B\u81EA\u5DF1\u7684 CSS \u4E5F\u5728\u7528 :has()\uFF09\u3002
+         \u65E7\u5199\u6CD5 div[class*="_frame"] \u5B9E\u6D4B\u8DE8 8 \u4E2A\u5305\u8BEF\u5339\u914D\uFF08layout / chat / attachment /
+         subagent / user-questions\xD72 / sidebar-documentpreview\xD72\uFF09\uFF0C\u5DF2\u5E9F\u5F03\u3002 */
+      div:has(> [data-shell-overlay]) {
         display: flex !important;
         flex-direction: column !important;
         width: 100vw !important;
@@ -122,8 +135,12 @@ var MOBILE_STYLES_CSS = `
         opacity: 0.6;
       }
 
-      /* \u53F3\u4FA7 (+) \u65B0\u5EFA\u4F1A\u8BDD\u6309\u94AE (DeepSeek App \u539F\u751F\u56FE\u6807) */
+      /* \u9876\u680F\u53F3\u4FA7\u6309\u94AE\uFF1A\u52A0\u53F7\uFF08\u65B0\u5EFA\u4F1A\u8BDD\uFF09\u9690\u85CF\uFF0C\u4F4D\u7F6E\u8BA9\u7ED9\u300C\u53F3\u680F\u5C55\u5F00/\u6536\u8D77\u300D\u6309\u94AE\u3002
+         \u4E24\u4E2A\u7C7B\u90FD\u662F\u6865\u81EA\u5DF1\u6CE8\u5165\u7684\uFF08client/index.js\uFF09\uFF0C\u7528\u81EA\u6709\u951A\u70B9\uFF0C\u6700\u7A33\u3002 */
       .dsh-header-new-btn {
+        display: none !important;
+      }
+      .dsh-header-expand-btn {
         width: 40px;
         height: 40px;
         border-radius: 50%;
@@ -138,8 +155,32 @@ var MOBILE_STYLES_CSS = `
         transition: opacity 0.15s;
         pointer-events: auto !important;
       }
-      .dsh-header-new-btn:active {
+      .dsh-header-expand-btn:active {
         opacity: 0.6;
+      }
+
+      /* \u8F68\u8FF9\u89C6\u56FE\u8FD4\u56DE\u6309\u94AE\uFF1A\u6574\u6761\u4F1A\u8BDD\u5934\u90E8\uFF08\u542B\u300C\u5BF9\u8BDD/\u8F68\u8FF9\u300Dtab \u680F\uFF09\u88AB\u9690\u85CF\u540E\uFF0C
+         \u7528\u6237\u4ECE\u5DE5\u5177\u5361\u8FDB\u5165\u300C\u8F68\u8FF9\u300D\u5C31\u6CA1\u6709 tab \u53EF\u70B9\u56DE\u6765\u4E86\u3002\u663E\u793A\u4E0E\u5426\u7531 JS \u6309 tab \u7684
+         aria-selected \u5224\u5B9A\uFF08\u4E0D\u8BFB\u754C\u9762\u6587\u6848\uFF09\uFF0C\u89C1 client/index.js \u7684 setupTrajectoryBack()\u3002 */
+      .dsh-trajectory-back-btn {
+        position: fixed !important;
+        left: 16px !important;
+        top: calc(var(--dsh-mobile-header-h, 52px) + 6px) !important;
+        z-index: 10010 !important;
+        height: 30px !important;
+        padding: 0 14px !important;
+        border-radius: 999px !important;
+        border: 1px solid var(--dsw-alias-border-l2, #e5e7eb) !important;
+        background: var(--dsw-alias-bg-layer-1, #ffffff) !important;
+        color: var(--dsw-alias-label-primary, #111827) !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        cursor: pointer !important;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.12) !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        gap: 4px !important;
+        pointer-events: auto !important;
       }
 
       /* \u4E2D\u95F4\u52A8\u6001\u4F1A\u8BDD\u6807\u9898 (\u5355\u884C\u5C45\u4E2D\u6253\u70B9\u622A\u65AD\uFF0C100% \u8FD8\u539F\u539F\u751F App \u5BFC\u822A\u4F53\u9A8C) */
@@ -157,6 +198,15 @@ var MOBILE_STYLES_CSS = `
         user-select: none !important;
         pointer-events: none !important;
         letter-spacing: -0.2px !important;
+      }
+
+      /* 3.0 \u9876\u90E8\u7CBE\u7B80\uFF1A\u6574\u6761\u4F1A\u8BDD\u5934\u90E8\u9690\u85CF \u2014\u2014 \u5B83\u540C\u65F6\u88C5\u7740 Preset \u5FBD\u6807\u6240\u5728\u7684\u884C\u4E0E\u300C\u5BF9\u8BDD/\u8F68\u8FF9\u300Dtab \u680F\u3002
+         \u951A\u70B9\u7528\u5BBF\u4E3B\u7684\u69FD\u951A\u70B9\u5951\u7EA6 [data-slot="<\u69FD\u540D>"]\uFF08\u6E32\u67D3\u5668\u4E3A\u6BCF\u4E2A\u69FD\u6E32\u67D3\u70B9\u8F93\u51FA\uFF0Cdisplay:contents\uFF09\uFF0C
+         \u4E0D\u5199\u5BBF\u4E3B CSS-module \u54C8\u5E0C\u515C\u5E95\uFF08\u5BBF\u4E3B\u5347\u7EA7\u65F6\u5B81\u53EF\u663E\u5F0F\u5931\u6548\uFF0C\u4E5F\u4E0D\u8981\u9759\u9ED8\u547D\u4E2D\u9519\u8BEF\u5143\u7D20\uFF09\u3002
+         \u8FDE\u5E26\u5F71\u54CD\uFF08\u5DF2\u4E0E\u4F7F\u7528\u8005\u786E\u8BA4\uFF09\uFF1A\u540C\u4E00\u6761\u5934\u90E8\u91CC\u7684\u300C\u6298\u53E0\u8F93\u5165\u6846\u300D\u6309\u94AE\u4E0E Session \u65E5\u5FD7\u5BFC\u51FA
+         \u6309\u94AE\u4E00\u5E76\u9690\u85CF\uFF1B\u53F3\u680F\u5C55\u5F00\u6309\u94AE\u7531\u9876\u680F\u7684\u4EE3\u7406\u6309\u94AE\u63A5\u7BA1\u3002 */
+      [data-slot="conversation.session.header"] {
+        display: none !important;
       }
 
       /* 3. \u4E2D\u95F4\u4E3B\u5185\u5BB9\u533A\u4E0E\u8F93\u5165\u6846 */
@@ -942,7 +992,8 @@ var MOBILE_STYLES_CSS = `
     @media (min-width: 768px) {
       .dsh-mobile-app-header,
       .dsh-mobile-backdrop,
-      .dsh-mobile-panel-close-btn {
+      .dsh-mobile-panel-close-btn,
+      .dsh-trajectory-back-btn {
         display: none !important;
       }
     }
@@ -5357,6 +5408,28 @@ function setupMobileExperience(rpcCall, ctx) {
     header.appendChild(rightBtn);
     document.body.appendChild(header);
   }
+  const ensureExpandButton = (bar) => {
+    if (!bar || bar.querySelector(".dsh-header-expand-btn")) return;
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "dsh-header-expand-btn";
+    btn.title = "\u5C55\u5F00/\u6536\u8D77\u53F3\u4FA7\u8FB9\u680F";
+    btn.innerHTML = `
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <rect x="3" y="4" width="18" height="16" rx="2.5"></rect>
+        <line x1="15" y1="4" x2="15" y2="20"></line>
+      </svg>
+    `;
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const target = document.querySelector("button[data-sidebar-right-expand]") ?? document.querySelector("button[data-sidebar-right-toggle]");
+      if (target) target.click();
+    };
+    const anchor = bar.querySelector(".dsh-header-new-btn");
+    if (anchor && anchor.parentElement === bar) bar.insertBefore(btn, anchor);
+    else bar.appendChild(btn);
+  };
+  ensureExpandButton(header);
   const syncMobileTitle = () => {
     if (!titleEl) titleEl = document.querySelector(".dsh-mobile-header-title");
     if (!titleEl) return;
@@ -5415,7 +5488,8 @@ function setupMobileExperience(rpcCall, ctx) {
   document.addEventListener("click", (e) => {
     if (typeof window === "undefined" || window.innerWidth > MOBILE_MAX_WIDTH) return;
     const trigger = e.target.closest('button[aria-label*="\u9762\u677F"], button[aria-label*="\u5DE5\u4F5C\u533A"], div[class*="toggleCluster"] button, button[class*="subagent"], div[class*="headerActions"] button, div[class*="titleRow"] button');
-    if (trigger && !trigger.classList.contains("dsh-mobile-panel-close-btn") && !trigger.classList.contains("dsh-header-menu-btn") && !trigger.classList.contains("dsh-header-new-btn")) {
+    const isSidebarRightControl = Boolean(trigger?.matches?.("[data-sidebar-right-expand], [data-sidebar-right-toggle]"));
+    if (trigger && !isSidebarRightControl && !trigger.classList.contains("dsh-mobile-panel-close-btn") && !trigger.classList.contains("dsh-header-menu-btn") && !trigger.classList.contains("dsh-header-new-btn")) {
       document.body.classList.add("dsh-workbench-open");
     }
   }, true);
@@ -6394,6 +6468,68 @@ function setupComposerCollapse() {
   observer.observe(document.body, { childList: true, subtree: true });
   onComposerChange();
 }
+function setupTrajectoryBack(ctx) {
+  if (typeof window === "undefined" || typeof document === "undefined") return;
+  const HEADER_SLOT = '[data-slot="conversation.session.header"]';
+  const BTN_CLASS = "dsh-trajectory-back-btn";
+  let btn = null;
+  let observed = null;
+  let observer = null;
+  const isMobileNow = () => window.innerWidth <= MOBILE_MAX_WIDTH;
+  const tabsOf = () => Array.prototype.slice.call(document.querySelectorAll(HEADER_SLOT + ' [role="tab"]'));
+  const hide = () => {
+    if (!btn) return;
+    btn.remove();
+    btn = null;
+  };
+  const show = () => {
+    if (btn || !isMobileNow()) return;
+    btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = BTN_CLASS;
+    btn.textContent = "\u2190 \u5BF9\u8BDD";
+    btn.onclick = (e) => {
+      e.stopPropagation();
+      const chatTab = tabsOf()[0];
+      if (chatTab) chatTab.click();
+      hide();
+    };
+    document.body.appendChild(btn);
+  };
+  const check = () => {
+    if (!isMobileNow()) {
+      hide();
+      return;
+    }
+    const tabs = tabsOf();
+    if (tabs.length < 2) {
+      hide();
+      return;
+    }
+    if (tabs[0].getAttribute("aria-selected") === "true") hide();
+    else show();
+  };
+  const rescan = () => {
+    const host = document.querySelector(HEADER_SLOT);
+    if (host && host !== observed) {
+      if (observer) observer.disconnect();
+      observer = new MutationObserver(check);
+      observer.observe(host, { subtree: true, childList: true, attributes: true, attributeFilter: ["aria-selected"] });
+      observed = host;
+    }
+    check();
+  };
+  const onClickCapture = () => setTimeout(rescan, 0);
+  document.addEventListener("click", onClickCapture, true);
+  window.addEventListener("resize", rescan);
+  ctx.effect(() => () => {
+    document.removeEventListener("click", onClickCapture, true);
+    window.removeEventListener("resize", rescan);
+    if (observer) observer.disconnect();
+    hide();
+  }, "dsh-bridge: mobile trajectory back button cleanup");
+  rescan();
+}
 function apply(ctx) {
   window.__dshClientCtx = ctx;
   const rpcCall = (endpoint, payload, signal) => ctx.connection.rpc.call(BRIDGE_RPC_CHANNEL, endpoint, payload, signal);
@@ -6401,6 +6537,7 @@ function apply(ctx) {
   setupIosKeyboardAdapter();
   setupComposerCollapse();
   setupMobileExperience(rpcCall, ctx);
+  setupTrajectoryBack(ctx);
   const injected = () => ({ pick: () => ctx.workspaces?.pickDirectory?.() });
   ctx.slots.inject(
     "conversation.hero.workspace.directoryFlow",
