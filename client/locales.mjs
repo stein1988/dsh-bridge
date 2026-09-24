@@ -28,6 +28,9 @@ export const zh = {
   'menu.open': '打开菜单',
   'menu.newSession': '新建会话',
   'title.fallback': '新会话',
+  // 顶栏右侧代理按钮与轨迹返回入口（移动端自绘 UI，文案随 DSH 主体语言）
+  'sidebarRight.toggle': '展开/收起右侧边栏',
+  'trajectory.back': '← 对话',
   // 移动端输入区
   'composer.placeholder': '✍️ 点击输入消息…',
   'composer.expand': '展开输入框',
@@ -90,6 +93,9 @@ export const en = {
   'menu.open': 'Open menu',
   'menu.newSession': 'New session',
   'title.fallback': 'New Session',
+  // Mobile-drawn top bar: right sidebar proxy button and trajectory back entry
+  'sidebarRight.toggle': 'Expand/collapse right sidebar',
+  'trajectory.back': '← Chat',
   'composer.placeholder': '✍️ Tap to type a message…',
   'composer.expand': 'Expand input',
   'composer.collapse': 'Collapse input to maximize chat view',
