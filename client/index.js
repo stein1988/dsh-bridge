@@ -3914,10 +3914,7 @@ function setupMobileExperience(rpcCall, ctx) {
   document.addEventListener('click', (e) => {
     if (typeof window === 'undefined' || window.innerWidth > MOBILE_MAX_WIDTH) return;
     const trigger = e.target.closest('button[aria-label*="面板"], button[aria-label*="工作区"], div[class*="toggleCluster"] button, button[class*="subagent"], div[class*="headerActions"] button, div[class*="titleRow"] button');
-    // 右侧栏的展开/收起按钮就在 titleRow 内，但它打开的是右栏而不是工作台：
-    // 必须排除，否则点它会误加 body.dsh-workbench-open（桥的 CSS 据此显示 better-sidebar 面板）。
-    const isSidebarRightControl = Boolean(trigger?.matches?.('[data-sidebar-right-expand], [data-sidebar-right-toggle]'));
-    if (trigger && !isSidebarRightControl && !trigger.classList.contains('dsh-mobile-panel-close-btn') && !trigger.classList.contains('dsh-header-menu-btn') && !trigger.classList.contains('dsh-header-new-btn')) {
+    if (trigger && !trigger.classList.contains('dsh-mobile-panel-close-btn') && !trigger.classList.contains('dsh-header-menu-btn') && !trigger.classList.contains('dsh-header-new-btn')) {
       document.body.classList.add('dsh-workbench-open');
     }
   }, true);
@@ -3925,6 +3922,14 @@ function setupMobileExperience(rpcCall, ctx) {
   // 移动端点击 DSH 自带的收起侧边栏图标时，自动收起抽屉
   document.addEventListener('click', (e) => {
     if (typeof window === 'undefined' || window.innerWidth > MOBILE_MAX_WIDTH) return;
+    // 右侧栏的收起按钮 aria-label 是「收起右侧边栏」，不含左侧抽屉的「收起侧边栏」，
+    // 因此额外用宿主语义属性 data-sidebar-right-toggle 命中；收起右栏时必须摘掉
+    // dsh-workbench-open，否则桥的 CSS 会把 better-sidebar 面板继续留在屏幕上。
+    const rightToggle = e.target.closest('button[data-sidebar-right-toggle]');
+    if (rightToggle) {
+      document.body.classList.remove('dsh-workbench-open');
+      return;
+    }
     const toggle = e.target.closest('button[aria-label*="收起侧边栏"], button[title*="收起侧边栏"]');
     if (toggle) {
       document.body.classList.remove('dsh-drawer-open');

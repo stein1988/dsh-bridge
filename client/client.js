@@ -5488,13 +5488,17 @@ function setupMobileExperience(rpcCall, ctx) {
   document.addEventListener("click", (e) => {
     if (typeof window === "undefined" || window.innerWidth > MOBILE_MAX_WIDTH) return;
     const trigger = e.target.closest('button[aria-label*="\u9762\u677F"], button[aria-label*="\u5DE5\u4F5C\u533A"], div[class*="toggleCluster"] button, button[class*="subagent"], div[class*="headerActions"] button, div[class*="titleRow"] button');
-    const isSidebarRightControl = Boolean(trigger?.matches?.("[data-sidebar-right-expand], [data-sidebar-right-toggle]"));
-    if (trigger && !isSidebarRightControl && !trigger.classList.contains("dsh-mobile-panel-close-btn") && !trigger.classList.contains("dsh-header-menu-btn") && !trigger.classList.contains("dsh-header-new-btn")) {
+    if (trigger && !trigger.classList.contains("dsh-mobile-panel-close-btn") && !trigger.classList.contains("dsh-header-menu-btn") && !trigger.classList.contains("dsh-header-new-btn")) {
       document.body.classList.add("dsh-workbench-open");
     }
   }, true);
   document.addEventListener("click", (e) => {
     if (typeof window === "undefined" || window.innerWidth > MOBILE_MAX_WIDTH) return;
+    const rightToggle = e.target.closest("button[data-sidebar-right-toggle]");
+    if (rightToggle) {
+      document.body.classList.remove("dsh-workbench-open");
+      return;
+    }
     const toggle = e.target.closest('button[aria-label*="\u6536\u8D77\u4FA7\u8FB9\u680F"], button[title*="\u6536\u8D77\u4FA7\u8FB9\u680F"]');
     if (toggle) {
       document.body.classList.remove("dsh-drawer-open");
