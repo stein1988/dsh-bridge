@@ -21,8 +21,7 @@
     "README.md",
     "README.en.md",
     "CHANGELOG.md",
-    "LICENSE",
-    "docs"
+    "LICENSE"
   ],
   "scripts": {
     "build:client": "node client/build.mjs",

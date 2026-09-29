@@ -1,7 +1,7 @@
 # dsh-bridge
 
 <p align="center">
-  <img src="docs/banner.jpg" alt="dsh-bridge banner" width="100%" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/banner.webp" alt="dsh-bridge banner" width="100%" />
 </p>
 
 <p align="center">
@@ -128,7 +128,7 @@ Launch DeepSeek Harness, open Settings in the left sidebar, and click **"Remote 
 Starts **automatically with DSH service**, zero configuration required.
 
 <p align="center">
-  <img src="docs/screenshots/lan-access.jpg" width="600" alt="LAN Access Console" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/lan-access.webp" width="600" alt="LAN Access Console" />
 </p>
 
 * **Instant QR Code Scan**: Connect phone and PC to the same Wi-Fi, scan the QR code with phone camera to access mobile web UI;
@@ -141,7 +141,7 @@ Starts **automatically with DSH service**, zero configuration required.
 Access DeepSeek Harness from anywhere outside your home network without public IP or router port forwarding:
 
 <p align="center">
-  <img src="docs/screenshots/tunnel-access.jpg" width="600" alt="Tunnel Access Configuration" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/tunnel-access.webp" width="600" alt="Tunnel Access Configuration" />
 </p>
 
 - **Mode 1: Zero-Login Temporary Tunnel (Default)**:
@@ -169,25 +169,25 @@ Deeply optimized for mobile screens and touch interactions:
 #### Mobile Chat & Workspace Experience
 
 <p align="center">
-  <img src="docs/screenshots/remote-web-mobile.jpg" width="23%" alt="Mobile Home" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/remote-web-mobile.webp" width="23%" alt="Mobile Home" />
   &nbsp;
-  <img src="docs/screenshots/mobile-chat.jpg" width="23%" alt="Mobile Chat" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/mobile-chat.webp" width="23%" alt="Mobile Chat" />
   &nbsp;
-  <img src="docs/screenshots/mobile-drawer.jpg" width="23%" alt="Mobile Drawer" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/mobile-drawer.webp" width="23%" alt="Mobile Drawer" />
   &nbsp;
-  <img src="docs/screenshots/mobile-workspace-picker.jpg" width="23%" alt="Mobile Workspace Picker" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/mobile-workspace-picker.webp" width="23%" alt="Mobile Workspace Picker" />
 </p>
 
 #### Remote Settings Center on Mobile
 
 <p align="center">
-  <img src="docs/screenshots/mobile-settings-lan.jpg" width="23%" alt="LAN Settings" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/mobile-settings-lan.webp" width="23%" alt="LAN Settings" />
   &nbsp;
-  <img src="docs/screenshots/mobile-settings-tunnel.jpg" width="23%" alt="Tunnel Settings" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/mobile-settings-tunnel.webp" width="23%" alt="Tunnel Settings" />
   &nbsp;
-  <img src="docs/screenshots/mobile-settings-im.jpg" width="23%" alt="IM Bot Settings" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/mobile-settings-im.webp" width="23%" alt="IM Bot Settings" />
   &nbsp;
-  <img src="docs/screenshots/mobile-settings-security.jpg" width="23%" alt="Security Settings" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/mobile-settings-security.webp" width="23%" alt="Security Settings" />
 </p>
 
 ---
@@ -197,7 +197,7 @@ Deeply optimized for mobile screens and touch interactions:
 Solves the pain point of mobile browsers being unable to trigger PC native folder dialogs:
 
 <p align="center">
-  <img src="docs/screenshots/mobile-workspace-picker.jpg" width="380" alt="Mobile Workspace Picker" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/mobile-workspace-picker.webp" width="380" alt="Mobile Workspace Picker" />
 </p>
 
 * **Smart Routing**: PC localhost visits (`127.0.0.1`) invoke OS native file dialogs; mobile/remote visits pop up responsive bottom directory browser;
@@ -210,7 +210,7 @@ Solves the pain point of mobile browsers being unable to trigger PC native folde
 Open **"Security"** tab to establish bank-grade protection for your local development environment:
 
 <p align="center">
-  <img src="docs/screenshots/security-auth-config.jpg" width="600" alt="Security Config" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/security-auth-config.webp" width="600" alt="Security Config" />
 </p>
 
 #### 1. 🛡️ Line 1: External Access Gateway
@@ -221,7 +221,7 @@ Open **"Security"** tab to establish bank-grade protection for your local develo
   <summary>📱 Click to view Remote Access Login Page</summary>
   <br/>
   <p align="center">
-    <img src="docs/screenshots/remote-auth-login.jpg" width="500" alt="Remote Access Login Page" />
+    <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/remote-auth-login.webp" width="500" alt="Remote Access Login Page" />
   </p>
 </details>
 
@@ -233,13 +233,13 @@ Open **"Security"** tab to establish bank-grade protection for your local develo
   <summary>🖥️ Click to view Admin Console Lock Screen</summary>
   <br/>
   <p align="center">
-    <img src="docs/screenshots/admin-lock-screen.jpg" width="500" alt="Admin Console Lock Screen" />
+    <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/admin-lock-screen.webp" width="500" alt="Admin Console Lock Screen" />
   </p>
 </details>
 
 #### 3. 🛟 Triple Disaster Recovery (Never Locked Out)
 - **Host Physical Privilege**: PC localhost (`127.0.0.1`) enjoys permanent highest privilege, never locked;
-- **Terminal Emergency Reset**: Run `touch ~/.dsh/dsh-bridge/reset-auth` in terminal to reset passwords instantly;
+- **Terminal Emergency Reset**: Run `touch ~/.dsh/dsh-bridge/reset-auth` in terminal to reset passwords and security policy (takes effect on the next plugin start / DSH restart);
 - **Interactive Guidance**: Built-in interactive recovery guides on all auth pages.
 
 ---
@@ -255,14 +255,14 @@ Interact with local AI agents directly inside your favorite messaging apps witho
 Scan QR code with personal WeChat account to chat, manage sessions, and approve permissions via official Tencent servers without public IP.
 
 <p align="center">
-  <img src="docs/screenshots/wechat-bot-config.jpg" width="600" alt="WeChat Bot Config" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/wechat-bot-config.webp" width="600" alt="WeChat Bot Config" />
 </p>
 
 <details>
   <summary>📱 Click to view WeChat Chat & Approval</summary>
   <br/>
   <p align="center">
-    <img src="docs/screenshots/wechat-chat.jpg" width="380" alt="WeChat Chat" />
+    <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/wechat-chat.webp" width="380" alt="WeChat Chat" />
   </p>
 </details>
 
@@ -275,15 +275,15 @@ Scan QR code with personal WeChat account to chat, manage sessions, and approve 
 Official QQ Bot with direct/group @chat, Markdown rendering, interactive button keyboards, and rich media transfers.
 
 <p align="center">
-  <img src="docs/screenshots/qq-bot-config.jpg" width="600" alt="QQ Bot Config" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/qq-bot-config.webp" width="600" alt="QQ Bot Config" />
 </p>
 
 <details>
   <summary>📱 Click to view QQ Direct & Group Chat</summary>
   <br/>
   <p align="center">
-    <img src="docs/screenshots/qq-chat.jpg" width="48%" alt="QQ Direct Chat" />
-    <img src="docs/screenshots/qq-group.jpg" width="48%" alt="QQ Group Chat" />
+    <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/qq-chat.webp" width="48%" alt="QQ Direct Chat" />
+    <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/qq-group.webp" width="48%" alt="QQ Group Chat" />
   </p>
 </details>
 
@@ -296,14 +296,14 @@ Official QQ Bot with direct/group @chat, Markdown rendering, interactive button 
 Enterprise self-built app via official full-duplex WebSocket long connection—**100% No Public IP / No Webhook required**.
 
 <p align="center">
-  <img src="docs/screenshots/feishu-bot-config.jpg" width="600" alt="Feishu Bot Config" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/feishu-bot-config.webp" width="600" alt="Feishu Bot Config" />
 </p>
 
 <details>
   <summary>📱 Click to view Feishu Chat & Card Approval</summary>
   <br/>
   <p align="center">
-    <img src="docs/screenshots/feishu-chat.jpg" width="380" alt="Feishu Chat" />
+    <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/feishu-chat.webp" width="380" alt="Feishu Chat" />
   </p>
 </details>
 
@@ -316,7 +316,7 @@ Enterprise self-built app via official full-duplex WebSocket long connection—*
 Official Telegram Bot API with Long Polling and **built-in zero-dependency HTTP/HTTPS proxy tunnel**.
 
 <p align="center">
-  <img src="docs/screenshots/telegram-bot-config.jpg" width="600" alt="Telegram Bot Config" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/telegram-bot-config.webp" width="600" alt="Telegram Bot Config" />
 </p>
 
 * **Quick Setup**: Create bot with [@BotFather](https://t.me/BotFather) > Fill Bot Token (and optional proxy) > Send first message to auto-authorize. See [Telegram Guide](docs/telegram-usage.md).
@@ -348,7 +348,7 @@ Official Telegram Bot API with Long Polling and **built-in zero-dependency HTTP/
 Open **"Maintenance"** tab to monitor health and manage operations:
 
 <p align="center">
-  <img src="docs/screenshots/mobile-remote-settings.jpg" width="380" alt="Maintenance Dashboard" />
+  <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/mobile-remote-settings.webp" width="380" alt="Maintenance Dashboard" />
 </p>
 
 * **📊 Host System Metrics Dashboard**: Real-time CPU model, total/used RAM, Node heap memory, and DSH uptime;

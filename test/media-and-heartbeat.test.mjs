@@ -172,7 +172,7 @@ test('ConversationBridge triggers sendMediaFile on turn/end when [SEND_FILE: pat
   bridge.peerId = 'u1'
   bridge.activeSessionId = 'session-1'
 
-  const targetFile = 'docs/banner.jpg'
+  const targetFile = 'package.json' // 用仓内稳定文件做夹具，避免依赖 docs/ 资源（其格式与打包策略会变）
 
   await ctx.emit('session/event', { id: 'session-1' }, { type: 'turn/start', data: { turn: 1 } })
   await ctx.emit('session/event', { id: 'session-1' }, {
