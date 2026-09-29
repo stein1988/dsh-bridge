@@ -1742,6 +1742,8 @@ var BRIDGE_ENDPOINTS = {
   authRegenerateToken: "authRegenerateToken",
   authAdminUnlock: "authAdminUnlock",
   authAdminLock: "authAdminLock",
+  // 首次启用引导：用户确认已了解后置位，避免重复打扰
+  dismissFirstRunGuide: "dismissFirstRunGuide",
   // 平台管理器（多 IM 平台统一接口）
   listPlatforms: "listPlatforms",
   platformLogin: "platformLogin",
