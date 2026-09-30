@@ -22,6 +22,8 @@
 
 ### 🐞 修复
 
+- **IM 会话标题恒为「新会话」（DSH 0.1.7 存储格式变更）**：`/sessions` 列表所有会话标题都显示「新会话」。DSH 0.1.7 把 `session_projcache` 领域由**单文件**改为**per-record 目录**（`storages/session_projcache/sessions/<id>.json`），插件仍读旧的 `storages/session_projcache.json`（已不存在）→ 投影缓存恒为空 → 标题只能回退到内存/事件标题，取不到即落成「新会话」。现同时支持两种布局，并改为**按 id 惰性读取**（消费方只按 sessionId 取值，无需在一次 `/sessions` 中同步读取数百个文件；实测构造耗时 0.37ms，本机 470 个缓存文件无一全量加载）。
+  - **与 v2.11.3 修的「移动端顶栏标题」是同一根因的两处表现**：那次只改了前端读取源（宿主 DOM 面包屑），未修 IM 侧数据源，故 IM 症状依旧。**升级 DSH 后请同时回归移动端与 IM 两处标题。**
 - **局域网直连原生 3080 端口时 WebSocket 被误拒**：Origin 白名单原先只给 LAN IP 配置 `proxyPort`，而回环同时配置了 3080/3082。用户从局域网访问 DSH 原生端口时表现为「页面能打开、但实时通道全部静默失效」，极难自查。现 LAN IP 与回环一致同时覆盖两个端口。
 - **`reset-auth` 救急重置的生效时机说明与实际不符**：中英文 README 原称「毫秒级自动清空」，实际实现仅在**插件启动时**检测一次标记（无常驻文件监听器）。文档已改为「下次插件启动时生效」，并说明该设计取舍（避免为救急功能引入常驻监听）。
 
@@ -39,14 +41,15 @@
 
 ### 🧪 测试
 
-- 新增 18 项回归用例：`test/security-hardening.test.mjs`（6 项 Origin 分支：无 Origin 放行、白名单放行、陌生 Origin 403、`Origin: null` 403、认证优先 401、回调抛异常 fail-closed）、`test/config-file-permissions.test.mjs`（6 项权限契约：新建带 mode、存量收敛且内容不变、幂等、ENOENT 静默、错误分类、失败不抛）、`test/first-run-guide.test.mjs`（6 项引导判据：新用户提示、已开认证不提示、已确认不提示、老用户升级不打扰、设密码但未开启仍提示、脏数据不误判）。全量 **361 项测试 100% 通过**，CI 覆盖 ubuntu/windows × Node 22/24，CodeQL 无告警。
+- 新增 26 项回归用例：`test/security-hardening.test.mjs`（6 项 Origin 分支：无 Origin 放行、白名单放行、陌生 Origin 403、`Origin: null` 403、认证优先 401、回调抛异常 fail-closed）、`test/config-file-permissions.test.mjs`（6 项权限契约：新建带 mode、存量收敛且内容不变、幂等、ENOENT 静默、错误分类、失败不抛）、`test/first-run-guide.test.mjs`（6 项引导判据：新用户提示、已开认证不提示、已确认不提示、老用户升级不打扰、设密码但未开启仍提示、脏数据不误判）、`test/session-projcache-layout.test.mjs`（8 项投影缓存布局：0.1.7 新布局、0.1.6 旧布局、并存优先级、双缺失、未知 id、损坏文件、内存注入优先、惰性读取）。全量 **369 项测试 100% 通过**，CI 覆盖 ubuntu/windows × Node 22/24，CodeQL 无告警。
 - 修正既有用例对文档资源的耦合：`media-and-heartbeat.test.mjs` 原以 `docs/banner.jpg` 为夹具，改用 `package.json`。
 
 ### 📝 升级说明
 
 - **无破坏性变更**：默认监听地址、端口、`exports` 与配置默认值均未改动，现有部署不受影响。
 - 权限收紧与 Origin 校验在 **dsh 重启后**生效；存量 `config.json` 会在首次启动时被自动收敛为 0600。
-- 本次不含隧道数据面与四条 IM 通道的端到端验证（审计同时标注这些为未验证项），相关结论不适用于本版。
+- **隧道数据面已实测验证**（针对本版发布前，用真实 Cloudflare 隧道 + 公网域名）：公网访客被门禁拦下（401 + 登录页）；伪造 `Host: 127.0.0.1` 被 403 拒绝（防 DNS rebinding）；未认证 WebSocket 升级被 401 拒绝；二维码 Token 免密直达（302 → `HttpOnly` + `SameSite=Lax` 会话 Cookie）后可换取真实访问（200）；隧道 QUIC 断连自动重连、无需人工干预。
+- **仍未验证**：四条 IM 通道（微信/QQ/飞书/Telegram）的**真实平台端到端对话**、PWA 移动端渲染、多网卡切换。这些结论不适用于本版。
 
 ---
 
