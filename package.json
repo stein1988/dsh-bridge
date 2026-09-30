@@ -2,7 +2,7 @@
   "name": "@wenbin_wb/dsh-bridge",
   "version": "2.12.0",
   "description": "手机扫码即可在移动端/公网继续用 DeepSeek Harness，人不在电脑前也能接着干。一键局域网二维码、Cloudflare 公网隧道、自建隧道与微信 / QQ / 飞书 / Telegram Bot（多工作区/会话持久化/媒体/卡片审批/流式输出），无需自己搭公网服务器。",
-  "releaseNotes": "【v2.12.0】安全加固 + 首次启用引导 + 修复 IM 标题 + 重启打断保护 + 发布包瘦身 88%\n• 修复：IM /sessions 会话标题全为「新会话」——DSH 0.1.7 把 session_projcache 改为 per-record 目录，插件仍读旧单文件路径；现兼容两种布局\n• 安全：config.json 与微信 context token 落盘收紧为 0600（此前 0644 同机可读，含明文隧道凭据），存量文件启动时自动收敛\n• 安全：WebSocket 升级补齐 Origin 校验（防恶意页面借浏览器 Cookie 建连）；Origin 缺失一律放行，不影响 IM 机器人等非浏览器客户端\n• 修复：局域网直连原生 3080 端口时 WebSocket 被误拒、实时通道静默失效\n• 新功能：首次启用引导——检测到「监听 0.0.0.0 但未开启访问认证」时提示开门禁，已配置用户不打扰\n• 新功能：重启打断保护——有任务在跑（含子代理、待审批）时弹二次确认并列出具体现场，避免静默打断\n• 优化：文档配图转 WebP 并移出发布包，tarball 7.63MB → 0.87MB\n• 说明：默认监听地址保持 0.0.0.0 不变，不破坏现有部署；权限与校验改动重启 dsh 后生效",
+  "releaseNotes": "【v2.12.0】安全加固 + 首次启用引导 + 修复 IM 标题 + 重启打断保护 + 发布包瘦身 88%\n• 修复：IM /sessions 会话标题全为「新会话」——DSH 0.1.7 把 session_projcache 改为 per-record 目录，插件仍读旧单文件路径；现兼容两种布局\n• 安全：config.json 与微信 context token 落盘收紧为 0600（此前 0644 同机可读，含明文隧道凭据），存量文件启动时自动收敛\n• 安全：WebSocket 升级补齐 Origin 校验（防恶意页面借浏览器 Cookie 建连）；Origin 缺失一律放行，不影响 IM 机器人等非浏览器客户端\n• 修复：局域网直连原生 3080 端口时 WebSocket 被误拒、实时通道静默失效\n• 新功能：首次启用引导——检测到「监听 0.0.0.0 但未开启访问认证」时提示开门禁，已配置用户不打扰\n• 新功能：重启打断保护——有任务在跑（含子代理、待审批）时弹二次确认并列出具体现场，避免静默打断\n• 修复：一键升级 DSH 显示成功但实际仍是旧版本——prefix 错位（装到 lib/lib/node_modules）改用 npm prefix -g；升级后核验 dsh --version，不匹配则报错而非报喜\n• 优化：文档配图转 WebP 并移出发布包，tarball 7.63MB → 0.87MB\n• 说明：默认监听地址保持 0.0.0.0 不变，不破坏现有部署；权限与校验改动重启 dsh 后生效",
   "type": "module",
   "main": "lib/index.js",
   "exports": {

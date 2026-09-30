@@ -26,6 +26,7 @@
   - **与 v2.11.3 修的「移动端顶栏标题」是同一根因的两处表现**：那次只改了前端读取源（宿主 DOM 面包屑），未修 IM 侧数据源，故 IM 症状依旧。**升级 DSH 后请同时回归移动端与 IM 两处标题。**
 - **局域网直连原生 3080 端口时 WebSocket 被误拒**：Origin 白名单原先只给 LAN IP 配置 `proxyPort`，而回环同时配置了 3080/3082。用户从局域网访问 DSH 原生端口时表现为「页面能打开、但实时通道全部静默失效」，极难自查。现 LAN IP 与回环一致同时覆盖两个端口。
 - **`reset-auth` 救急重置的生效时机说明与实际不符**：中英文 README 原称「毫秒级自动清空」，实际实现仅在**插件启动时**检测一次标记（无常驻文件监听器）。文档已改为「下次插件启动时生效」，并说明该设计取舍（避免为救急功能引入常驻监听）。
+- **一键升级 DSH 显示成功但实际仍是旧版本**：两个叠加缺陷。① prefix 错位——`_probeDshUpgrade` 用 `dirname(npm root -g)`（本机为 `…/lib`）作为 `npm install -g --prefix`，而 `npm root -g` 返回的是 prefix 下的 `lib/node_modules`，导致实际安装到 `…/lib/lib/node_modules`（本机留下 508MB 错位副本为证），`dsh` 命令仍加载旧目录；npm 退出码为 0，面板遂显示「升级完成」。现改用 `npm prefix -g` 的真实前缀。② 成功即报喜——此前 npm 命令成功就直接返回 `ok:true`，不再核验正在使用的 `dsh` 是否真的变新。现安装成功后立即用同一 `dsh` 路径核验 `dsh --version`：指定版本号时必须精确匹配，否则返回失败并提示手动命令（带 `installedButNotActive` 标记）；`latest` 因无法预知目标版本号而跳过核验。升级成功后同时清理版本检查缓存，避免 UI 继续显示旧版本。
 
 ### ✨ 新功能
 
@@ -46,7 +47,7 @@
 
 ### 🧪 测试
 
-- 新增 36 项回归用例：`test/security-hardening.test.mjs`（6 项 Origin 分支：无 Origin 放行、白名单放行、陌生 Origin 403、`Origin: null` 403、认证优先 401、回调抛异常 fail-closed）、`test/config-file-permissions.test.mjs`（6 项权限契约：新建带 mode、存量收敛且内容不变、幂等、ENOENT 静默、错误分类、失败不抛）、`test/first-run-guide.test.mjs`（6 项引导判据：新用户提示、已开认证不提示、已确认不提示、老用户升级不打扰、设密码但未开启仍提示、脏数据不误判）、`test/session-projcache-layout.test.mjs`（8 项投影缓存布局：0.1.7 新布局、0.1.6 旧布局、并存优先级、双缺失、未知 id、损坏文件、内存注入优先、惰性读取）、`test/restart-active-work-guard.test.mjs`（10 项重启打断保护：未闭合 turn 判定、已结束会话不计入、子代理归类、待审批计入、无任务不确认，以及「探测失败不得阻断重启」的 5 项护栏）。全量 **379 项测试 100% 通过**，CI 覆盖 ubuntu/windows × Node 22/24，CodeQL 无告警。
+- 新增 41 项回归用例：`test/security-hardening.test.mjs`（6 项 Origin 分支：无 Origin 放行、白名单放行、陌生 Origin 403、`Origin: null` 403、认证优先 401、回调抛异常 fail-closed）、`test/config-file-permissions.test.mjs`（6 项权限契约：新建带 mode、存量收敛且内容不变、幂等、ENOENT 静默、错误分类、失败不抛）、`test/first-run-guide.test.mjs`（6 项引导判据：新用户提示、已开认证不提示、已确认不提示、老用户升级不打扰、设密码但未开启仍提示、脏数据不误判）、`test/session-projcache-layout.test.mjs`（8 项投影缓存布局：0.1.7 新布局、0.1.6 旧布局、并存优先级、双缺失、未知 id、损坏文件、内存注入优先、惰性读取）、`test/restart-active-work-guard.test.mjs`（10 项重启打断保护：未闭合 turn 判定、已结束会话不计入、子代理归类、待审批计入、无任务不确认，以及「探测失败不得阻断重启」的 5 项护栏）、`test/dsh-upgrade.test.mjs`（5 项一键升级 DSH：--prefix 采用 npm prefix -g、指定版本安装后核验 dsh --version、预发布标签放行 + 注入拦截、成功后清版本缓存、latest 跳过核验）。全量 **384 项测试 100% 通过**，CI 覆盖 ubuntu/windows × Node 22/24，CodeQL 无告警。
 - 修正既有用例对文档资源的耦合：`media-and-heartbeat.test.mjs` 原以 `docs/banner.jpg` 为夹具，改用 `package.json`。
 
 ### 📝 升级说明
