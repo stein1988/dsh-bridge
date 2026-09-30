@@ -4425,6 +4425,38 @@ function BackupRestoreWidget({ rpcCall, onUpdate }) {
     }, msg.text)
   );
 }
+function formatActiveWorkWarning(work) {
+  if (!work || !work.total) return null;
+  const lines = [];
+  if (work.sessions?.length) {
+    lines.push(`\u2022 \u8FDB\u884C\u4E2D\u7684\u4F1A\u8BDD ${work.sessions.length} \u4E2A\uFF1A`);
+    for (const s2 of work.sessions.slice(0, 5)) {
+      const detail = s2.tools > 0 ? `${s2.tools} \u6B21\u5DE5\u5177\u8C03\u7528${s2.lastTool ? `\uFF08\u6700\u8FD1\uFF1A${s2.lastTool}\uFF09` : ""}` : "\u601D\u8003\u4E2D";
+      lines.push(`    - ${s2.title}\uFF08\u7B2C ${s2.turn} \u8F6E\uFF0C${detail}\uFF09`);
+    }
+    if (work.sessions.length > 5) lines.push(`    \u2026\u7B49\u5171 ${work.sessions.length} \u4E2A`);
+  }
+  if (work.subagentSessions?.length) {
+    lines.push(`\u2022 \u8FDB\u884C\u4E2D\u7684\u5B50\u4EE3\u7406/agent \u4EFB\u52A1 ${work.subagentSessions.length} \u4E2A\uFF1A`);
+    for (const s2 of work.subagentSessions.slice(0, 5)) {
+      const detail = s2.tools > 0 ? `${s2.tools} \u6B21\u5DE5\u5177\u8C03\u7528` : "\u601D\u8003\u4E2D";
+      lines.push(`    - ${s2.title}\uFF08\u7B2C ${s2.turn} \u8F6E\uFF0C${detail}\uFF09`);
+    }
+    if (work.subagentSessions.length > 5) lines.push(`    \u2026\u7B49\u5171 ${work.subagentSessions.length} \u4E2A`);
+  }
+  if (work.pendingApprovals?.length) {
+    lines.push(`\u2022 \u5F85\u5BA1\u6279\u8BF7\u6C42 ${work.pendingApprovals.length} \u4E2A\uFF1A`);
+    for (const a of work.pendingApprovals.slice(0, 5)) {
+      lines.push(`    - [${a.platform}] ${a.summary}`);
+    }
+    if (work.pendingApprovals.length > 5) lines.push(`    \u2026\u7B49\u5171 ${work.pendingApprovals.length} \u4E2A`);
+  }
+  return `\u26A0\uFE0F \u68C0\u6D4B\u5230\u6709\u4EFB\u52A1\u6B63\u5728\u8FD0\u884C\uFF0C\u91CD\u542F\u4F1A\u4E2D\u65AD\u5B83\u4EEC\uFF1A
+
+${lines.join("\n")}
+
+\u4E2D\u65AD\u540E\u53EF\u80FD\u9700\u8981\u91CD\u65B0\u53D1\u8D77\u3002\u786E\u5B9A\u8981\u7EE7\u7EED\u91CD\u542F\u5417\uFF1F`;
+}
 function useDshRestart({ rpcCall, maxAttempts = 30, texts = {} } = {}) {
   const T = {
     restarting: "\u6B63\u5728\u5411 DSH \u670D\u52A1\u53D1\u9001\u91CD\u542F\u6307\u4EE4\u2026",
@@ -4446,8 +4478,21 @@ function useDshRestart({ rpcCall, maxAttempts = 30, texts = {} } = {}) {
     setStatus({ phase: "restarting", text: T.restarting });
     try {
       const r = await rpcCall(BRIDGE_ENDPOINTS.restartDsh, {});
-      if (r && r.ok === false) {
-        setStatus({ phase: "timeout", text: `${T.timeout}\uFF1A${r.error || "\u672A\u77E5\u539F\u56E0"}` });
+      if (r && r.ok === false && r.error?.code === "busy") {
+        const warning = formatActiveWorkWarning(r.error?.details?.activeWork);
+        if (!window.confirm(warning || "\u5F53\u524D\u6709\u4EFB\u52A1\u6B63\u5728\u8FD0\u884C\uFF0C\u91CD\u542F\u4F1A\u4E2D\u65AD\u5B83\u4EEC\u3002\u786E\u5B9A\u7EE7\u7EED\u5417\uFF1F")) {
+          setStatus(null);
+          setRestarting(false);
+          return;
+        }
+        const r2 = await rpcCall(BRIDGE_ENDPOINTS.restartDsh, { confirm: true });
+        if (r2 && r2.ok === false) {
+          setStatus({ phase: "timeout", text: `${T.timeout}\uFF1A${r2.error?.message || "\u672A\u77E5\u539F\u56E0"}` });
+          setRestarting(false);
+          return;
+        }
+      } else if (r && r.ok === false) {
+        setStatus({ phase: "timeout", text: `${T.timeout}\uFF1A${r.error?.message || r.error || "\u672A\u77E5\u539F\u56E0"}` });
         setRestarting(false);
         return;
       }

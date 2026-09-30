@@ -30,6 +30,11 @@
 ### ✨ 新功能
 
 - **首次启用引导**：检测到「监听 `0.0.0.0` 但访问认证未开启」时，面板提示用户开启门禁。判据保守，**已开启认证的老用户与已确认过引导的用户一律不再提示**；严格判等（`!== true`），脏数据不误判为已开启。新增 `firstRunGuide` 状态与 `dismissFirstRunGuide` 端点。
+- **重启打断保护**：面板点「重启 DSH」时，若检测到有任务正在运行，**先弹二次确认并列出具体现场**，确认后才真正重启，避免静默打断正在跑的任务。检测三类信号：
+  - 进行中的会话（事件流里未闭合的 `turn/start`，与 IM「处理中」同一判据）
+  - 进行中的子代理/agent 任务（`origin: 'subagent'` 的嵌套会话，最容易被遗忘、损失也最大）
+  - 待审批请求（各 IM 平台尚未被回复的审批，重启会丢失该状态）
+  设计取舍：仅提示 + 二次确认，**不做硬阻断**——重启是救急能力（实例卡死时仍需能重启）；且探测逻辑任何一步失败都降级为「无任务」，绝不因探测失败把重启锁死。
 
 ### ⚡ 优化
 
@@ -41,7 +46,7 @@
 
 ### 🧪 测试
 
-- 新增 26 项回归用例：`test/security-hardening.test.mjs`（6 项 Origin 分支：无 Origin 放行、白名单放行、陌生 Origin 403、`Origin: null` 403、认证优先 401、回调抛异常 fail-closed）、`test/config-file-permissions.test.mjs`（6 项权限契约：新建带 mode、存量收敛且内容不变、幂等、ENOENT 静默、错误分类、失败不抛）、`test/first-run-guide.test.mjs`（6 项引导判据：新用户提示、已开认证不提示、已确认不提示、老用户升级不打扰、设密码但未开启仍提示、脏数据不误判）、`test/session-projcache-layout.test.mjs`（8 项投影缓存布局：0.1.7 新布局、0.1.6 旧布局、并存优先级、双缺失、未知 id、损坏文件、内存注入优先、惰性读取）。全量 **369 项测试 100% 通过**，CI 覆盖 ubuntu/windows × Node 22/24，CodeQL 无告警。
+- 新增 36 项回归用例：`test/security-hardening.test.mjs`（6 项 Origin 分支：无 Origin 放行、白名单放行、陌生 Origin 403、`Origin: null` 403、认证优先 401、回调抛异常 fail-closed）、`test/config-file-permissions.test.mjs`（6 项权限契约：新建带 mode、存量收敛且内容不变、幂等、ENOENT 静默、错误分类、失败不抛）、`test/first-run-guide.test.mjs`（6 项引导判据：新用户提示、已开认证不提示、已确认不提示、老用户升级不打扰、设密码但未开启仍提示、脏数据不误判）、`test/session-projcache-layout.test.mjs`（8 项投影缓存布局：0.1.7 新布局、0.1.6 旧布局、并存优先级、双缺失、未知 id、损坏文件、内存注入优先、惰性读取）、`test/restart-active-work-guard.test.mjs`（10 项重启打断保护：未闭合 turn 判定、已结束会话不计入、子代理归类、待审批计入、无任务不确认，以及「探测失败不得阻断重启」的 5 项护栏）。全量 **379 项测试 100% 通过**，CI 覆盖 ubuntu/windows × Node 22/24，CodeQL 无告警。
 - 修正既有用例对文档资源的耦合：`media-and-heartbeat.test.mjs` 原以 `docs/banner.jpg` 为夹具，改用 `package.json`。
 
 ### 📝 升级说明

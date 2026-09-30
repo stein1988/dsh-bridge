@@ -2348,6 +2348,41 @@ function BackupRestoreWidget({ rpcCall, onUpdate }) {
 // 重启 + 健康轮询公共逻辑：定时器保存在 ref 中，组件卸载即清理。
 // 修复点：原先两处复制粘贴的 setInterval 不随组件卸载清理，用户切走 Tab 后
 // 轮询仍会继续运行，并在服务恢复时无条件执行 window.location.reload()。
+
+/**
+ * 把「正在运行的任务」格式化成二次确认文案。
+ * 返回 null 表示没有任务在跑，调用方无需确认。
+ * @param {{sessions?:Array, subagentSessions?:Array, pendingApprovals?:Array, total?:number}} work
+ */
+function formatActiveWorkWarning(work) {
+  if (!work || !work.total) return null;
+  const lines = [];
+  if (work.sessions?.length) {
+    lines.push(`• 进行中的会话 ${work.sessions.length} 个：`);
+    for (const s of work.sessions.slice(0, 5)) {
+      const detail = s.tools > 0 ? `${s.tools} 次工具调用${s.lastTool ? `（最近：${s.lastTool}）` : ''}` : '思考中';
+      lines.push(`    - ${s.title}（第 ${s.turn} 轮，${detail}）`);
+    }
+    if (work.sessions.length > 5) lines.push(`    …等共 ${work.sessions.length} 个`);
+  }
+  if (work.subagentSessions?.length) {
+    lines.push(`• 进行中的子代理/agent 任务 ${work.subagentSessions.length} 个：`);
+    for (const s of work.subagentSessions.slice(0, 5)) {
+      const detail = s.tools > 0 ? `${s.tools} 次工具调用` : '思考中';
+      lines.push(`    - ${s.title}（第 ${s.turn} 轮，${detail}）`);
+    }
+    if (work.subagentSessions.length > 5) lines.push(`    …等共 ${work.subagentSessions.length} 个`);
+  }
+  if (work.pendingApprovals?.length) {
+    lines.push(`• 待审批请求 ${work.pendingApprovals.length} 个：`);
+    for (const a of work.pendingApprovals.slice(0, 5)) {
+      lines.push(`    - [${a.platform}] ${a.summary}`);
+    }
+    if (work.pendingApprovals.length > 5) lines.push(`    …等共 ${work.pendingApprovals.length} 个`);
+  }
+  return `⚠️ 检测到有任务正在运行，重启会中断它们：\n\n${lines.join('\n')}\n\n中断后可能需要重新发起。确定要继续重启吗？`;
+}
+
 function useDshRestart({ rpcCall, maxAttempts = 30, texts = {} } = {}) {
   const T = {
     restarting: '正在向 DSH 服务发送重启指令…',
@@ -2371,10 +2406,25 @@ function useDshRestart({ rpcCall, maxAttempts = 30, texts = {} } = {}) {
     setStatus({ phase: 'restarting', text: T.restarting });
     try {
       const r = await rpcCall(BRIDGE_ENDPOINTS.restartDsh, {});
-      // 宿主已明确告知"没能安排重启"（例如 systemd 调用失败、助手都派生不出来）：
-      // 这时绝不能再假装"正在重连"——直接报错并停下，否则用户只会看到永远转圈。
-      if (r && r.ok === false) {
-        setStatus({ phase: 'timeout', text: `${T.timeout}：${r.error || '未知原因'}` });
+      // 有任务在跑：宿主不会重启，而是把现场回给面板，由这里弹二次确认。
+      // 确认后带 confirm:true 再请求一次（宿主才真正执行重启）。
+      if (r && r.ok === false && r.error?.code === 'busy') {
+        const warning = formatActiveWorkWarning(r.error?.details?.activeWork);
+        if (!window.confirm(warning || '当前有任务正在运行，重启会中断它们。确定继续吗？')) {
+          setStatus(null);
+          setRestarting(false);
+          return;
+        }
+        const r2 = await rpcCall(BRIDGE_ENDPOINTS.restartDsh, { confirm: true });
+        if (r2 && r2.ok === false) {
+          setStatus({ phase: 'timeout', text: `${T.timeout}：${r2.error?.message || '未知原因'}` });
+          setRestarting(false);
+          return;
+        }
+      } else if (r && r.ok === false) {
+        // 宿主已明确告知"没能安排重启"（例如 systemd 调用失败、助手都派生不出来）：
+        // 这时绝不能再假装"正在重连"——直接报错并停下，否则用户只会看到永远转圈。
+        setStatus({ phase: 'timeout', text: `${T.timeout}：${r.error?.message || r.error || '未知原因'}` });
         setRestarting(false);
         return;
       }
