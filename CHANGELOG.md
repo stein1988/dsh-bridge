@@ -4,6 +4,27 @@
 
 ---
 
+## [v2.12.1] - 2026-10-03
+
+> 本版为**桌面版（Electron）兼容修复**版。排查依据为一手来源：官方同仓库 `apps/desktop-host/src/index.ts`、`apps/desktop/README.zh.md` 及官方 `evaluatePluginCompatibility` 实测。核心功能（面板、IM、隧道、存储）在桌面端与 Web 版跑同一套宿主与前端，确认兼容；以下两处是"Web 正常、桌面走错路"的分支，已修。
+
+### 🐞 修复
+
+- **面板"重启 DSH"在桌面端拦截**：桌面宿主由 Electron 壳经 IPC 管理生死，插件若按 Web/CLI 假设派生 `restart-helper` 重拉进程，会产生壳外孤儿（抢占 19387 端口、触发壳的恢复对话框）。现 `restartDsh` 开头检测桌面环境（`process.versions.electron` 或主模块路径 `desktop-host`，fail-open），直接拒绝并指引走应用菜单重启，绝不派生任何子进程。
+- **插件自升级 profile 参数化**：`upgradePlugin` 原来硬编码 `dsh plugin --profile web add`，在桌面端（profile 名为 `desktop`）会把包装进宿主不加载的 profile，造成"显示成功实际没升"。现按宿主形态推导（桌面 `desktop`、其余 `web`），传入值白名单只认 `desktop`/`web`（防 shell 注入）。
+- **桌面端一键升级 DSH 文案**：`_probeDshUpgrade` 在桌面端仍正确返回不可升级（应用包内文件不能用 npm 动），但 reason 换成桌面 relevant 的指引（走应用菜单"检查更新"）。
+
+### 🧪 测试
+
+- 新增 `test/desktop-host-compat.test.mjs`（11 项：electron 标记判定、`desktop-host` 路径分段判定、fail-open 脏输入、profile 推导、桌面重启零派生、非桌面重启不受影响、默认 web/显式 desktop/注入 profile 白名单，以及"测试文件名含子串不误判"的回归）。全量 **395 项测试 100% 通过**。
+
+### 📝 升级说明
+
+- 无破坏性变更；Web/CLI 用户行为与 v2.12.0 完全一致（桌面检测 fail-open，判不准时按原路走）。
+- 桌面端实机验证仍未做（本机无桌面版安装包）：P0/P1 修复基于官方源码的静态结论 + 单测，`process.versions.electron` 在 RunAsNode 下的存在性为 Electron 官方行为。建议在 macOS/Windows 桌面端实测"面板重启被拒"与"插件升级进 desktop profile"两条路径后再关闭该跟踪。
+
+---
+
 ## [v2.12.0] - 2026-10-03
 
 > 本版为**安全加固 + 首次启用引导 + 发布包瘦身**版。依据外部安全审计（针对 v2.10.13）逐条核实后修复；按「不破坏现有用户」原则，**默认监听地址保持 `0.0.0.0` 不变**，改用引导提示降低「开箱敞开」风险。
