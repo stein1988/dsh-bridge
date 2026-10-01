@@ -7343,14 +7343,24 @@ function setupTrajectoryBack(ctx) {
     check();
   };
   const onClickCapture = () => setTimeout(rescan, 0);
-  document.addEventListener("click", onClickCapture, true);
-  window.addEventListener("resize", rescan);
-  ctx.effect(() => () => {
-    document.removeEventListener("click", onClickCapture, true);
-    window.removeEventListener("resize", rescan);
-    if (observer) observer.disconnect();
-    hide();
-  }, "dsh-bridge: mobile trajectory back button cleanup");
+  if (typeof document.addEventListener === "function") {
+    document.addEventListener("click", onClickCapture, true);
+  }
+  if (typeof window.addEventListener === "function") {
+    window.addEventListener("resize", rescan);
+  }
+  if (typeof ctx.effect === "function") {
+    ctx.effect(() => () => {
+      if (typeof document.removeEventListener === "function") {
+        document.removeEventListener("click", onClickCapture, true);
+      }
+      if (typeof window.removeEventListener === "function") {
+        window.removeEventListener("resize", rescan);
+      }
+      if (observer) observer.disconnect();
+      hide();
+    }, "dsh-bridge: mobile trajectory back button cleanup");
+  }
   rescan();
 }
 function apply(ctx) {
