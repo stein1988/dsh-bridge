@@ -80,6 +80,12 @@ test('顶部精简：整条会话头部按槽锚点隐藏，且不带哈希兜�
     /\[data-slot="conversation\.session\.header"\][^{]*,[^{]*\{/,
     '该规则不应附带哈希兜底选择器（宿主升级时宁可显式失效）',
   );
+  // 隐藏槽内容后，宿主头部容器仍会因 :has(.tabs) 命中原有 min-height:76px 而占位，
+  // 手机顶部会出现一条与顶栏等高的大段空白；必须用同一个槽锚点把父容器一并折叠。
+  const hostHeaderBody = ruleBody(mobile, ':has(> [data-slot="conversation.session.header"])');
+  assert.ok(hostHeaderBody, '应折叠承载 conversation.session.header 的宿主容器（消除 76px 空白）');
+  assert.match(hostHeaderBody, /min-height:\s*0\s*!important/, '容器最小高度必须归零');
+  assert.match(hostHeaderBody, /padding-top:\s*0\s*!important/, '容器顶部内边距必须归零');
 });
 
 test('加号隐藏，右栏代理按钮占用它的位置且可点', () => {

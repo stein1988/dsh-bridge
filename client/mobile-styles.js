@@ -257,6 +257,18 @@ export const MOBILE_STYLES_CSS = `
         display: none !important;
       }
 
+      /* 只隐藏槽内容还不够：宿主把头部容器的最小高度绑在 :has(.tabs) 上，而 :has 看的是 DOM
+         —— 槽 display:none 后 tabs 仍在 DOM 里，容器继续按 min-height:76px 占位，手机顶部
+         因此出现一条大段空白（0.2.0 实测：顶栏下 52px 处开始、76px 的空白区）。
+         用同一个槽锚点反向选中直接父容器并整体折叠：min-height / padding / border 归零，
+         容器内 headerLeading 为空时高度自然归零；仍不引用任何宿主哈希类名。 */
+      :has(> [data-slot="conversation.session.header"]) {
+        min-height: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        border-bottom: none !important;
+      }
+
       /* 3. 中间主内容区与输入框 */
       div[class*="_centerCol"] {
         flex: 1 1 100% !important;

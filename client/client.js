@@ -288,6 +288,18 @@ var MOBILE_STYLES_CSS = `
         display: none !important;
       }
 
+      /* \u53EA\u9690\u85CF\u69FD\u5185\u5BB9\u8FD8\u4E0D\u591F\uFF1A\u5BBF\u4E3B\u628A\u5934\u90E8\u5BB9\u5668\u7684\u6700\u5C0F\u9AD8\u5EA6\u7ED1\u5728 :has(.tabs) \u4E0A\uFF0C\u800C :has \u770B\u7684\u662F DOM
+         \u2014\u2014 \u69FD display:none \u540E tabs \u4ECD\u5728 DOM \u91CC\uFF0C\u5BB9\u5668\u7EE7\u7EED\u6309 min-height:76px \u5360\u4F4D\uFF0C\u624B\u673A\u9876\u90E8
+         \u56E0\u6B64\u51FA\u73B0\u4E00\u6761\u5927\u6BB5\u7A7A\u767D\uFF080.2.0 \u5B9E\u6D4B\uFF1A\u9876\u680F\u4E0B 52px \u5904\u5F00\u59CB\u300176px \u7684\u7A7A\u767D\u533A\uFF09\u3002
+         \u7528\u540C\u4E00\u4E2A\u69FD\u951A\u70B9\u53CD\u5411\u9009\u4E2D\u76F4\u63A5\u7236\u5BB9\u5668\u5E76\u6574\u4F53\u6298\u53E0\uFF1Amin-height / padding / border \u5F52\u96F6\uFF0C
+         \u5BB9\u5668\u5185 headerLeading \u4E3A\u7A7A\u65F6\u9AD8\u5EA6\u81EA\u7136\u5F52\u96F6\uFF1B\u4ECD\u4E0D\u5F15\u7528\u4EFB\u4F55\u5BBF\u4E3B\u54C8\u5E0C\u7C7B\u540D\u3002 */
+      :has(> [data-slot="conversation.session.header"]) {
+        min-height: 0 !important;
+        padding-top: 0 !important;
+        padding-bottom: 0 !important;
+        border-bottom: none !important;
+      }
+
       /* 3. \u4E2D\u95F4\u4E3B\u5185\u5BB9\u533A\u4E0E\u8F93\u5165\u6846 */
       div[class*="_centerCol"] {
         flex: 1 1 100% !important;
