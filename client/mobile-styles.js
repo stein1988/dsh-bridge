@@ -20,6 +20,18 @@ export const MOBILE_STYLES_CSS = `
       --dsh-mobile-safe-bottom: env(safe-area-inset-bottom, 0px);
     }
 
+    /* 隐藏 dsh-cost-meter 在输入框下方（composer dock 槽）的「本会话费用明细」入口按钮。
+       该按钮由插件**无条件**注册进 conversation.composer.dock 与
+       conversation.session.header.actions 两个槽；插件自身的「会话费用显示位置」只有
+       输入区下方 / 会话标题栏 / 关闭三档，且「关闭」只关成本数字那一行，入口按钮照旧渲染
+       （实测 dsh-cost-meter 1.8.2）。故由本插件兜底隐藏输入框下方的那个入口。
+       刻意写在 @media 之外：桌面网页端同样生效（使用者要求网页 + 手机都隐藏）。
+       选择器收窄到 composer dock 槽内的那个入口，不使用裸 .cm-stat-entry ——
+       同一插件注册在会话标题栏的另一个入口不受影响（手机端已由「顶部精简」整条隐藏）。 */
+    [data-slot="conversation.composer.dock"] .cm-stat-entry {
+      display: none !important;
+    }
+
     /* 挂在 <body> 下、自带遮罩的「模态根」必须能盖在设置弹窗之上。
        —— 这是本插件抬高设置弹窗层叠后必须自己补上的一环（谁抬的谁负责）。
 
