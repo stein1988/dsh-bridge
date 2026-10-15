@@ -509,6 +509,13 @@ test('/diff：导出本轮改动为 .patch 附件 + 摘要文本；无记录时�
   assert.match(captured[0].content, /\+new/)
   assert.match(platform.sent.at(-1).text, /已导出本轮改动补丁/)
   assert.equal(fs.existsSync(captured[0].filePath), false, '发送后应清理临时文件')
+  // 不得再往共享临时目录里写可预测文件名（CodeQL js/insecure-temporary-file / CWE-377）：
+  // 必须写进 mkdtemp 建出的私有目录，且目录用完即删。
+  const os = await import('node:os')
+  const pathMod = await import('node:path')
+  assert.notEqual(pathMod.dirname(captured[0].filePath), os.tmpdir(), 'patch 不得直接落在共享临时目录根')
+  assert.match(pathMod.dirname(captured[0].filePath), /dsh-bridge-diff-/)
+  assert.equal(fs.existsSync(pathMod.dirname(captured[0].filePath)), false, '私有临时目录应一并清理')
 
   bridge.dispose()
   platform.dispose()
