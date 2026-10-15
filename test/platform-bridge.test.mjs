@@ -401,6 +401,41 @@ test('ConversationBridge 仅在收到 [SEND_FILE: path] 指令时发送媒体文
   }
 })
 
+test('SEND_FILE：会话 cwd 在 header 里时也应放行（回归：曾误读 sess.cwd 导致附件被静默拦掉）', async () => {
+  const fs = await import('node:fs')
+  const os = await import('node:os')
+  const path = await import('node:path')
+
+  // 会话工作区与 dsh 进程启动目录不同，确保不是"碰巧因为 process.cwd()"通过
+  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'dsh-bridge-ws-'))
+  const tmpFile = path.join(workDir, 'report.html')
+  fs.writeFileSync(tmpFile, '<html>report</html>')
+
+  const { ctx } = makeMockCtx()
+  const platform = new MockPlatform({ ctx, logger: ctx.logger })
+  const bridge = new ConversationBridge({ ctx, logger: ctx.logger, config: {}, platform })
+  bridge.peerId = 'user-wechat-123'
+  bridge.activeSessionId = 's-sendfile'
+
+  try {
+    const session = { id: 's-sendfile', header: { cwd: workDir } } // DSH：cwd 在 header 内
+    ctx.emit('session/event', session, { type: 'turn/start', data: { turn: 1 } })
+    ctx.emit('session/event', session, {
+      type: 'assistant/message',
+      data: { message: { content: [{ type: 'text', text: `导出完成：\n[SEND_FILE: ${tmpFile}]` }] } },
+    })
+    ctx.emit('session/event', session, { type: 'turn/end', data: { reason: { kind: 'stop' } } })
+    await new Promise((r) => setTimeout(r, 15))
+
+    assert.equal(platform.sentMedia.length, 1, '会话工作区内的附件必须放行')
+    assert.equal(platform.sentMedia[0].filePath, tmpFile)
+  } finally {
+    try { fs.rmSync(workDir, { recursive: true, force: true }) } catch {}
+    bridge.dispose()
+    platform.dispose()
+  }
+})
+
 test('ConversationBridge 在普通代码修改时绝不发送文件且不误判', async () => {
   const fs = await import('node:fs')
   const path = await import('node:path')

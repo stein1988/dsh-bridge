@@ -395,6 +395,70 @@ export const MOBILE_STYLES_CSS = `
         opacity: 0.85 !important;
       }
 
+      /* 1.1.1 宿主浮层（智能体团队 / 子智能体下拉）：移动端统一退出通道。
+         —— 宿主这两处浮层都是**桌面语义的 popover**，自身没有任何关闭控件：桌面靠鼠标移出、
+         点浮层外空白或 Esc 收起（团队浮层是 dsh-client-ui-primitives 的
+         useDismissOnOutsidePointer + keydown Escape；子智能体下拉是自带的 closeOutside +
+         React onKeyDown）。手机上没有 hover，而"点外面"这条唯一退路未必够得着：
+           · 团队浮层：上限 680px 已接近整屏，实测 360×803 占 y=91.5..771.5，上下只剩 92/32px；
+           · 子智能体下拉：宿主自留 140px，但矮屏 + 多子智能体时同样紧张
+             （实测 360×560 + 12 个子智能体 = 328×420 于 y=91.5..511.5，下方只剩 49px）。
+         这两段空白在真机上正好落在浏览器地址栏/底部导航条覆盖区，左右 16px 又要跟系统
+         返回手势抢 —— 用户"点不到空白"，退不出来。这里统一做两件事：
+         (1) 收紧高度上限：按**动态视口**再留安全边（vh 行是不支持 dvh 的兜底，只在视口
+             真的更矮时生效，正常竖屏无视觉变化），保证浮层不伸到浏览器 UI 底下。
+             外层 max(160px, …) 是**下限保护**：数学函数在"视口比保留量还矮"时会把结果钳到
+             ≤0，而 !important 会赢过宿主自己的兜底 → 浮层被压成 0 高、连按钮一起不可见
+             （独立验收实测：80px 视口下计算值就是 0px）。真机上视口 <256px 不可达，这里
+             纯属健壮性保护：宁可略高于视口，也不要"整块消失"；
+         (2) 为 JS 注入的收起按钮（.dsh-mobile-popover-close-btn，见 client/index.js）
+             预留顶部 44px 操作带，按钮钉在右上角，在真机可用视口内（实测视口高 ≥176px 时
+             浮层顶边仍为正、按钮完整可见且可命中；真机竖/横屏都远高于此）始终落在浮层
+             可见区；视口矮到约 176px 以下时宿主会把浮层顶边推到负值、按钮随之出屏，
+             属不可达场景，不在本规则的承诺范围内。 */
+      [data-team-panel].dsh-bridge-team-panel {
+        padding-top: 44px !important;
+        max-height: max(160px, min(680px, calc(100vh - 96px))) !important;
+        max-height: max(160px, min(680px, calc(100dvh - 96px))) !important;
+      }
+      /* 子智能体下拉：宿主自己已按 min(560px, 100vh - 140px) 预留 140px，这里只把 vh 换成
+         动态视口 —— 否则手机地址栏/底部导航条吃掉的那段会被算进可用高度。 */
+      body > div[class*="_menu"].dsh-bridge-subagent-menu {
+        padding-top: 44px !important;
+        max-height: max(160px, min(560px, calc(100vh - 140px))) !important;
+        max-height: max(160px, min(560px, calc(100dvh - 140px))) !important;
+      }
+      .dsh-mobile-popover-close-btn {
+        position: absolute !important;
+        top: 8px !important;
+        right: 8px !important;
+        z-index: 2 !important;
+        box-sizing: border-box !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        padding: 0 10px !important;
+        border-radius: 14px !important;
+        border: 1px solid var(--dsw-alias-border-l2, rgba(127, 127, 127, 0.35)) !important;
+        background: var(--dsw-alias-bg-layer-2, rgba(127, 127, 127, 0.16)) !important;
+        color: var(--dsw-alias-label-primary, inherit) !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 4px !important;
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+        cursor: pointer !important;
+        -webkit-tap-highlight-color: transparent !important;
+        transition: transform 0.1s, opacity 0.15s !important;
+      }
+      .dsh-mobile-popover-close-btn:active {
+        transform: scale(0.95) !important;
+        opacity: 0.85 !important;
+      }
+
       /* 3.1 会话对话头部顶栏：移动端防挤压与空间释放优化（严格排除 .dsh-mobile-app-header） */
       div[class*="_centerCol"] header,
       header[class*="__F_CONV__header"] {

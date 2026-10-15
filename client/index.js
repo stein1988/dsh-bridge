@@ -4498,9 +4498,152 @@ function setupMobileExperience(rpcCall, ctx) {
     });
   };
 
-  const panelObserver = new MutationObserver(ensurePanelCloseButton);
+  // 1.1.1 移动端宿主浮层统一退出通道。宿主这两处浮层都是**桌面语义的 popover**：自身不含
+  // 任何关闭控件，只靠"点面板外空白 / 鼠标移出 / Esc"收起。手机上没有 hover，而"点外面"
+  // 这条唯一退路未必够得着 —— 智能体团队浮层高度上限 680px 已接近整屏（实测 360×803 时
+  // 只剩上 92 / 下 32 / 左右各 16px 空白）；子智能体下拉虽由宿主自留 140px，但在矮屏 +
+  // 多子智能体时（实测 360×560 + 12 个子智能体 = 328×420，下方只剩 49px）同样会被浏览器
+  // 地址栏/底部导航条吃掉。故这里按**稳定 DOM 钩子**统一注入一个常驻的「✕ 收起」按钮。
+  //
+  // 关闭动作走宿主**自己的**收起路径（都注册在 document 上，与本插件的 DOM 注入解耦）：
+  //   ① 在 body 上派发一次冒泡 pointerdown —— 与"手指点了浮层外的空白"完全等价
+  //      （团队浮层的 useDismissOnOutsidePointer、子智能体下拉的 closeOutside 都只看
+  //       target 是否落在浮层/触发器内，且都没有 isTrusted 校验）；
+  //   ② 兜底再派发一次 Esc（团队浮层注册的是 document 级 keydown，这条对它有效；
+  //      子智能体下拉的 Esc 是 React onKeyDown，document 上的合成事件到不了它，但①已足够）。
+  // 刻意不触碰 React 内部状态：宿主换实现时这里最多失效（由浏览器验收兜住），不会把
+  // 浮层状态改坏。
+  //
+  // 选择器都取宿主**非哈希**的结构/属性特征，宿主重算 CSS-module 哈希不受影响：
+  //   · 团队浮层：[data-team-panel]（宿主自带属性）
+  //   · 子智能体下拉：body 直挂的 portal 菜单 + 其直接子级 role=tree（宿主没有属性钩子）。
+  //     实测该选择器同时只命中它一个；侧边栏那棵 role=tree 的会话树在 sidebar 内，不误伤。
+  const MOBILE_POPOVERS = [
+    {
+      key: 'team',
+      selector: '[data-team-panel]',
+      hostClass: 'dsh-bridge-team-panel',
+    },
+    {
+      key: 'subagent',
+      selector: 'body > div[class*="_menu"]:has(> div[role="tree"])',
+      hostClass: 'dsh-bridge-subagent-menu',
+    },
+  ];
+  const POPOVER_CLOSE_CLASS = 'dsh-mobile-popover-close-btn';
+  const POPOVER_KEY_ATTR = 'data-dshbr-popover';
+
+  // ⚠️ 死循环红线：Chromium 里 classList.add()/remove() **即使 class 属性值不变**（token 已
+  // 存在 / 本来就没有）也会写出 class 属性并产生一条 attributes 变更记录（本次实测
+  // add 已有 token → 1 条记录；remove 不存在的 token → 也是 1 条）。而本函数就跑在监听
+  // class 的 MutationObserver 回调里，无条件 add/remove 会变成"回调→变更→回调"的微任务
+  // 死循环，直接把渲染进程卡死（实测：打开浮层后页面 15s 无任何响应、CDP 调用全部超时）。
+  // 故所有 class 开关都必须先判存在再动。
+  const setPopoverHostClass = (el, cls, on) => {
+    if (on === el.classList.contains(cls)) return;
+    if (on) el.classList.add(cls);
+    else el.classList.remove(cls);
+  };
+
+  /** 按宿主的"点外面"语义收起当前浮层（target 必须是浮层外的节点，故派发在 body 上）。 */
+  const closeMobilePopover = (node) => {
+    if (node === undefined || !node.isConnected) return;
+    const PointerCtor = typeof window.PointerEvent === 'function' ? window.PointerEvent : window.MouseEvent;
+    document.body.dispatchEvent(new PointerCtor('pointerdown', { bubbles: true, cancelable: true }));
+    // React 的状态更新是异步的：同步读到"浮层还在"属正常，故下一帧再判定是否要兜底。
+    const fallbackToEscape = () => {
+      if (node.isConnected) {
+        document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true }));
+      }
+    };
+    if (typeof requestAnimationFrame === 'function') requestAnimationFrame(fallbackToEscape);
+    else setTimeout(fallbackToEscape, 0);
+  };
+
+  /** 查一处浮层；选择器不被老引擎支持（如 :has() 需要 Chromium 105+）时返回空集。
+   *  绝不能把异常抛出去：本函数与其它浮层的补齐在同一个观察器回调里，一次 SyntaxError
+   *  会把"同一批里的其它浮层"一起带崩（团队浮层也会跟着没按钮）。
+   *  但也不能静默吞掉：不支持 = 该处浮层永远没有退出按钮，必须留一条可观测的告警
+   *  （同一选择器只告警一次，避免观察器高频回调刷屏）。 */
+  const popoverSelectorWarned = new Set();
+  const popoverNodes = (selector) => {
+    try {
+      return document.querySelectorAll(selector);
+    } catch (reason) {
+      if (!popoverSelectorWarned.has(selector)) {
+        popoverSelectorWarned.add(selector);
+        try {
+          console.warn(`[dsh-bridge] 浮层选择器不被当前浏览器支持，该处浮层不会注入收起按钮：${selector}`, reason);
+        } catch { /* 控制台不可用时不影响主流程 */ }
+      }
+      return [];
+    }
+  };
+
+  const ensureMobilePopoverCloseButtons = () => {
+    if (typeof window === 'undefined') return;
+    const mobile = window.innerWidth <= MOBILE_MAX_WIDTH;
+    if (!mobile) {
+      // 桌面端保持宿主原样：撤掉按钮与让位类（含宿主换钩子后可能残留的按钮）
+      document.querySelectorAll(`.${POPOVER_CLOSE_CLASS}`).forEach(btn => btn.remove());
+      MOBILE_POPOVERS.forEach((popover) => {
+        popoverNodes(popover.selector)
+          .forEach(node => setPopoverHostClass(node, popover.hostClass, false));
+      });
+      return;
+    }
+    MOBILE_POPOVERS.forEach((popover) => {
+      popoverNodes(popover.selector).forEach((node) => {
+        setPopoverHostClass(node, popover.hostClass, true);
+        const collapseLabel = localeT('popover.collapse');
+        const existing = node.querySelector(`.${POPOVER_CLOSE_CLASS}`);
+        if (existing !== null) {
+          // 已注入过：语言切换后文案要跟上（按钮是本插件注入的，宿主重渲染不会更新它）。
+          // 写前比对，避免每轮观察器回调都产生一次 DOM 变更。
+          const text = existing.querySelector('span');
+          if (text !== null && text.textContent !== collapseLabel) text.textContent = collapseLabel;
+          if (existing.getAttribute('aria-label') !== collapseLabel) existing.setAttribute('aria-label', collapseLabel);
+          return;
+        }
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = POPOVER_CLOSE_CLASS;
+        btn.setAttribute(POPOVER_KEY_ATTR, popover.key);
+        btn.setAttribute('aria-label', collapseLabel);
+        // 图标是固定字符串；可见文案走 textContent —— 即使将来词典来源变化，也不会把
+        // 文案拼进 innerHTML 变成注入点。
+        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+        const label = document.createElement('span');
+        label.textContent = collapseLabel;
+        btn.appendChild(label);
+        btn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeMobilePopover(node);
+        });
+        // 追加到末尾而不是前置：浮层是 position:fixed 的定位祖先，按钮绝对定位到右上角，
+        // 追加可以避免干扰 React 在同一个容器里插入自己的子节点（团队浮层只认自己的
+        // div.body，子智能体下拉只认自己的 div.menuBody）。
+        node.appendChild(btn);
+      });
+    });
+  };
+
+  // 三处浮层补齐挂在同一个观察器/尺寸回调上：浮层出现、被重建、宽窄屏切换都能收敛
+  //（各 ensure 都是幂等的，自己造成的 DOM 变更不会再产生新的变更）。
+  const syncMobilePanelAffordances = () => {
+    ensurePanelCloseButton();
+    ensureMobilePopoverCloseButtons();
+  };
+
+  const panelObserver = new MutationObserver(syncMobilePanelAffordances);
   panelObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
-  window.addEventListener('resize', ensurePanelCloseButton);
+  // 语言切换：宿主把 active 语言同步到 <html lang>（LocaleFace.syncDocumentLanguage），
+  // 而 documentElement 不在 body 子树里。单独挂一个只盯 lang 的观察，让已注入按钮的文案
+  // 在语言切换时**事件驱动**地跟上，而不是碰运气等下一次 class 变更（独立验收实测：
+  // 只改 lang 且无其它被观察变更时，文案会滞后）。
+  panelObserver.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+  window.addEventListener('resize', syncMobilePanelAffordances);
 
   // 移动端点击面板/工作区触发按钮时，自动激活 dsh-workbench-open
   // （宿主文案随语言切换：中文「面板/工作区」/ 英文 "Panel/workspace" —— 注意英文实际是

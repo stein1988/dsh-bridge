@@ -25,6 +25,8 @@ export const zh = {
   'composer.expand': '展开输入框',
   'composer.collapse': '收起输入框，最大化对话阅读区',
   'panel.backToChat': '返回对话',
+  // 宿主浮层（智能体团队 / 子智能体下拉）在移动端由本插件统一补收起按钮：动作文案，兼作 aria-label
+  'popover.collapse': '收起',
   // 移动端设置面板 / 抽屉（dsh-bridge 自绘部分）
   'workspace.choose': '选择电脑工作区',
   'workspace.reading': '正在读取目录内容…',
@@ -84,6 +86,8 @@ export const en = {
   'composer.expand': 'Expand input',
   'composer.collapse': 'Collapse input to maximize chat view',
   'panel.backToChat': 'Back to chat',
+  // Host popovers (Agent Team / subagent dropdown) get a collapse control from this plugin on mobile
+  'popover.collapse': 'Collapse',
   'workspace.choose': 'Choose a workspace',
   'workspace.reading': 'Reading directory…',
   'workspace.currentDir': 'Current directory:',

@@ -420,6 +420,70 @@ var MOBILE_STYLES_CSS = `
         opacity: 0.85 !important;
       }
 
+      /* 1.1.1 \u5BBF\u4E3B\u6D6E\u5C42\uFF08\u667A\u80FD\u4F53\u56E2\u961F / \u5B50\u667A\u80FD\u4F53\u4E0B\u62C9\uFF09\uFF1A\u79FB\u52A8\u7AEF\u7EDF\u4E00\u9000\u51FA\u901A\u9053\u3002
+         \u2014\u2014 \u5BBF\u4E3B\u8FD9\u4E24\u5904\u6D6E\u5C42\u90FD\u662F**\u684C\u9762\u8BED\u4E49\u7684 popover**\uFF0C\u81EA\u8EAB\u6CA1\u6709\u4EFB\u4F55\u5173\u95ED\u63A7\u4EF6\uFF1A\u684C\u9762\u9760\u9F20\u6807\u79FB\u51FA\u3001
+         \u70B9\u6D6E\u5C42\u5916\u7A7A\u767D\u6216 Esc \u6536\u8D77\uFF08\u56E2\u961F\u6D6E\u5C42\u662F dsh-client-ui-primitives \u7684
+         useDismissOnOutsidePointer + keydown Escape\uFF1B\u5B50\u667A\u80FD\u4F53\u4E0B\u62C9\u662F\u81EA\u5E26\u7684 closeOutside +
+         React onKeyDown\uFF09\u3002\u624B\u673A\u4E0A\u6CA1\u6709 hover\uFF0C\u800C"\u70B9\u5916\u9762"\u8FD9\u6761\u552F\u4E00\u9000\u8DEF\u672A\u5FC5\u591F\u5F97\u7740\uFF1A
+           \xB7 \u56E2\u961F\u6D6E\u5C42\uFF1A\u4E0A\u9650 680px \u5DF2\u63A5\u8FD1\u6574\u5C4F\uFF0C\u5B9E\u6D4B 360\xD7803 \u5360 y=91.5..771.5\uFF0C\u4E0A\u4E0B\u53EA\u5269 92/32px\uFF1B
+           \xB7 \u5B50\u667A\u80FD\u4F53\u4E0B\u62C9\uFF1A\u5BBF\u4E3B\u81EA\u7559 140px\uFF0C\u4F46\u77EE\u5C4F + \u591A\u5B50\u667A\u80FD\u4F53\u65F6\u540C\u6837\u7D27\u5F20
+             \uFF08\u5B9E\u6D4B 360\xD7560 + 12 \u4E2A\u5B50\u667A\u80FD\u4F53 = 328\xD7420 \u4E8E y=91.5..511.5\uFF0C\u4E0B\u65B9\u53EA\u5269 49px\uFF09\u3002
+         \u8FD9\u4E24\u6BB5\u7A7A\u767D\u5728\u771F\u673A\u4E0A\u6B63\u597D\u843D\u5728\u6D4F\u89C8\u5668\u5730\u5740\u680F/\u5E95\u90E8\u5BFC\u822A\u6761\u8986\u76D6\u533A\uFF0C\u5DE6\u53F3 16px \u53C8\u8981\u8DDF\u7CFB\u7EDF
+         \u8FD4\u56DE\u624B\u52BF\u62A2 \u2014\u2014 \u7528\u6237"\u70B9\u4E0D\u5230\u7A7A\u767D"\uFF0C\u9000\u4E0D\u51FA\u6765\u3002\u8FD9\u91CC\u7EDF\u4E00\u505A\u4E24\u4EF6\u4E8B\uFF1A
+         (1) \u6536\u7D27\u9AD8\u5EA6\u4E0A\u9650\uFF1A\u6309**\u52A8\u6001\u89C6\u53E3**\u518D\u7559\u5B89\u5168\u8FB9\uFF08vh \u884C\u662F\u4E0D\u652F\u6301 dvh \u7684\u515C\u5E95\uFF0C\u53EA\u5728\u89C6\u53E3
+             \u771F\u7684\u66F4\u77EE\u65F6\u751F\u6548\uFF0C\u6B63\u5E38\u7AD6\u5C4F\u65E0\u89C6\u89C9\u53D8\u5316\uFF09\uFF0C\u4FDD\u8BC1\u6D6E\u5C42\u4E0D\u4F38\u5230\u6D4F\u89C8\u5668 UI \u5E95\u4E0B\u3002
+             \u5916\u5C42 max(160px, \u2026) \u662F**\u4E0B\u9650\u4FDD\u62A4**\uFF1A\u6570\u5B66\u51FD\u6570\u5728"\u89C6\u53E3\u6BD4\u4FDD\u7559\u91CF\u8FD8\u77EE"\u65F6\u4F1A\u628A\u7ED3\u679C\u94B3\u5230
+             \u22640\uFF0C\u800C !important \u4F1A\u8D62\u8FC7\u5BBF\u4E3B\u81EA\u5DF1\u7684\u515C\u5E95 \u2192 \u6D6E\u5C42\u88AB\u538B\u6210 0 \u9AD8\u3001\u8FDE\u6309\u94AE\u4E00\u8D77\u4E0D\u53EF\u89C1
+             \uFF08\u72EC\u7ACB\u9A8C\u6536\u5B9E\u6D4B\uFF1A80px \u89C6\u53E3\u4E0B\u8BA1\u7B97\u503C\u5C31\u662F 0px\uFF09\u3002\u771F\u673A\u4E0A\u89C6\u53E3 <256px \u4E0D\u53EF\u8FBE\uFF0C\u8FD9\u91CC
+             \u7EAF\u5C5E\u5065\u58EE\u6027\u4FDD\u62A4\uFF1A\u5B81\u53EF\u7565\u9AD8\u4E8E\u89C6\u53E3\uFF0C\u4E5F\u4E0D\u8981"\u6574\u5757\u6D88\u5931"\uFF1B
+         (2) \u4E3A JS \u6CE8\u5165\u7684\u6536\u8D77\u6309\u94AE\uFF08.dsh-mobile-popover-close-btn\uFF0C\u89C1 client/index.js\uFF09
+             \u9884\u7559\u9876\u90E8 44px \u64CD\u4F5C\u5E26\uFF0C\u6309\u94AE\u9489\u5728\u53F3\u4E0A\u89D2\uFF0C\u5728\u771F\u673A\u53EF\u7528\u89C6\u53E3\u5185\uFF08\u5B9E\u6D4B\u89C6\u53E3\u9AD8 \u2265176px \u65F6
+             \u6D6E\u5C42\u9876\u8FB9\u4ECD\u4E3A\u6B63\u3001\u6309\u94AE\u5B8C\u6574\u53EF\u89C1\u4E14\u53EF\u547D\u4E2D\uFF1B\u771F\u673A\u7AD6/\u6A2A\u5C4F\u90FD\u8FDC\u9AD8\u4E8E\u6B64\uFF09\u59CB\u7EC8\u843D\u5728\u6D6E\u5C42
+             \u53EF\u89C1\u533A\uFF1B\u89C6\u53E3\u77EE\u5230\u7EA6 176px \u4EE5\u4E0B\u65F6\u5BBF\u4E3B\u4F1A\u628A\u6D6E\u5C42\u9876\u8FB9\u63A8\u5230\u8D1F\u503C\u3001\u6309\u94AE\u968F\u4E4B\u51FA\u5C4F\uFF0C
+             \u5C5E\u4E0D\u53EF\u8FBE\u573A\u666F\uFF0C\u4E0D\u5728\u672C\u89C4\u5219\u7684\u627F\u8BFA\u8303\u56F4\u5185\u3002 */
+      [data-team-panel].dsh-bridge-team-panel {
+        padding-top: 44px !important;
+        max-height: max(160px, min(680px, calc(100vh - 96px))) !important;
+        max-height: max(160px, min(680px, calc(100dvh - 96px))) !important;
+      }
+      /* \u5B50\u667A\u80FD\u4F53\u4E0B\u62C9\uFF1A\u5BBF\u4E3B\u81EA\u5DF1\u5DF2\u6309 min(560px, 100vh - 140px) \u9884\u7559 140px\uFF0C\u8FD9\u91CC\u53EA\u628A vh \u6362\u6210
+         \u52A8\u6001\u89C6\u53E3 \u2014\u2014 \u5426\u5219\u624B\u673A\u5730\u5740\u680F/\u5E95\u90E8\u5BFC\u822A\u6761\u5403\u6389\u7684\u90A3\u6BB5\u4F1A\u88AB\u7B97\u8FDB\u53EF\u7528\u9AD8\u5EA6\u3002 */
+      body > div[class*="_menu"].dsh-bridge-subagent-menu {
+        padding-top: 44px !important;
+        max-height: max(160px, min(560px, calc(100vh - 140px))) !important;
+        max-height: max(160px, min(560px, calc(100dvh - 140px))) !important;
+      }
+      .dsh-mobile-popover-close-btn {
+        position: absolute !important;
+        top: 8px !important;
+        right: 8px !important;
+        z-index: 2 !important;
+        box-sizing: border-box !important;
+        height: 28px !important;
+        min-width: 28px !important;
+        padding: 0 10px !important;
+        border-radius: 14px !important;
+        border: 1px solid var(--dsw-alias-border-l2, rgba(127, 127, 127, 0.35)) !important;
+        background: var(--dsw-alias-bg-layer-2, rgba(127, 127, 127, 0.16)) !important;
+        color: var(--dsw-alias-label-primary, inherit) !important;
+        font-size: 12px !important;
+        font-weight: 600 !important;
+        line-height: 1 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 4px !important;
+        flex: 0 0 auto !important;
+        white-space: nowrap !important;
+        cursor: pointer !important;
+        -webkit-tap-highlight-color: transparent !important;
+        transition: transform 0.1s, opacity 0.15s !important;
+      }
+      .dsh-mobile-popover-close-btn:active {
+        transform: scale(0.95) !important;
+        opacity: 0.85 !important;
+      }
+
       /* 3.1 \u4F1A\u8BDD\u5BF9\u8BDD\u5934\u90E8\u9876\u680F\uFF1A\u79FB\u52A8\u7AEF\u9632\u6324\u538B\u4E0E\u7A7A\u95F4\u91CA\u653E\u4F18\u5316\uFF08\u4E25\u683C\u6392\u9664 .dsh-mobile-app-header\uFF09 */
       div[class*="_centerCol"] header,
       header[class*="__F_CONV__header"] {
@@ -1908,6 +1972,8 @@ var zh = {
   "composer.expand": "\u5C55\u5F00\u8F93\u5165\u6846",
   "composer.collapse": "\u6536\u8D77\u8F93\u5165\u6846\uFF0C\u6700\u5927\u5316\u5BF9\u8BDD\u9605\u8BFB\u533A",
   "panel.backToChat": "\u8FD4\u56DE\u5BF9\u8BDD",
+  // 宿主浮层（智能体团队 / 子智能体下拉）在移动端由本插件统一补收起按钮：动作文案，兼作 aria-label
+  "popover.collapse": "\u6536\u8D77",
   // 移动端设置面板 / 抽屉（dsh-bridge 自绘部分）
   "workspace.choose": "\u9009\u62E9\u7535\u8111\u5DE5\u4F5C\u533A",
   "workspace.reading": "\u6B63\u5728\u8BFB\u53D6\u76EE\u5F55\u5185\u5BB9\u2026",
@@ -1966,6 +2032,8 @@ var en = {
   "composer.expand": "Expand input",
   "composer.collapse": "Collapse input to maximize chat view",
   "panel.backToChat": "Back to chat",
+  // Host popovers (Agent Team / subagent dropdown) get a collapse control from this plugin on mobile
+  "popover.collapse": "Collapse",
   "workspace.choose": "Choose a workspace",
   "workspace.reading": "Reading directory\u2026",
   "workspace.currentDir": "Current directory:",
@@ -6893,9 +6961,99 @@ function setupMobileExperience(rpcCall, ctx) {
       }
     });
   };
-  const panelObserver = new MutationObserver(ensurePanelCloseButton);
+  const MOBILE_POPOVERS = [
+    {
+      key: "team",
+      selector: "[data-team-panel]",
+      hostClass: "dsh-bridge-team-panel"
+    },
+    {
+      key: "subagent",
+      selector: 'body > div[class*="_menu"]:has(> div[role="tree"])',
+      hostClass: "dsh-bridge-subagent-menu"
+    }
+  ];
+  const POPOVER_CLOSE_CLASS = "dsh-mobile-popover-close-btn";
+  const POPOVER_KEY_ATTR = "data-dshbr-popover";
+  const setPopoverHostClass = (el, cls, on) => {
+    if (on === el.classList.contains(cls)) return;
+    if (on) el.classList.add(cls);
+    else el.classList.remove(cls);
+  };
+  const closeMobilePopover = (node) => {
+    if (node === void 0 || !node.isConnected) return;
+    const PointerCtor = typeof window.PointerEvent === "function" ? window.PointerEvent : window.MouseEvent;
+    document.body.dispatchEvent(new PointerCtor("pointerdown", { bubbles: true, cancelable: true }));
+    const fallbackToEscape = () => {
+      if (node.isConnected) {
+        document.dispatchEvent(new KeyboardEvent("keydown", { key: "Escape", bubbles: true, cancelable: true }));
+      }
+    };
+    if (typeof requestAnimationFrame === "function") requestAnimationFrame(fallbackToEscape);
+    else setTimeout(fallbackToEscape, 0);
+  };
+  const popoverSelectorWarned = /* @__PURE__ */ new Set();
+  const popoverNodes = (selector) => {
+    try {
+      return document.querySelectorAll(selector);
+    } catch (reason) {
+      if (!popoverSelectorWarned.has(selector)) {
+        popoverSelectorWarned.add(selector);
+        try {
+          console.warn(`[dsh-bridge] \u6D6E\u5C42\u9009\u62E9\u5668\u4E0D\u88AB\u5F53\u524D\u6D4F\u89C8\u5668\u652F\u6301\uFF0C\u8BE5\u5904\u6D6E\u5C42\u4E0D\u4F1A\u6CE8\u5165\u6536\u8D77\u6309\u94AE\uFF1A${selector}`, reason);
+        } catch {
+        }
+      }
+      return [];
+    }
+  };
+  const ensureMobilePopoverCloseButtons = () => {
+    if (typeof window === "undefined") return;
+    const mobile = window.innerWidth <= MOBILE_MAX_WIDTH;
+    if (!mobile) {
+      document.querySelectorAll(`.${POPOVER_CLOSE_CLASS}`).forEach((btn) => btn.remove());
+      MOBILE_POPOVERS.forEach((popover) => {
+        popoverNodes(popover.selector).forEach((node) => setPopoverHostClass(node, popover.hostClass, false));
+      });
+      return;
+    }
+    MOBILE_POPOVERS.forEach((popover) => {
+      popoverNodes(popover.selector).forEach((node) => {
+        setPopoverHostClass(node, popover.hostClass, true);
+        const collapseLabel = localeT("popover.collapse");
+        const existing = node.querySelector(`.${POPOVER_CLOSE_CLASS}`);
+        if (existing !== null) {
+          const text = existing.querySelector("span");
+          if (text !== null && text.textContent !== collapseLabel) text.textContent = collapseLabel;
+          if (existing.getAttribute("aria-label") !== collapseLabel) existing.setAttribute("aria-label", collapseLabel);
+          return;
+        }
+        const btn = document.createElement("button");
+        btn.type = "button";
+        btn.className = POPOVER_CLOSE_CLASS;
+        btn.setAttribute(POPOVER_KEY_ATTR, popover.key);
+        btn.setAttribute("aria-label", collapseLabel);
+        btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>';
+        const label = document.createElement("span");
+        label.textContent = collapseLabel;
+        btn.appendChild(label);
+        btn.addEventListener("click", (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          closeMobilePopover(node);
+        });
+        node.appendChild(btn);
+      });
+    });
+  };
+  const syncMobilePanelAffordances = () => {
+    ensurePanelCloseButton();
+    ensureMobilePopoverCloseButtons();
+  };
+  const panelObserver = new MutationObserver(syncMobilePanelAffordances);
   panelObserver.observe(document.body, { childList: true, subtree: true, attributes: true, attributeFilter: ["class"] });
-  window.addEventListener("resize", ensurePanelCloseButton);
+  panelObserver.observe(document.documentElement, { attributes: true, attributeFilter: ["lang"] });
+  window.addEventListener("resize", syncMobilePanelAffordances);
   document.addEventListener("click", (e) => {
     if (typeof window === "undefined" || window.innerWidth > MOBILE_MAX_WIDTH) return;
     const trigger = e.target.closest('button[aria-label*="\u9762\u677F"], button[aria-label*="\u5DE5\u4F5C\u533A"], button[aria-label*="workspace"], button[aria-label*="Workspace"], div[class*="toggleCluster"] button, button[class*="subagent"], div[class*="headerActions"] button, div[class*="titleRow"] button');

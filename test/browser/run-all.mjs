@@ -29,6 +29,7 @@ const SUITES = [
   { file: 'market-install.mjs', label: '插件市场安装确认框可达性' },
   { file: 'mobile-sidebar-drawer.mjs', label: '侧边栏抽屉展开/收起（宿主按钮中英文匹配）' },
   { file: 'mobile-sidebar-right.mjs', label: '右侧栏展开/收起（0.1.7 grid 布局修复）' },
+  { file: 'mobile-popover-close.mjs', label: '宿主浮层收起按钮（团队浮层 + 子智能体下拉的退出通道）' },
 ];
 
 // ---- 预检：环境不对时直接给可操作的报错，而不是让 9 个套件各报一堆空断言 ----

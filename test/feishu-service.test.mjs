@@ -736,6 +736,30 @@ test('[飞书] 审批后输出从新卡片续写（不再写回上方旧流式�
   node.dispose()
 })
 
+test('[飞书] 接收附件：落盘到当前会话工作区（session.header.cwd）', async () => {
+  const { ctx, node, gateway } = makeNodeHarness()
+  const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'feishu-recv-'))
+  const downloads = []
+  gateway.downloadResourceToFile = async (messageId, fileKey, type, destPath) => {
+    downloads.push({ messageId, fileKey, type, destPath })
+    fs.writeFileSync(destPath, Buffer.from('bytes'))
+    return { contentType: 'application/pdf', bytesWritten: 5 }
+  }
+  // DSH 会话：cwd 在 header 内
+  ctx.sessions = { get: (id) => (id === 'sess_1' ? { id, header: { cwd: workDir } } : undefined), list: () => [] }
+  node.handleInbound = async () => 'routed'
+
+  await ctx.emit('feishu/message', {
+    chatId: 'oc_chat', peerId: 'oc_chat', senderId: 'ou_user', isGroup: false,
+    text: '', messageId: 'om_media', rawContentType: 'file',
+    resources: [{ type: 'file', fileKey: 'fk_1', fileName: 'doc.pdf' }],
+  })
+
+  assert.equal(downloads.length, 1)
+  assert.ok(downloads[0].destPath.startsWith(path.join(workDir, '.feishu-media')), `应落到会话工作区，实际 ${downloads[0].destPath}`)
+  node.dispose()
+})
+
 test('[飞书] 审批卡片走 CardKit 实体：决议后原地更新、不再补文字消息', async () => {
   const { ctx, node, gateway, sends } = makeNodeHarness()
   const calls = { create: [], sendRef: [], update: [] }
