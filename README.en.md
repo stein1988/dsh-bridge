@@ -64,7 +64,7 @@
 - **📱 Native-Grade Mobile UI & PWA**: Centered session header, native drawer sidebar with `[|` fold icon, anti-overlap responsive layout, PWA install support;
 - **🗂️ Web Remote Workspace Directory Picker**: Mobile/remote visits pop up responsive tree directory browser; localhost visits route to OS native dialogs; supports `/addworkspace` IM command;
 - **🔐 Comprehensive Access Security & Dual Defenses**: QR code secret Token login, visitor password gate, independent admin anti-tamper lock; host physical privilege (`127.0.0.1`) & emergency terminal reset (`reset-auth`);
-- **🤖 All-in-One IM Bot Matrix (WeChat / QQ / Feishu / Telegram)**: Multi-workspace dispatching, cross-restart session persistence, streaming Markdown typewriter, Card 2.0 interactive approvals, and bidirectional file sharing;
+- **🤖 All-in-One IM Bot Matrix (WeChat / QQ / Feishu / Telegram)**: Multi-workspace dispatching, cross-restart session persistence, streaming Markdown typewriter, Card 2.0 interactive approvals, and bidirectional file sharing; every platform also reports a **per-turn change digest** (which files changed) and `/diff` exports a `.patch` attachment;
 - **📊 Maintenance & Smooth Upgrades**: Host CPU / RAM / Uptime metrics, 1-click network diagnosis, JSON configuration backup & restore, npmmirror fast check & graceful restart.
 
 ---
@@ -333,9 +333,9 @@ Built on the **official Feishu Channel SDK**: WebSocket transport with auto-reco
 </details>
 
 * **Cloud-doc comments**: mention the bot in a Feishu doc/sheet comment and the answer is posted back into that comment thread (no need to mention again when following up; comments are plain text — no streaming or cards).
-* **Native slash-command panel**: on connect the plugin registers 10 commands (`/help`, `/new`, `/sessions`, `/use`, `/status`, …) so users can pick them from Feishu's `/` panel (requires Feishu PC ≥ 7.70 / mobile ≥ 7.71; typing them manually works on older clients too).
+* **Native slash-command panel**: on connect the plugin registers 11 commands (`/help`, `/new`, `/sessions`, `/use`, `/status`, `/diff`, …) so users can pick them from Feishu's `/` panel (requires Feishu PC ≥ 7.70 / mobile ≥ 7.71; typing them manually works on older clients too).
 * **🚀 Scan to create app (recommended)**: click **"📱 Scan to create app"** in the settings panel > confirm with the Feishu mobile app; permissions, event subscriptions and card callbacks are provisioned automatically and the bot connects right away — no developer console needed. Tenant brand (Feishu / Lark) is detected automatically.
-* **⌨️ Native slash-command panel**: 10 commands (`/help`, `/new`, `/sessions`, `/use`, `/status`, …) are registered automatically so users can pick them from Feishu's `/` panel (Feishu PC ≥ 7.70 / mobile ≥ 7.71; typing them manually works on older clients).
+* **⌨️ Native slash-command panel**: 11 commands (`/help`, `/new`, `/sessions`, `/use`, `/status`, `/diff`, …) are registered automatically so users can pick them from Feishu's `/` panel (Feishu PC ≥ 7.70 / mobile ≥ 7.71; typing them manually works on older clients).
 * **📄 Cloud-doc comments**: mention the bot in a Feishu doc/sheet comment and the answer is posted back into that comment thread (no need to mention again when following up; comments are plain text).
 * **🛡 In-place approval cards**: after you approve/reject, the card turns into a result state (showing who decided and who requested; timeout/cancel are marked too) instead of sending a duplicate text message.
 * **Manual setup (existing app)**: create a self-built app on [Feishu Open Platform](https://open.feishu.cn/app), enable long connection > fill App ID & Secret. See [Feishu Guide](docs/feishu-usage.md).

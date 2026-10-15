@@ -10,6 +10,7 @@ import path from 'node:path'
 import { FeishuGateway } from '../lib/feishu/gateway.js'
 import { FeishuConversationNode } from '../lib/feishu/node.js'
 import { FeishuService } from '../lib/feishu/index.js'
+import { DESIRED_SLASH_COMMANDS } from '../lib/feishu/slash-commands.js'
 import { PlatformManager } from '../lib/platform/manager.js'
 import { buildCommentPeerId, isCommentPeerId, flattenCommentElements, extractCommentInput } from '../lib/feishu/comment.js'
 
@@ -736,6 +737,14 @@ test('[飞书] 审批后输出从新卡片续写（不再写回上方旧流式�
   node.dispose()
 })
 
+test('[飞书] 出站目标解析器：单聊取 chat_id，不用发送者 open_id；轮次绑定优先', () => {
+  const { node } = makeNodeHarness()
+  node._lastPeer = { peerId: 'oc_chat', senderId: 'ou_user', isGroup: false }
+  assert.equal(node.resolveSendTarget({}), 'oc_chat', '单聊必须用会话 chat_id')
+  assert.equal(node.resolveSendTarget({ outboundPeer: { peerId: 'oc_topic', isGroup: true } }), 'oc_topic', '轮次绑定优先')
+  node.dispose()
+})
+
 test('[飞书] 接收附件：落盘到当前会话工作区（session.header.cwd）', async () => {
   const { ctx, node, gateway } = makeNodeHarness()
   const workDir = fs.mkdtempSync(path.join(os.tmpdir(), 'feishu-recv-'))
@@ -1243,8 +1252,8 @@ test('[飞书] 连接成功后自动同步斜杠指令（默认开启）并持�
   await new Promise((r) => setTimeout(r, 20))
 
   assert.equal(calls.filter((c) => c.method === 'GET').length, 1, '先查列表')
-  assert.equal(calls.filter((c) => c.method === 'POST').length, 10, '缺失的指令全部创建')
-  assert.equal(Object.keys(gw.config.slashCommandIds).length, 10)
+  assert.equal(calls.filter((c) => c.method === 'POST').length, DESIRED_SLASH_COMMANDS.length, '缺失的指令全部创建')
+  assert.equal(Object.keys(gw.config.slashCommandIds).length, DESIRED_SLASH_COMMANDS.length)
   assert.ok(Object.values(gw.config.slashCommandIds).every((entry) => entry.ours === true))
   assert.equal(persisted.length, 1, '映射需回调持久化')
   assert.match(calls[0].url, /\/open-apis\/application\/v7\/app_slash_commands$/)

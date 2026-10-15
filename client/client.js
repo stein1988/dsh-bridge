@@ -4292,6 +4292,25 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
         }),
         React.createElement("span", null, "\u7FA4\u804A\u81EA\u52A8\u6388\u6743\uFF08\u65B0\u7FA4\u9996\u6B21 @\u673A\u5668\u4EBA \u81EA\u52A8\u52A0\u5165\u767D\u540D\u5355\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09")
       ),
+      // 本轮改动摘要开关：默认开启（IM 侧也能看到"这轮改了哪些文件"）
+      React.createElement(
+        "label",
+        {
+          style: { display: "flex", alignItems: "center", gap: 6, marginTop: 10, fontSize: 12, cursor: "pointer", width: "fit-content", color: "var(--dsw-alias-label-secondary,#6b7280)" },
+          title: '\u5F00\u542F\u540E\uFF0C\u6BCF\u8F6E\u7ED3\u675F\u4F1A\u628A"\u6539\u4E86\u54EA\u4E9B\u6587\u4EF6\uFF08+\u589E/-\u5220\uFF09"\u64AD\u62A5\u5230\u5F53\u524D\u4F1A\u8BDD\uFF1B/diff \u53EF\u5BFC\u51FA .patch \u8865\u4E01'
+        },
+        React.createElement("input", {
+          type: "checkbox",
+          checked: cfgDraft?.changesDigest !== false,
+          disabled: busy,
+          onChange: (e) => {
+            const checked = e.target.checked;
+            setCfgDraft((d) => ({ ...d ?? {}, changesDigest: checked }));
+            act(BRIDGE_ENDPOINTS.platformSetConfig, { changesDigest: checked });
+          }
+        }),
+        React.createElement("span", null, "\u672C\u8F6E\u6539\u52A8\u6458\u8981\uFF08\u6BCF\u8F6E\u64AD\u62A5\u6539\u52A8\u6587\u4EF6\u6E05\u5355\uFF0C\u9ED8\u8BA4\u5F00\u542F\uFF09")
+      ),
       // 高级设置：会话级配置（工作区 / Agent 预设 / 模型路由）+ 会话节奏参数
       React.createElement(
         "div",

@@ -401,6 +401,119 @@ test('ConversationBridge 仅在收到 [SEND_FILE: path] 指令时发送媒体文
   }
 })
 
+test('本轮改动摘要：workspace/changes 播报一次（同轮重复事件去重）', async () => {
+  const { ctx } = makeMockCtx()
+  const platform = new MockPlatform({ ctx, logger: ctx.logger })
+  const summary = {
+    turn: 3, cwd: '/w', total: 2, added: 12, deleted: 4,
+    files: [
+      { path: 'src/a.js', display: 'src/a.js', added: 10, deleted: 4 },
+      { path: 'src/b.css', display: 'src/b.css', added: 2, deleted: 0 },
+    ],
+  }
+  ctx.workspaceChanges = { summary: (_sid, seq) => (seq === 7 ? summary : undefined), diff: async () => undefined }
+  const bridge = new ConversationBridge({ ctx, logger: ctx.logger, config: {}, platform })
+  bridge.peerId = 'peer-1'
+  bridge.activeSessionId = 's-chg'
+
+  ctx.emit('session/event', { id: 's-chg' }, { type: 'workspace/changes', seq: 7, data: { turn: 3 } })
+  await new Promise((r) => setTimeout(r, 10))
+  assert.equal(platform.sent.length, 1, '应播报一条摘要')
+  assert.match(platform.sent[0].text, /本轮改动\*\* 2 个文件（\+12\/-4）/)
+  assert.match(platform.sent[0].text, /src\/a\.js/)
+
+  // 同一轮重复事件（宿主可能追加多次）→ 不重复播报
+  ctx.emit('session/event', { id: 's-chg' }, { type: 'workspace/changes', seq: 8, data: { turn: 3 } })
+  await new Promise((r) => setTimeout(r, 10))
+  assert.equal(platform.sent.length, 1, '同一轮只播一次')
+
+  bridge.dispose()
+  platform.dispose()
+})
+
+test('本轮改动摘要：开关关闭 / 宿主无该服务 / 本轮无改动 → 全程静默', async () => {
+  const mk = (config, withService) => {
+    const { ctx } = makeMockCtx()
+    const platform = new MockPlatform({ ctx, logger: ctx.logger })
+    if (withService) ctx.workspaceChanges = { summary: () => ({ turn: 1, total: 0, files: [] }), diff: async () => undefined }
+    const bridge = new ConversationBridge({ ctx, logger: ctx.logger, config, platform })
+    bridge.peerId = 'peer-1'
+    bridge.activeSessionId = 's-quiet'
+    return { ctx, platform, bridge }
+  }
+
+  // ① 显式关闭
+  {
+    const { ctx, platform, bridge } = mk({ changesDigest: false }, true)
+    ctx.workspaceChanges = { summary: () => ({ turn: 1, total: 2, added: 1, deleted: 0, files: [{ path: 'a', display: 'a', added: 1, deleted: 0 }] }), diff: async () => undefined }
+    ctx.emit('session/event', { id: 's-quiet' }, { type: 'workspace/changes', seq: 1, data: { turn: 1 } })
+    await new Promise((r) => setTimeout(r, 10))
+    assert.equal(platform.sent.length, 0, '关闭后不得播报')
+    bridge.dispose(); platform.dispose()
+  }
+  // ② 老宿主（无 workspaceChanges 服务）
+  {
+    const { ctx, platform, bridge } = mk({}, false)
+    ctx.emit('session/event', { id: 's-quiet' }, { type: 'workspace/changes', seq: 1, data: { turn: 1 } })
+    await new Promise((r) => setTimeout(r, 10))
+    assert.equal(platform.sent.length, 0, '无服务时静默跳过')
+    bridge.dispose(); platform.dispose()
+  }
+  // ③ 本轮没有文件改动
+  {
+    const { ctx, platform, bridge } = mk({}, true)
+    ctx.emit('session/event', { id: 's-quiet' }, { type: 'workspace/changes', seq: 1, data: { turn: 1 } })
+    await new Promise((r) => setTimeout(r, 10))
+    assert.equal(platform.sent.length, 0, 'total=0 不刷屏')
+    bridge.dispose(); platform.dispose()
+  }
+})
+
+test('/diff：导出本轮改动为 .patch 附件 + 摘要文本；无记录时友好提示', async () => {
+  const fs = await import('node:fs')
+  const { ctx } = makeMockCtx()
+  const platform = new MockPlatform({ ctx, logger: ctx.logger })
+  const captured = []
+  platform.sendMediaFile = async (peerId, filePath, opts) => {
+    captured.push({ peerId, filePath, opts, content: fs.readFileSync(filePath, 'utf8') })
+    return { success: true }
+  }
+  const summary = {
+    turn: 5, cwd: '/w', total: 1, added: 1, deleted: 1,
+    files: [{ path: 'src/a.js', display: 'src/a.js', added: 1, deleted: 1 }],
+  }
+  ctx.workspaceChanges = {
+    summary: (_sid, seq) => (seq === 9 ? summary : undefined),
+    diff: async () => ({ kind: 'text', path: 'src/a.js', display: 'src/a.js', hunks: [{ oldStart: 1, oldLines: 1, newStart: 1, newLines: 1, lines: ['-old', '+new'] }] }),
+  }
+  const bridge = new ConversationBridge({ ctx, logger: ctx.logger, config: {}, platform })
+  bridge.peerId = 'peer-1'
+  bridge.activeSessionId = 's-diff'
+
+  // 还没有改动记录 → 友好提示，不发附件
+  await bridge.sendSessionDiff()
+  assert.equal(captured.length, 0, '无记录不发附件')
+  assert.match(platform.sent.at(-1).text, /还没有可导出的改动记录/)
+
+  // 播报事件登记本轮改动后 → /diff 出 patch
+  ctx.emit('session/event', { id: 's-diff' }, { type: 'workspace/changes', seq: 9, data: { turn: 5 } })
+  await new Promise((r) => setTimeout(r, 10))
+  platform.sent.length = 0
+  await bridge.sendSessionDiff()
+  await new Promise((r) => setTimeout(r, 10))
+
+  assert.equal(captured.length, 1, '应发出一个附件')
+  assert.match(captured[0].filePath, /changes-turn-5\.patch$/)
+  assert.equal(captured[0].peerId, 'peer-1')
+  assert.match(captured[0].content, /diff --git a\/src\/a\.js b\/src\/a\.js/)
+  assert.match(captured[0].content, /\+new/)
+  assert.match(platform.sent.at(-1).text, /已导出本轮改动补丁/)
+  assert.equal(fs.existsSync(captured[0].filePath), false, '发送后应清理临时文件')
+
+  bridge.dispose()
+  platform.dispose()
+})
+
 test('SEND_FILE：会话 cwd 在 header 里时也应放行（回归：曾误读 sess.cwd 导致附件被静默拦掉）', async () => {
   const fs = await import('node:fs')
   const os = await import('node:os')

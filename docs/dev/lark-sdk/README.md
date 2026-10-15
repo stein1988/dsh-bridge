@@ -113,6 +113,37 @@ npm pack @larksuite/channel@<version> && tar -xzf larksuite-channel-*.tgz && \
   - 同一评论线程的后续回复**免 @**（进程内记住 peer）；未 @ 的无关评论忽略；
   - 已知限制：评论回复是纯文本（Markdown 语法按字面显示）、不能流式、不能发文件/卡片、超长回复未分片（失败会有告警日志）。
 
+## 5.35 宿主服务：每轮改动清单（workspaceChanges）
+
+IM 侧的「本轮改动摘要」与 `/diff` 用的是 **DSH 宿主**的服务（与 Web 端"改动/交付物"面板同源），不是飞书 SDK 能力，但同样必须按文档/类型事实使用：
+
+```ts
+// @deepseek-ai/dsh-workspace-changes（宿主已挂到 cordis Context）
+ctx.workspaceChanges.summary(sessionId, seq): {
+  turn: number; cwd: string;
+  total: number; added: number; deleted: number;          // 含被 cap 掉的文件
+  files: { path: string; display: string; added: number; deleted: number; binary?: true; oversized?: true }[];
+  snapshot?: { before: string; after: string };
+} | undefined
+ctx.workspaceChanges.diff(sessionId, seq, index, signal): Promise<
+  { kind: 'text'; hunks: { oldStart; oldLines; newStart; newLines; lines: string[] }[] }
+  | { kind: 'binary' | 'oversized'; path; display } | undefined
+>
+// 会话事件（每轮完成的顶层 turn 之后追加）：session/event → { type: 'workspace/changes', data: { turn } }
+```
+
+关键语义（实测/类型均确认）：
+- 摘要**留在宿主**，用 `(sessionId, event.seq)` 取；事件本身只带 `turn`；
+- **同一轮可能追加多次事件**（新的替换旧的）→ 播报侧按 turn 去重；
+- `files` 已按 `display` 排序且受宿主 `maxFiles` 限制，`total/added/deleted` 是**全量**统计；
+- 会话被销毁后 `summary()` 返回 undefined（要做空判）；
+- 老宿主可能没有该服务 → 一律 `ctx.workspaceChanges?.summary` 守卫，缺失即静默跳过。
+
+本仓库实现：
+- 播报：`conversation-bridge._announceChanges()` → `lib/platform/changes-digest.js:formatChangesDigest()`（默认开启，`changesDigest` 开关）；
+- 导出：`conversation-bridge.sendSessionDiff()`（挂到 `/diff` 指令）→ `buildUnifiedPatch()` 生成 `.patch` 写临时文件后走 `platform.sendMediaFile()`；
+- 出站目标：`resolveSendTarget(opts)`（基类默认 `outboundPeer.peerId ?? this.peerId ?? allowFrom[0]`，飞书覆盖为 `chat_id` 优先），`sendMediaFile` 支持透传 `{ replyTo, replyInThread }`，话题群里的附件也留在话题内。
+
 ## 5.4 出站 Markdown 的硬要求（表格/引用必须空行分隔）
 
 官方「发送消息内容结构」原文要点：`md` 标签支持 CommonMark 0.31 + GFM（**含表格**），但

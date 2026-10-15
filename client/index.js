@@ -1937,6 +1937,23 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
         }),
         React.createElement('span', null, '群聊自动授权（新群首次 @机器人 自动加入白名单，默认关闭）'),
       ),
+      // 本轮改动摘要开关：默认开启（IM 侧也能看到"这轮改了哪些文件"）
+      React.createElement('label', {
+        style: { display: 'flex', alignItems: 'center', gap: 6, marginTop: 10, fontSize: 12, cursor: 'pointer', width: 'fit-content', color: 'var(--dsw-alias-label-secondary,#6b7280)' },
+        title: '开启后，每轮结束会把"改了哪些文件（+增/-删）"播报到当前会话；/diff 可导出 .patch 补丁',
+      },
+        React.createElement('input', {
+          type: 'checkbox',
+          checked: cfgDraft?.changesDigest !== false,
+          disabled: busy,
+          onChange: (e) => {
+            const checked = e.target.checked;
+            setCfgDraft(d => ({ ...(d ?? {}), changesDigest: checked }));
+            act(BRIDGE_ENDPOINTS.platformSetConfig, { changesDigest: checked });
+          },
+        }),
+        React.createElement('span', null, '本轮改动摘要（每轮播报改动文件清单，默认开启）'),
+      ),
       // 高级设置：会话级配置（工作区 / Agent 预设 / 模型路由）+ 会话节奏参数
       React.createElement('div', { style: { marginTop: 12 } },
         React.createElement('button', {
