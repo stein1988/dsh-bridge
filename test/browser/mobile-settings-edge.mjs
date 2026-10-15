@@ -5,7 +5,7 @@
 // 用法：node test/browser/mobile-settings-edge.mjs
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
-import { suiteResult, openSettings, installLegacySelectorBridge, launchOptions, shotsDir, connect, dismissHostNotices } from './helpers.mjs';
+import { suiteResult, openSettings, clickSettingsCell, installLegacySelectorBridge, checkNavReachable, launchOptions, shotsDir, connect, dismissHostNotices } from './helpers.mjs';
 
 const SHOTS = shotsDir('mobile-settings-edge');
 const CHROME = launchOptions().executablePath;
@@ -33,56 +33,66 @@ const browser = await puppeteer.launch({ executablePath: CHROME, headless: true,
   await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
   await new Promise((r) => setTimeout(r, 4000));
   await dismissHostNotices(page);
-  await openSettings(page);
-  await new Promise((r) => setTimeout(r, 1200));
+  const didOpen = await openSettings(page);
 
-  const menu = await page.evaluate(() => {
-    const ov = document.querySelector('[class*="VOzbGW_overlay"]');
-    const nav = ov.querySelector('nav[class*="VOzbGW_nav"]');
-    const nr = nav.getBoundingClientRect();
-    const cells = [...nav.querySelectorAll('button[class*="VOzbGW_navCell"]')];
-    const close = ov.querySelector('[class*="VOzbGW_close"]');
-    const cr = close.getBoundingClientRect();
-    return {
-      cellCount: cells.length,
-      allInsideNav: cells.every((b) => {
-        const r = b.getBoundingClientRect();
-        return r.top >= nr.top - 0.5 && r.bottom <= nr.bottom + 0.5 && r.left >= nr.left - 0.5 && r.right <= nr.right + 0.5;
-      }),
-      navScrollable: nav.scrollHeight > nav.clientHeight + 1,
-      closeVisible: close.offsetParent !== null && cr.width > 0 && cr.right <= innerWidth + 0.5 && cr.bottom <= innerHeight + 0.5,
-      docScrollW: document.documentElement.scrollWidth,
-      innerW: innerWidth,
-    };
-  });
-  say('320x480 分类行全部落在导航容器内（未溢出）', menu.allInsideNav, `cells=${menu.cellCount} navScrollable=${menu.navScrollable}`);
-  say('320x480 关闭按钮可见且在视口内', menu.closeVisible);
-  say('320x480 无整页横向滚动条', menu.docScrollW <= menu.innerW + 1, `scrollW=${menu.docScrollW} innerW=${menu.innerW}`);
-  await page.screenshot({ path: path.join(SHOTS, '320x480__menu.png') });
+  if (!didOpen) {
+    say('320x480 设置弹窗可打开', false, '入口点击后 overlay 未出现');
+    await page.close();
+  } else {
+    // 可达性语义（与 fix 套件一致）：宿主分类已从 6 项增到 8 项，320×480 一屏放不下，
+    // navList 是可滚动容器，真正的不变量是「每项都能滚进视野并点中」，而非「一屏全塞下」。
+    const navReach = await checkNavReachable(page);
+    const menu = await page.evaluate(() => {
+      const ov = document.querySelector('[class*="VOzbGW_overlay"]');
+      const nav = ov.querySelector('nav[class*="VOzbGW_nav"]');
+      const close = ov.querySelector('[class*="VOzbGW_close"]');
+      const cr = close.getBoundingClientRect();
+      return {
+        cellCount: [...nav.querySelectorAll('button[class*="VOzbGW_navCell"]')].length,
+        navScrollable: nav.scrollHeight > nav.clientHeight + 1,
+        closeVisible: close.offsetParent !== null && cr.width > 0 && cr.right <= innerWidth + 0.5 && cr.bottom <= innerHeight + 0.5,
+        docScrollW: document.documentElement.scrollWidth,
+        innerW: innerWidth,
+      };
+    });
+    say(
+      '320x480 分类行可滚动到达并可点中（无永久溢出）',
+      navReach.allReachable && navReach.count > 0,
+      `cells=${menu.cellCount} 可滚动=${navReach.scrollable} 不可达=${JSON.stringify(navReach.unreachable)}`,
+    );
+    say('320x480 关闭按钮可见且在视口内', menu.closeVisible);
+    say('320x480 无整页横向滚动条', menu.docScrollW <= menu.innerW + 1, `scrollW=${menu.docScrollW} innerW=${menu.innerW}`);
+    await page.screenshot({ path: path.join(SHOTS, '320x480__menu.png') });
 
-  await page.evaluate(() => document.querySelectorAll('button[class*="VOzbGW_navCell"]')[2].click());
-  await new Promise((r) => setTimeout(r, 2200));
-  const detail = await page.evaluate(() => {
-    const ov = document.querySelector('[class*="VOzbGW_overlay"]');
-    const opts = ov.querySelector('[class*="VOzbGW_options"]');
-    const back = ov.querySelector('div[class*="VOzbGW_navTitle"]');
-    const br = back.getBoundingClientRect();
-    const hit = document.elementFromPoint(br.left + br.width / 2, br.top + br.height / 2);
-    return {
-      optionsW: Math.round(opts.getBoundingClientRect().width),
-      optionsScrollW: opts.scrollWidth,
-      optionsClientW: opts.clientWidth,
-      backText: (back.textContent || '').trim(),
-      backHittable: !!hit && (back === hit || back.contains(hit)),
-      docScrollW: document.documentElement.scrollWidth,
-      innerW: innerWidth,
-    };
-  });
-  say('320x480 详情页内容区占满整宽', detail.optionsW >= 290, `optionsW=${detail.optionsW}`);
-  say('320x480 详情页无整页横向滚动条', detail.docScrollW <= detail.innerW + 1, `scrollW=${detail.docScrollW}`);
-  say('320x480 返回行可点中', detail.backHittable, `text=${detail.backText}`);
-  await page.screenshot({ path: path.join(SHOTS, '320x480__detail.png') });
-  await page.close();
+    // 进入第 3 个分类（远程访问）：宿主有间歇性自动关闭弹窗的抖动，带重试并如实记录
+    const entered = await clickSettingsCell(page, 2);
+    const detail = await page.evaluate(() => {
+      const ov = document.querySelector('[class*="VOzbGW_overlay"]');
+      if (!ov) return { gone: true };
+      const opts = ov.querySelector('[class*="VOzbGW_options"]');
+      const back = ov.querySelector('div[class*="VOzbGW_navTitle"]');
+      const br = back.getBoundingClientRect();
+      const hit = document.elementFromPoint(br.left + br.width / 2, br.top + br.height / 2);
+      return {
+        optionsW: Math.round(opts.getBoundingClientRect().width),
+        optionsScrollW: opts.scrollWidth,
+        optionsClientW: opts.clientWidth,
+        backText: (back.textContent || '').trim(),
+        backHittable: !!hit && (back === hit || back.contains(hit)),
+        docScrollW: document.documentElement.scrollWidth,
+        innerW: innerWidth,
+      };
+    });
+    if (detail.gone || !entered.ok) {
+      say('320x480 详情页内容区占满整宽', false, `进入详情页失败：${entered.reason ?? '弹窗消失'}（宿主自动关闭 ${entered.closedTimes} 次）`);
+    } else {
+      say('320x480 详情页内容区占满整宽', detail.optionsW >= 290, `optionsW=${detail.optionsW}`);
+      say('320x480 详情页无整页横向滚动条', detail.docScrollW <= detail.innerW + 1, `scrollW=${detail.docScrollW}`);
+      say('320x480 返回行可点中', detail.backHittable, `text=${detail.backText}`);
+    }
+    await page.screenshot({ path: path.join(SHOTS, '320x480__detail.png') });
+    await page.close();
+  }
 }
 
 // ---------- B. 插件市场页签在 375px 是否可达 ----------
@@ -97,24 +107,29 @@ for (const width of [375, 390]) {
   await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
   await new Promise((r) => setTimeout(r, 4000));
   await dismissHostNotices(page);
-  await openSettings(page);
-  await new Promise((r) => setTimeout(r, 1000));
+  const marketOpened = await openSettings(page);
   // 宿主 0.2.0 设置导航可能已无市场入口（结构漂移）：缺席时本段断言 SKIP，不记 FAIL
-  const marketNav = await page.evaluate(() => {
+  const marketIdx = marketOpened ? await page.evaluate(() => {
     const ov = document.querySelector('[class*="VOzbGW_overlay"]');
-    const cell = [...ov.querySelectorAll('button[class*="VOzbGW_navCell"]')].find((x) => /Plugin Market/.test(x.textContent));
-    if (cell) cell.click();
-    return { hasCell: !!cell };
-  });
-  await new Promise((r) => setTimeout(r, 6000));
-  const marketSkipped = !marketNav.hasCell;
+    if (!ov) return -1;
+    return [...ov.querySelectorAll('button[class*="VOzbGW_navCell"]')].findIndex((x) => /Plugin Market/.test(x.textContent));
+  }) : -1;
+  const marketNav = marketIdx >= 0
+    ? await clickSettingsCell(page, marketIdx, null, { settleMs: 5000 })
+    : { ok: false, closedTimes: 0, reason: '设置导航无市场入口' };
+  const marketSkipped = marketIdx < 0;
   if (marketSkipped) {
     skip++;
     console.log(`SKIP  ${width}px 插件市场页签（宿主设置导航无市场入口，0.2.0 结构漂移，待宿主稳定后重写断言）`);
+  } else if (!marketNav.ok) {
+    say(`${width}px 进入插件市场页`, false, `${marketNav.reason}（宿主自动关闭 ${marketNav.closedTimes} 次）`);
+    await page.close();
+    continue;
   }
 
   const before = await page.evaluate(() => {
     const ov = document.querySelector('[class*="VOzbGW_overlay"]');
+    if (!ov) return { gone: true };
     const opts = ov.querySelector('[class*="VOzbGW_options"]');
     const or = opts.getBoundingClientRect();
     const tabs = [...opts.querySelectorAll('button')].filter((b) => /Discover|Themes|Favorites|Installed|Advanced|发现|主题|收藏|已安装|高级/i.test(b.textContent || ''));
@@ -132,6 +147,7 @@ for (const width of [375, 390]) {
   // 横向滑动内容区到最右，再看目标页签是否进入可视且可命中
   const after = await page.evaluate(() => {
     const ov = document.querySelector('[class*="VOzbGW_overlay"]');
+    if (!ov) return { gone: true, tabs: [] };
     const opts = ov.querySelector('[class*="VOzbGW_options"]');
     opts.scrollLeft = 9999;
     const or = opts.getBoundingClientRect();
@@ -165,7 +181,16 @@ for (const width of [375, 390]) {
       !!advanced && advanced.insideOptions && advanced.hittable,
       `${JSON.stringify(advanced)}`,
     );
-    say(`${width}px 内容区确实可横向滚动（maxScrollLeft>0）`, before.maxScrollLeft > 0, `scrollW/clientW=${before.optionsScrollW}/${before.optionsClientW}`);
+    // 「内容区可横滑」是**为可达性服务的手段**，不是目的：当第三方市场页在 375/390px 下
+    // 已经自己收敛到不溢出（实测 scrollW==clientW、无 maxScrollLeft），就没有需要横滑
+    // 才能看到的页签，此时断言"必须能横滑"是假的失败。真正的不变量是「页签可达」——
+    // 上面两条已分别用 insideOptions + 命中测试覆盖。
+    const tabsAllReachable = after.tabs.length > 0 && after.tabs.every((t) => t.insideOptions && t.hittable);
+    say(
+      `${width}px 市场页签全部可达（无需横滑即可见，或横滑后可见）`,
+      tabsAllReachable,
+      `maxScrollLeft=${before.maxScrollLeft} tabs=${JSON.stringify(after.tabs.map((t) => `${t.text}:${t.hittable}`))}`,
+    );
   }
   if (!before.tabs.length) {
     const txt = await page.evaluate(() => (document.querySelector('[class*="VOzbGW_options"]')?.innerText || '').replace(/\s+/g, ' ').slice(0, 160));
@@ -187,27 +212,36 @@ for (const width of [375, 390]) {
   await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
   await new Promise((r) => setTimeout(r, 4000));
   await dismissHostNotices(page);
-  await openSettings(page);
-  await new Promise((r) => setTimeout(r, 1000));
-  // 宿主 0.2.0 导航格数量变化（实测仅 5 格）：下标访问先判空，缺席则本段 SKIP
-  const hasSixthCell = await page.evaluate(() => !!document.querySelectorAll('button[class*="VOzbGW_navCell"]')[5]);
+  const cOpened = await openSettings(page);
+  // 宿主导航格数量随版本变化（实测 8 格）：下标访问先判空，缺席则本段 SKIP
+  const hasSixthCell = cOpened && await page.evaluate(() => !!document.querySelectorAll('button[class*="VOzbGW_navCell"]')[5]);
   if (!hasSixthCell) {
     skip++;
-    console.log('SKIP  返回后 nav 滚动（宿主 0.2.0 导航不足 6 格，结构漂移，待宿主稳定后重写断言）');
+    console.log('SKIP  返回后 nav 滚动（宿主设置弹窗未打开或导航不足 6 格，待宿主稳定后重写断言）');
     await page.close();
   } else {
-  await page.evaluate(() => document.querySelectorAll('button[class*="VOzbGW_navCell"]')[5].click());
-  await new Promise((r) => setTimeout(r, 1200));
-  await page.evaluate(() => document.querySelector('div[class*="VOzbGW_navTitle"]').click());
-  await new Promise((r) => setTimeout(r, 800));
-  const st = await page.evaluate(() => {
-    const ov = document.querySelector('[class*="VOzbGW_overlay"]');
-    const nav = ov.querySelector('nav[class*="VOzbGW_nav"]');
-    const panel = ov.querySelector('[class*="VOzbGW_panel"]');
-    return { navScrollTop: nav.scrollTop, attr: panel.getAttribute('data-dshbr-settings-view'), optionsDisplay: getComputedStyle(ov.querySelector('[class*="VOzbGW_options"]')).display };
-  });
-  say('返回列表后视图属性已清除且 nav 滚动归零', st.attr === null && st.navScrollTop === 0, JSON.stringify(st));
-  await page.close();
+    const backEntered = await clickSettingsCell(page, 5);
+    const st = backEntered.ok ? await page.evaluate(() => {
+      const ov = document.querySelector('[class*="VOzbGW_overlay"]');
+      if (!ov) return { gone: true };
+      const navTitle = ov.querySelector('div[class*="VOzbGW_navTitle"]');
+      if (navTitle) navTitle.click();
+      return null;
+    }) : { gone: true };
+    if (backEntered.ok && st === null) await new Promise((r) => setTimeout(r, 800));
+    const finalSt = backEntered.ok ? await page.evaluate(() => {
+      const ov = document.querySelector('[class*="VOzbGW_overlay"]');
+      if (!ov) return { gone: true };
+      const nav = ov.querySelector('nav[class*="VOzbGW_nav"]');
+      const panel = ov.querySelector('[class*="VOzbGW_panel"]');
+      return { navScrollTop: nav.scrollTop, attr: panel.getAttribute('data-dshbr-settings-view'), optionsDisplay: getComputedStyle(ov.querySelector('[class*="VOzbGW_options"]')).display };
+    }) : { gone: true };
+    say(
+      '返回列表后视图属性已清除且 nav 滚动归零',
+      backEntered.ok && !finalSt.gone && finalSt.attr === null && finalSt.navScrollTop === 0,
+      backEntered.ok ? JSON.stringify(finalSt) : `${backEntered.reason}（宿主自动关闭 ${backEntered.closedTimes} 次）`,
+    );
+    await page.close();
   }
 }
 

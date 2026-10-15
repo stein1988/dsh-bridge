@@ -13,7 +13,7 @@
 // 用法：node test/browser/mobile-settings-fallback.mjs
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
-import { suiteResult, openSettings, installLegacySelectorBridge, launchOptions, shotsDir, connect } from './helpers.mjs';
+import { suiteResult, openSettings, clickSettingsCell, installLegacySelectorBridge, checkNavReachable, launchOptions, shotsDir, connect } from './helpers.mjs';
 
 const SHOTS = shotsDir('mobile-settings-fallback');
 const CHROME = launchOptions().executablePath;
@@ -48,8 +48,8 @@ for (const vp of [
 
   // 摘掉开关 = 模拟「CSS 6.2 惰性」这一回退分支
   await page.evaluate(() => document.documentElement.removeAttribute('data-dshbr-drilldown'));
-  await openSettings(page);
-  await new Promise((r) => setTimeout(r, 1500));
+  const fbOpened = await openSettings(page);
+  await new Promise((r) => setTimeout(r, 600));
 
   const fb = await page.evaluate(() => {
     const ov = document.querySelector('[class*="VOzbGW_overlay"]');
@@ -95,6 +95,7 @@ for (const vp of [
     };
   });
 
+  say(`${vp.name} 回退后设置弹窗可打开`, !!fb.found, `入口点击=${fbOpened}`);
   say(`${vp.name} 回退为横向轨道布局（未走钻取）`, fb.found && fb.panelDir === 'row', `panelDir=${fb.panelDir} railW=${fb.railW}`);
   say(`${vp.name} 回退后内容区可见且有内容（不是死列表）`, fb.found && fb.optionsDisplay !== 'none' && fb.optionsContentLen > 200, `display=${fb.optionsDisplay} 内容长度=${fb.optionsContentLen}`);
   // 回退态内容宽度 = 视口 - 20(面板左右 padding) - 88(轨道)。按视口宽度判定，
@@ -104,7 +105,14 @@ for (const vp of [
   // 措辞收窄：第三方（如插件市场）自身用 overflow:hidden 裁自己的装饰图标不算插件的问题，
   // 独立验收实测回退态 375/320 各有 1 个 12x12 GitHub 图标被其自身祖先 <a> 裁掉。
   say(`${vp.name} 回退后无本插件导致的永久裁切`, fb.clipped === 0, `clipped=${fb.clipped}`);
-  say(`${vp.name} 回退后分类行完整落在轨道内`, !!fb.cellsInsideNav);
+  // 可达性语义：分类数随宿主增长（6 → 8），矮视口一屏放不下时由 navList 滚动兜底，
+  // 不变量是「可滚动到达」，而非「一屏全塞下」。
+  const fbReach = fb.found ? await checkNavReachable(page) : { allReachable: false, count: 0, unreachable: ['(弹窗未打开)'], scrollable: false };
+  say(
+    `${vp.name} 回退后分类行可滚动到达并可点中`,
+    fbReach.allReachable && fbReach.count > 0,
+    `count=${fbReach.count} 可滚动=${fbReach.scrollable} 一屏外=${fb.found ? '' : 'n/a'} 不可达=${JSON.stringify(fbReach.unreachable)}`,
+  );
   say(`${vp.name} 回退后关闭按钮可见`, !!fb.closeVisible);
   await page.screenshot({ path: path.join(SHOTS, `${vp.name}__fallback.png`) });
   await page.close();
@@ -158,8 +166,7 @@ for (const mqCase of BROKEN_MQ_CASES) {
   const gate = await page.evaluate(() => document.documentElement.getAttribute('data-dshbr-drilldown'));
   say(`375x667 [${mqCase.name}] 就绪开关不得打开`, gate === null, `gate=${gate}`);
 
-  await openSettings(page);
-  await new Promise((r) => setTimeout(r, 1500));
+  const mqOpened = await openSettings(page);
   const m = await page.evaluate(() => {
     const ov = document.querySelector('[class*="VOzbGW_overlay"]');
     if (!ov) return { found: false };
@@ -173,7 +180,7 @@ for (const mqCase of BROKEN_MQ_CASES) {
       panelTextLen: (ov.querySelector('[class*="VOzbGW_panel"]').textContent || '').trim().length,
     };
   });
-  say(`375x667 [${mqCase.name}] 退回轨道布局且面板非空（不是死列表）`, m.found && m.panelDir === 'row' && m.optionsDisplay !== 'none' && m.panelTextLen > 200, JSON.stringify(m));
+  say(`375x667 [${mqCase.name}] 退回轨道布局且面板非空（不是死列表）`, m.found && m.panelDir === 'row' && m.optionsDisplay !== 'none' && m.panelTextLen > 200, m.found ? JSON.stringify(m) : `弹窗未稳定打开（入口点击=${mqOpened}，宿主自动关闭抖动）`);
   await page.screenshot({ path: path.join(SHOTS, `375x667__mq-${mqCase.name.replace(/[^\w]/g, '_')}.png`) });
   await page.close();
 }
@@ -189,21 +196,29 @@ for (const mqCase of BROKEN_MQ_CASES) {
  if (c) await page.setCookie({ name: cn, value: c.slice(cn.length + 1), domain: '127.0.0.1', path: '/' });
   await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
   await new Promise((r) => setTimeout(r, 4500));
-  await openSettings(page);
-  await new Promise((r) => setTimeout(r, 1200));
+  const ctrlOpened = await openSettings(page);
+  await new Promise((r) => setTimeout(r, 600));
   const menu = await page.evaluate(() => {
     const ov = document.querySelector('[class*="VOzbGW_overlay"]');
+    if (!ov) return { gone: true };
     return {
       panelDir: getComputedStyle(ov.querySelector('[class*="VOzbGW_panel"]')).flexDirection,
       optionsDisplay: getComputedStyle(ov.querySelector('[class*="VOzbGW_options"]')).display,
     };
   });
+  say('对照组 设置弹窗可打开', !!ctrlOpened && !menu.gone, `入口点击=${ctrlOpened}`);
+  if (menu.gone) {
+    say('对照组 打开即分类列表页（纵向、内容区隐藏）', false, 'overlay 未出现');
+    say('对照组 点分类进入详情页且内容占满整宽', false, 'overlay 未出现');
+    say('对照组 点返回行回到分类列表', false, 'overlay 未出现');
+    await page.close();
+  } else {
   say('对照组 打开即分类列表页（纵向、内容区隐藏）', menu.panelDir === 'column' && menu.optionsDisplay === 'none', JSON.stringify(menu));
 
-  await page.evaluate(() => document.querySelectorAll('button[class*="VOzbGW_navCell"]')[2].click());
-  await new Promise((r) => setTimeout(r, 1500));
-  const detail = await page.evaluate(() => {
+  const detailEntered = await clickSettingsCell(page, 2);
+  const detail = detailEntered.ok ? await page.evaluate(() => {
     const ov = document.querySelector('[class*="VOzbGW_overlay"]');
+    if (!ov) return { gone: true };
     const opts = ov.querySelector('[class*="VOzbGW_options"]');
     return {
       attr: ov.querySelector('[class*="VOzbGW_panel"]').getAttribute('data-dshbr-settings-view'),
@@ -211,20 +226,22 @@ for (const mqCase of BROKEN_MQ_CASES) {
       optionsW: Math.round(opts.getBoundingClientRect().width),
       navListDisplay: getComputedStyle(ov.querySelector('[class*="VOzbGW_navList"]')).display,
     };
-  });
-  say('对照组 点分类进入详情页且内容占满整宽', detail.attr === 'detail' && detail.optionsDisplay !== 'none' && detail.optionsW >= 340 && detail.navListDisplay === 'none', JSON.stringify(detail));
+  }) : { gone: true };
+  say('对照组 点分类进入详情页且内容占满整宽', !detail.gone && detail.attr === 'detail' && detail.optionsDisplay !== 'none' && detail.optionsW >= 340 && detail.navListDisplay === 'none', detailEntered.ok ? JSON.stringify(detail) : `进入失败：${detailEntered.reason}（宿主自动关闭 ${detailEntered.closedTimes} 次）`);
 
-  await page.evaluate(() => document.querySelector('div[class*="VOzbGW_navTitle"]').click());
+  await page.evaluate(() => document.querySelector('div[class*="VOzbGW_navTitle"]')?.click());
   await new Promise((r) => setTimeout(r, 900));
   const back = await page.evaluate(() => {
     const ov = document.querySelector('[class*="VOzbGW_overlay"]');
+    if (!ov) return { gone: true };
     return {
       attr: ov.querySelector('[class*="VOzbGW_panel"]').getAttribute('data-dshbr-settings-view'),
       optionsDisplay: getComputedStyle(ov.querySelector('[class*="VOzbGW_options"]')).display,
     };
   });
-  say('对照组 点返回行回到分类列表', back.attr === null && back.optionsDisplay === 'none', JSON.stringify(back));
+  say('对照组 点返回行回到分类列表', !back.gone && back.attr === null && back.optionsDisplay === 'none', JSON.stringify(back));
   await page.close();
+  }
 }
 
 await browser.close();

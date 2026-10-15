@@ -44,13 +44,20 @@ for (const vp of VIEWPORTS) {
   await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
   await new Promise((r) => setTimeout(r, 4200));
   await dismissHostNotices(page);
-  await openSettings(page);
-  await new Promise((r) => setTimeout(r, 1200));
+  const opened = await openSettings(page);
+  if (!opened) {
+    say(`${vp.n} 设置弹窗可打开`, false, '入口点击后 overlay 未出现');
+    await page.close();
+    continue;
+  }
   // 宿主 0.2.0 设置导航可能已无市场入口（结构漂移）：缺席时本视口断言 SKIP，不记 FAIL
   const marketNav = await page.evaluate(() => {
     const ov = document.querySelector('[class*="VOzbGW_overlay"]');
     const cell = [...ov.querySelectorAll('button[class*="VOzbGW_navCell"]')].find((x) => /Plugin Market/.test(x.textContent));
-    if (cell) cell.click();
+    if (cell) {
+      cell.scrollIntoView({ block: 'nearest' });
+      cell.click();
+    }
     return { hasCell: !!cell };
   });
   await new Promise((r) => setTimeout(r, 7000));

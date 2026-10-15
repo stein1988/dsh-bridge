@@ -10,7 +10,7 @@
 // 用法：node test/browser/host-family-compat.mjs（或 npm run verify:mobile-ui host-family）
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
-import { suiteResult, launchOptions, shotsDir, connect, readHostFamilies  } from './helpers.mjs';
+import { suiteResult, launchOptions, shotsDir, connect, readHostFamilies, openSettings } from './helpers.mjs';
 
 const SHOTS = shotsDir('host-family-compat');
 const CHROME = launchOptions().executablePath;
@@ -66,17 +66,12 @@ for (const vp of [
   const families = await readHostFamilies(page);
   say(`[${vp.name}] 前缀非哨兵（说明解析到了真实宿主前缀）`, !!families.SETTINGS && families.SETTINGS !== '__dshbr_absent_family', `SETTINGS=${families.SETTINGS}`);
 
-  // 打开设置：优先按前缀找常驻的「设置」轨道按钮（各代次都带 _rail），再按 aria/文本兜底
-  const opened = await page.evaluate((fam) => {
-    const rail = document.querySelector(`button[class*="${fam}_rail"]`);
-    const all = [...document.querySelectorAll('button')];
-    const b = rail
-      || all.find((x) => /^(设置|Settings)$/.test((x.getAttribute('aria-label') || '').trim()))
-      || all.find((x) => /设置|Settings/.test((x.getAttribute('aria-label') || '') + (x.textContent || '')));
-    b?.click();
-    return !!b;
-  }, families.SETTINGS);
-  await new Promise((r) => setTimeout(r, 2200));
+  // 打开设置：经 openSettings 兜底（前缀轨道按钮 → 中英 aria-label → 文本），并等弹窗
+  // 真正稳定出现。宿主实测会间歇性自动关闭刚打开的设置弹窗（无交互、无报错，~25%），
+  // 单次点击 + 固定 sleep 会把这种宿主抖动记成"前缀定位失败"——那恰恰是本套件要防的
+  // 假红。openSettings 内部对"自动关闭"也会重试。
+  const opened = await openSettings(page, families);
+  await new Promise((r) => setTimeout(r, 400));
 
   const hit = await page.evaluate((fam) => {
     const panel = document.querySelector(`div[class*="${fam}_panel"]`);

@@ -3,7 +3,7 @@
 // 用法：node test/browser/mobile-settings-close.mjs
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
-import { suiteResult, openSettings, installLegacySelectorBridge, launchOptions, shotsDir, connect, dismissHostNotices } from './helpers.mjs';
+import { suiteResult, openSettings, clickSettingsCell, installLegacySelectorBridge, launchOptions, shotsDir, connect, dismissHostNotices } from './helpers.mjs';
 
 const SHOTS = shotsDir('mobile-settings-close');
 const CHROME = launchOptions().executablePath;
@@ -126,8 +126,12 @@ for (const vp of VIEWPORTS) {
   await page.goto(`${BASE_URL}/`, { waitUntil: 'domcontentloaded' });
   await new Promise((r) => setTimeout(r, 4200));
   await dismissHostNotices(page);
-  await openSettings(page);
-  await new Promise((r) => setTimeout(r, 1300));
+  const openedList = await openSettings(page);
+  if (!openedList) {
+    say(`${vp.name} 列表页：设置弹窗可打开`, false, '入口点击后 overlay 未稳定出现（宿主自动关闭抖动）');
+    await page.close();
+    continue;
+  }
 
   // --- 列表页 ---
   const menu = await page.evaluate(measure);
@@ -150,10 +154,12 @@ for (const vp of VIEWPORTS) {
   say(`${vp.name} 列表页：点 ✕ 真的关闭弹窗`, await page.evaluate(() => !document.querySelector('[class*="VOzbGW_overlay"]')));
 
   // --- 详情页 ---
-  await openSettings(page);
-  await new Promise((r) => setTimeout(r, 1200));
-  await page.evaluate(() => document.querySelectorAll('button[class*="VOzbGW_navCell"]')[2].click());
-  await new Promise((r) => setTimeout(r, 1900));
+  const enteredDetail = await clickSettingsCell(page, 2);
+  if (!enteredDetail.ok) {
+    say(`${vp.name} 详情页：进入分类页`, false, `进入失败：${enteredDetail.reason}（宿主自动关闭 ${enteredDetail.closedTimes} 次）`);
+    await page.close();
+    continue;
+  }
   const detail = await page.evaluate(measure);
   say(`${vp.name} 详情页：✕ 位于面板右上角`, detail.found && detail.relTop <= 14 && detail.relRight <= 14 && detail.withinPanel, `relTop=${detail.relTop} relRight=${detail.relRight}`);
   say(`${vp.name} 详情页：✕ 与返回行同一行`, detail.sameRow, `✕中心y=${detail.closeCenterY} 返回文字中心y=${detail.titleTextMidY}`);

@@ -3,7 +3,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import puppeteer from 'puppeteer-core';
-import { suiteResult, openSettings, installLegacySelectorBridge, launchOptions, shotsDir, connect } from './helpers.mjs';
+import { suiteResult, openSettings, clickSettingsCell, installLegacySelectorBridge, checkNavReachable, launchOptions, shotsDir, connect } from './helpers.mjs';
 
 const SHOTS = shotsDir('mobile-settings-fix');
 const CHROME = launchOptions().executablePath;
@@ -139,13 +139,13 @@ for (const vp of VIEWPORTS) {
  if (c) await page.setCookie({ name: cn, value: c.slice(cn.length + 1), domain: '127.0.0.1', path: '/' });
   await page.goto(`http://127.0.0.1:${PORT}/`, { waitUntil: 'domcontentloaded' });
   await new Promise((r) => setTimeout(r, 4000));
-  await openSettings(page);
-  await new Promise((r) => setTimeout(r, 1200));
+  const didOpen = await openSettings(page);
+  await new Promise((r) => setTimeout(r, 600));
 
   // ---- A. 打开后默认状态 ----
   const opened = await page.evaluate(snap);
   if (!opened.found) {
-    record(label, '设置弹窗可打开', false, '未找到 overlay');
+    record(label, '设置弹窗可打开', false, `入口点击=${didOpen}，但 overlay 未出现`);
     await page.close();
     continue;
   }
@@ -168,14 +168,14 @@ for (const vp of VIEWPORTS) {
     record(label, '默认落在分类列表页（options 隐藏、navList 可见）', opened.optionsDisplay === 'none' && opened.navListDisplay !== 'none', `options.display=${opened.optionsDisplay} navList.display=${opened.navListDisplay}`);
     await page.screenshot({ path: path.join(SHOTS, `${label}__menu.png`) });
 
-    // 点第 3 个分类（远程访问）
-    await page.evaluate(() => {
-      const ov = document.querySelector('[class*="VOzbGW_overlay"]');
-      const cells = [...ov.querySelectorAll('button[class*="VOzbGW_navCell"]')];
-      cells[2].click();
-    });
-    await new Promise((r) => setTimeout(r, 1500));
-    const detail = await page.evaluate(snap);
+    // 点第 3 个分类（远程访问）：宿主有间歇性自动关闭弹窗的抖动，带重试并如实记录
+    const entered = await clickSettingsCell(page, 2);
+    const detail = entered.ok ? await page.evaluate(snap) : { found: false };
+    if (!detail.found) {
+      record(label, '点分类行进入详情页（options 可见、navList 收起）', false, `进入详情页失败：${entered.reason ?? '弹窗消失'}（宿主自动关闭 ${entered.closedTimes} 次）`);
+      await page.close();
+      continue;
+    }
     record(label, '点分类行进入详情页（options 可见、navList 收起）', detail.viewAttr === 'detail' && detail.optionsDisplay !== 'none' && detail.navListDisplay === 'none', `attr=${detail.viewAttr} options.display=${detail.optionsDisplay} navList.display=${detail.navListDisplay}`);
     record(label, '详情页关闭按钮仍可见', detail.closeVisible && detail.closeInsideViewport);
     record(
@@ -202,22 +202,33 @@ for (const vp of VIEWPORTS) {
     const back = await page.evaluate(snap);
     record(label, '点折叠标题行可返回分类列表', back.viewAttr === null && back.optionsDisplay === 'none', `attr=${back.viewAttr} options.display=${back.optionsDisplay}`);
   } else {
-    // 非窄屏（481-767 轨道 / >=768 桌面）：分类全部落在轨道内，无竖切
+    // 非窄屏（481-767 轨道 / >=768 桌面）：分类行必须**可达**（能滚进容器并点中）。
+    // 不再要求"一屏全部塞下"：宿主分类已从 6 项增到 8 项，矮视口必然放不下，
+    // 而 navList 是 overflow-y:auto 的可滚动容器，滚动可达才是真正的不变量。
+    const navReach = await checkNavReachable(page);
     const clipped = opened.navCells.filter((x) => !x.fullyInsideNav);
-    record(label, '全部分类行完整落在导航容器内（无竖切）', clipped.length === 0, clipped.map((x) => `${x.text}@${JSON.stringify(x.rect)}`).join(' | ') || 'none');
+    record(
+      label,
+      '全部分类行可滚动到达并可点中（无永久竖切）',
+      navReach.allReachable && navReach.count > 0,
+      `count=${navReach.count} scrollable=${navReach.scrollable} 一屏外=${clipped.length} 不可达=${JSON.stringify(navReach.unreachable)}`,
+    );
     record(label, '非窄屏不启用钻取（navList 可见）', opened.navListDisplay !== 'none', `navList.display=${opened.navListDisplay}`);
     await page.screenshot({ path: path.join(SHOTS, `${label}__rail.png`) });
   }
 
   // ---- Tab 条可达性（远程访问页） ----
-  await page.evaluate(() => {
+  // 这一页靠宿主 navCell 顺序不定，故按文本找下标；宿主自动关闭抖动由 clickSettingsCell 兜住
+  const remoteIdx = await page.evaluate(() => {
     const ov = document.querySelector('[class*="VOzbGW_overlay"]');
-    const cells = [...ov.querySelectorAll('button[class*="VOzbGW_navCell"]')];
-    const t = cells.find((x) => /远程访问/.test(x.textContent || ''));
-    if (t) t.click();
+    if (!ov) return -1;
+    return [...ov.querySelectorAll('button[class*="VOzbGW_navCell"]')].findIndex((x) => /远程访问/.test(x.textContent || ''));
   });
-  await new Promise((r) => setTimeout(r, 2500));
-  const tabs = await page.evaluate(() => {
+  const tabEntered = remoteIdx >= 0 ? await clickSettingsCell(page, remoteIdx) : { ok: false, reason: '未找到「远程访问」分类行', closedTimes: 0 };
+  if (!tabEntered.ok) {
+    record(label, 'Tab 条可横滑且 5 个分类都在（可滑到末尾）', false, `无法进入远程访问页：${tabEntered.reason}（宿主自动关闭 ${tabEntered.closedTimes} 次）`);
+  }
+  const tabs = tabEntered.ok ? await page.evaluate(() => {
     const ov = document.querySelector('[class*="VOzbGW_overlay"]');
     const tb = ov.querySelector('.dsh-tabbar-container');
     if (!tb) return null;
@@ -245,13 +256,16 @@ for (const vp of VIEWPORTS) {
         .map((b) => (b.textContent || '').trim()),
       optionsOverflowX: getComputedStyle(opts).overflowX,
     };
-  });
+  }) : null;
   if (tabs) {
     record(label, 'Tab 条可横滑且 5 个分类都在（可滑到末尾）', tabs.userScrolled && tabs.maxScroll > 0, `scrollW/clientW=${tabs.scrollW}/${tabs.clientW} maxScroll=${tabs.maxScroll}`);
     record(label, 'Tab 条有边缘渐隐提示（mask-image 非 none）', !!tabs.mask && tabs.mask !== 'none', String(tabs.mask).slice(0, 60));
     record(label, 'Tab 条分页全部落在各自可横滑容器内（无永久裁切）', tabs.clippedTabs.length === 0, `clippedTabs=${JSON.stringify(tabs.clippedTabs)}`);
-  }
-  await page.screenshot({ path: path.join(SHOTS, `${label}__tabs.png`) });
+  } else if (tabEntered.ok) {
+    record(label, 'Tab 条可横滑且 5 个分类都在（可滑到末尾）', false, '远程访问页未渲染出 .dsh-tabbar-container');
+    record(label, 'Tab 条有边缘渐隐提示（mask-image 非 none）', false, '无 Tab 条');
+    record(label, 'Tab 条分页全部落在各自可横滑容器内（无永久裁切）', false, '无 Tab 条');
+  }  await page.screenshot({ path: path.join(SHOTS, `${label}__tabs.png`) });
   await page.close();
 }
 

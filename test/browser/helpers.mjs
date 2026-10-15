@@ -171,26 +171,180 @@ export function famSel(families, slot, local) {
 }
 
 /**
+ * 设置弹窗（overlay）的选择器：按插件公布的真实前缀拼，前缀拿不到时退回历史族名
+ * （老套件里的字面量由 installLegacySelectorBridge 在查询层改写）。
+ */
+export function settingsOverlaySelector(families = {}) {
+  const fam = families.SETTINGS && families.SETTINGS !== '__dshbr_absent_family' ? families.SETTINGS : 'VOzbGW';
+  return `[class*="${fam}_overlay"]`;
+}
+
+/** 轮询等待某个选择器在页面里出现（避免用固定 sleep 赌宿主的渲染/懒加载耗时）。 */
+export async function waitForSelector(page, selector, timeoutMs = 4000, stepMs = 120) {
+  const deadline = Date.now() + timeoutMs;
+  for (;;) {
+    const hit = await page.evaluate((sel) => !!document.querySelector(sel), selector).catch(() => false);
+    if (hit) return true;
+    if (Date.now() >= deadline) return false;
+    await new Promise((r) => setTimeout(r, stepMs));
+  }
+}
+
+/**
  * 打开设置弹窗（Issue #72 测试债）：入口随宿主版本与界面语言而变——
  * 老套件一律点 `button[aria-label="Settings"]`，在中文界面（aria-label="设置"）或
  * 0.1.x 那种无 aria-label 的裸图标轨道按钮上直接落空，于是"宿主换代次"被误报成
  * "弹窗没打开"。这里按「前缀轨道按钮 → 中英 aria-label → 文本」逐级兜底。
  *
- * @returns {Promise<boolean>} 是否点到了入口
+ * 还必须**等到弹窗稳定**才算成功，两层含义：
+ *   1) 弹窗出现即返回是不够的——宿主的设置面板是懒加载 chunk，窄屏下入口按钮又位于
+ *      抽屉外（x 为负），首次点击可能被丢掉；旧实现返回"点到了"而后续断言拿到 null，
+ *      直接 TypeError 崩溃，把「测试没等够」误报成「插件坏了」。
+ *   2) 刚出现就立刻点分类行，可能在面板挂载完成前触发宿主重挂而整窗关闭（实测偶发
+ *      ~0.9s 后消失）。故出现后再等 settleMs 复核仍在，才算真的打开。
+ *
+ * @returns {Promise<boolean>} 设置弹窗是否已稳定打开
  */
-export async function openSettings(page, families = null) {
+export async function openSettings(page, families = null, { attempts = 6, timeoutMs = 4000, settleMs = 800, waitForEntryMs = 8000 } = {}) {
+  const fams = families ?? await readHostFamilies(page);
+  const overlaySel = settingsOverlaySelector(fams);
+  // 入口按钮本身也是懒渲染的：负载高时 4s 后可能还没出现，此时直接 return false 会把
+  // 「按钮还没渲染」误报成「弹窗打不开」（实测 768x1024 偶发）。先等入口出现再点。
+  const entrySel = (fams.SETTINGS && fams.SETTINGS !== '__dshbr_absent_family')
+    ? `button[class*="${fams.SETTINGS}_rail"]`
+    : 'button[aria-label="Settings"], button[aria-label="设置"]';
+  await waitForSelector(page, entrySel, waitForEntryMs).catch(() => false);
+  for (let attempt = 0; attempt < attempts; attempt += 1) {
+    // 已经开着就别再点（入口是 toggle 语义，重复点会把它关掉）
+    if (await page.evaluate((sel) => !!document.querySelector(sel), overlaySel).catch(() => false)) {
+      await new Promise((r) => setTimeout(r, settleMs));
+      if (await page.evaluate((sel) => !!document.querySelector(sel), overlaySel).catch(() => false)) return true;
+      continue;
+    }
+    const clicked = await page.evaluate((fam) => {
+      const rail = fam && fam !== '__dshbr_absent_family'
+        ? document.querySelector(`button[class*="${fam}_rail"]`)
+        : null;
+      const all = [...document.querySelectorAll('button')];
+      const btn = rail
+        || all.find((x) => /^(设置|Settings|設定)$/.test((x.getAttribute('aria-label') || '').trim()))
+        || all.find((x) => /设置|Settings/.test((x.getAttribute('aria-label') || '') + (x.textContent || '')));
+      if (!btn) return false;
+      btn.click();
+      return true;
+    }, fams.SETTINGS);
+    if (!clicked) return false;
+    if (!(await waitForSelector(page, overlaySel, timeoutMs))) continue;
+    // 稳定复核：懒加载面板可能在挂载中途整窗重挂，等一小段再确认仍在
+    await new Promise((r) => setTimeout(r, settleMs));
+    if (await page.evaluate((sel) => !!document.querySelector(sel), overlaySel).catch(() => false)) return true;
+  }
+  return false;
+}
+
+/**
+ * 进入某个设置分类并确认「分类内容确实渲染出来」。
+ *
+ * 为什么需要重试：实测宿主自身存在**间歇性自动关闭设置弹窗**——无任何交互、无控制台错误，
+ * 打开后约 0.4–0.9s 内 `VOzbGW_overlay` 被宿主整体卸载（MutationObserver 记录到的
+ * `overlay-removed` 早于本插件任何样式改动；本插件从不移除宿主节点，只删自己的
+ * `dsh-remote-workspace-modal` / `dsh-bridge-popover-close` 等自建节点）。负载高时概率更高
+ * （实测 ~25%）。真实鼠标点击同样命中，故不是 `.click()` 的合成事件问题。
+ * 这是宿主侧抖动，不该记成插件回归；但也绝不吞掉——重试次数与"关闭了几次"都会写进 detail。
+ *
+ * @returns {Promise<{ok:boolean, attempts:number, closedTimes:number, reason?:string}>}
+ */
+export async function clickSettingsCell(page, index, families = null, { attempts = 5, settleMs = 900 } = {}) {
+  const fams = families ?? await readHostFamilies(page);
+  const overlaySel = settingsOverlaySelector(fams);
+  let closedTimes = 0;
+  for (let attempt = 1; attempt <= attempts; attempt += 1) {
+    if (!(await openSettings(page, fams))) {
+      return { ok: false, attempts: attempt, closedTimes, reason: '设置弹窗未能打开' };
+    }
+    const clicked = await page.evaluate(({ sel, idx }) => {
+      const ov = document.querySelector(sel);
+      if (!ov) return 'gone';
+      const cell = ov.querySelectorAll('button[class*="_navCell"]')[idx]
+        || [...ov.querySelectorAll('nav button')][idx];
+      if (!cell) return 'no-cell';
+      cell.scrollIntoView({ block: 'nearest' });
+      cell.click();
+      return 'clicked';
+    }, { sel: overlaySel, idx: index });
+    if (clicked === 'no-cell') return { ok: false, attempts: attempt, closedTimes, reason: `第 ${index} 个分类行不存在` };
+    if (clicked === 'gone') { closedTimes += 1; continue; }
+    // 等分类内容渲染（宿主按 activeId 懒渲染 options）
+    const deadline = Date.now() + 6000;
+    for (;;) {
+      const st = await page.evaluate((sel) => {
+        const ov = document.querySelector(sel);
+        if (!ov) return { gone: true };
+        const opts = ov.querySelector('[class*="_options"]');
+        const panel = ov.querySelector('[class*="_panel"]');
+        return {
+          gone: false,
+          options: !!opts && getComputedStyle(opts).display !== 'none',
+          textLen: opts ? (opts.textContent || '').trim().length : 0,
+          view: panel ? panel.getAttribute('data-dshbr-settings-view') : null,
+        };
+      }, overlaySel);
+      if (st.gone) { closedTimes += 1; break; }
+      if (st.textLen > 40) {
+        await new Promise((r) => setTimeout(r, settleMs));
+        const after = await page.evaluate((sel) => !!document.querySelector(sel), overlaySel);
+        if (after) return { ok: true, attempts: attempt, closedTimes };
+        closedTimes += 1;
+        break;
+      }
+      if (Date.now() >= deadline) return { ok: false, attempts: attempt, closedTimes, reason: '分类内容未渲染' };
+      await new Promise((r) => setTimeout(r, 200));
+    }
+  }
+  return { ok: false, attempts, closedTimes, reason: `连续 ${attempts} 次尝试均被宿主自动关闭/未渲染` };
+}
+
+/**
+ * 设置导航（分类轨道）的**可达性**判定。
+ *
+ * 为什么不是「分类行必须全部同时落在 nav 盒子内」：宿主分类数会变（0.1.x 六项 → 现在八项），
+ * 矮视口（横屏手机/320×480）下八项本来就放不进一屏；插件把 navList 留成 `overflow-y:auto`，
+ * 用户滚动即可看到全部项。真正的不变量是「每一项都能滚进视野并被点中」，而不是「一屏塞下」。
+ * 旧断言按当前分类数写死了"无溢出"，宿主加了两项后就变成永真的假红。
+ *
+ * @returns {Promise<{count:number, allReachable:boolean, unreachable:string[], scrollable:boolean}>}
+ */
+export async function checkNavReachable(page, families = null) {
   const fams = families ?? await readHostFamilies(page);
   return page.evaluate((fam) => {
-    const rail = fam && fam !== '__dshbr_absent_family'
-      ? document.querySelector(`button[class*="${fam}_rail"]`)
-      : null;
-    const all = [...document.querySelectorAll('button')];
-    const btn = rail
-      || all.find((x) => /^(设置|Settings|設定)$/.test((x.getAttribute('aria-label') || '').trim()))
-      || all.find((x) => /设置|Settings/.test((x.getAttribute('aria-label') || '') + (x.textContent || '')));
-    if (!btn) return false;
-    btn.click();
-    return true;
+    const settingsFamily = fam && fam !== '__dshbr_absent_family' ? fam : 'VOzbGW';
+    const overlay = document.querySelector(`[class*="${settingsFamily}_overlay"]`);
+    if (!overlay) return { count: 0, allReachable: false, unreachable: ['(未找到设置弹窗)'], scrollable: false };
+    const nav = overlay.querySelector(`nav[class*="${settingsFamily}_nav"]`) || overlay.querySelector('nav');
+    if (!nav) return { count: 0, allReachable: false, unreachable: ['(未找到 nav)'], scrollable: false };
+    const cells = [...nav.querySelectorAll(`button[class*="${settingsFamily}_navCell"]`)];
+    const scrollBox = [...nav.querySelectorAll('*')].find((el) => {
+      const cs = getComputedStyle(el);
+      return (cs.overflowY === 'auto' || cs.overflowY === 'scroll') && el.scrollHeight > el.clientHeight + 1;
+    }) || nav;
+    const scrollable = scrollBox.scrollHeight > scrollBox.clientHeight + 1;
+    const startTop = scrollBox.scrollTop;
+    const unreachable = [];
+    for (const cell of cells) {
+      cell.scrollIntoView({ block: 'nearest' });
+      const r = cell.getBoundingClientRect();
+      const nr = nav.getBoundingClientRect();
+      const cx = r.left + r.width / 2;
+      const cy = r.top + r.height / 2;
+      const hit = document.elementFromPoint(cx, cy);
+      const visible = r.top >= nr.top - 0.5 && r.bottom <= nr.bottom + 0.5 && r.width > 0 && r.height > 0;
+      const clickable = !!hit && (cell === hit || cell.contains(hit));
+      if (!visible || !clickable) {
+        unreachable.push(`${(cell.textContent || '').trim().slice(0, 14)}${!visible ? '(滚不进容器)' : '(点不中)'}`);
+      }
+    }
+    scrollBox.scrollTop = startTop;
+    return { count: cells.length, allReachable: unreachable.length === 0, unreachable, scrollable };
   }, fams.SETTINGS);
 }
 
