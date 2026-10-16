@@ -246,3 +246,47 @@ test('[活动] 飞书：桥调用的 this.platform 必须真的暴露 setActivit
   assert.equal(typeof node.platform?.setActivityStatus, 'function',
     'platform 上必须有 setActivityStatus，否则桥会静默跳过状态推送')
 })
+
+test('[活动] 飞书：轮次结束后卡片必须去掉状态行（否则显示"仍在进行中"）', async () => {
+  // 真机前自查发现的第二处 bug：只清空 _activityLine 而不重渲染，卡片会**保留最后一次
+  // 带状态的版本** → 任务已结束却仍显示「正在运行命令（…）」，误导用户。
+  const { Context } = await import('@deepseek-ai/cordis')
+  const app = new Context()
+  const root = app.isolate('end-clear')
+  for (const [n, v] of Object.entries({
+    sessions: { list: () => [], get: () => undefined },
+    agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
+    approval: {},
+    workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
+    sessionPersistence: {},
+  })) root.provide(n, v)
+
+  const written = []
+  let finishedWith = null
+  root.provide('feishu', {
+    status: 'online', configured: true, botInfo: { openId: 'x' },
+    async openStream() {
+      return {
+        setContent: async (t) => { written.push(t) },
+        finish: async () => { finishedWith = written.at(-1) },
+      }
+    },
+    async sendText() { return { success: true } },
+    async sendCard() { return { success: true } },
+    async createCard() { return null },
+  })
+  const { FeishuConversationNode } = await import('../lib/feishu/node.js')
+  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false },
+    { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
+  node.peerId = 'oc'; node.activeSessionId = 's1'
+
+  await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
+  await node.sendText('正文内容')
+  await node.platform.setActivityStatus('⌨️ 正在运行命令（npm test） · 第 1 轮')
+  assert.match(written.at(-1), /正在运行命令/, '轮次中应显示状态')
+
+  await root.emit('session/event', { id: 's1' }, { type: 'turn/end', data: { reason: { kind: 'complete' } } })
+  await new Promise((r) => setTimeout(r, 20))
+  assert.ok(!/正在运行命令/.test(finishedWith ?? ''), `结束后不得残留状态行，实际: ${finishedWith}`)
+  assert.match(finishedWith ?? '', /正文内容/, '正文必须保留')
+})
