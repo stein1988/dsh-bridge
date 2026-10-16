@@ -618,3 +618,122 @@ test('[活动] 打字机总耗时应与内容长度相称，不得"每片固定�
     assert.ok(gap < 500, `片间隔 ${Math.round(gap)}ms 过大（不应每片固定 1 秒）`)
   }
 })
+
+// ---------- 状态可见性：没有文本时也要能看到状态 ----------
+//
+// 真机反馈（2026-10-16）："还是没有出来"。
+// 实测本机数据：当前轮首块文本在 turn 开始后 **39 秒**才到达；而状态行只能渲染进
+// **已存在的卡片**，卡片原先要等首块文本才创建 → 这 39 秒里用户看不到任何状态。
+// 修复：有活动状态但还没有卡片时**按需预热**一张（空轮次不预热，避免留垃圾卡片）。
+
+test('[活动] 飞书：尚无正文时收到状态，必须建卡让状态可见（首块文本前 39 秒空白问题）', async () => {
+  const { Context } = await import('@deepseek-ai/cordis')
+  const { activityParts } = await import('../lib/platform/activity.js')
+  const app = new Context()
+  const root = app.isolate('warmup')
+  for (const [n, v] of Object.entries({
+    sessions: { list: () => [], get: () => undefined },
+    agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
+    approval: {},
+    workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
+    sessionPersistence: {},
+  })) root.provide(n, v)
+  const written = []
+  let opened = 0
+  root.provide('feishu', {
+    status: 'online', configured: true, botInfo: { openId: 'x' },
+    async openStream() { opened += 1; return { setContent: async (t) => { written.push(t) }, finish: async () => {} } },
+    async sendText() { return { success: true } },
+    async sendCard() { return { success: true } },
+    async createCard() { return null },
+  })
+  const { FeishuConversationNode } = await import('../lib/feishu/node.js')
+  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false, activityIntervalSec: 0 },
+    { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
+  node._lastPeer = { peerId: 'oc', isGroup: false }
+  node.activeSessionId = 's1'
+  await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
+
+  // 还没有任何正文，先来一个活动状态
+  await node.setActivityStatus(null, null, activityParts({ turn: 1, toolName: 'bash', args: { command: 'npm test' } }))
+  assert.equal(opened, 1, '应立刻建卡（否则状态无处显示）')
+  assert.match(written.at(-1) ?? '', /正在运行命令/, '卡片里应能看到状态')
+  assert.match(written.at(-1) ?? '', /^> _/, '状态行应为引用块+斜体')
+
+  // 首块正文到达：复用同一张卡（不新建），且不丢状态
+  await node.sendText('第一段正文。')
+  assert.equal(opened, 1, '正文到达不应新建卡片（复用预热的那张）')
+  const merged = written.at(-1) ?? ''
+  assert.match(merged, /第一段正文/)
+  assert.match(merged, /正在运行命令/, '正文到达后状态行仍应保留')
+
+  await root.emit('session/event', { id: 's1' }, { type: 'turn/end', data: { reason: { kind: 'complete' } } })
+  await new Promise((r) => setTimeout(r, 20))
+})
+
+test('[活动] 飞书：空轮次（无正文无活动）不得留下垃圾卡片', async () => {
+  const { Context } = await import('@deepseek-ai/cordis')
+  const app = new Context()
+  const root = app.isolate('nowarm')
+  for (const [n, v] of Object.entries({
+    sessions: { list: () => [], get: () => undefined },
+    agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
+    approval: {},
+    workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
+    sessionPersistence: {},
+  })) root.provide(n, v)
+  let opened = 0
+  root.provide('feishu', {
+    status: 'online', configured: true, botInfo: { openId: 'x' },
+    async openStream() { opened += 1; return { setContent: async () => {}, finish: async () => {} } },
+    async sendText() { return { success: true } },
+    async sendCard() { return { success: true } },
+    async createCard() { return null },
+  })
+  const { FeishuConversationNode } = await import('../lib/feishu/node.js')
+  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false },
+    { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
+  node._lastPeer = { peerId: 'oc', isGroup: false }
+  node.activeSessionId = 's1'
+  await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
+  await root.emit('session/event', { id: 's1' }, { type: 'turn/end', data: { reason: { kind: 'complete' } } })
+  await new Promise((r) => setTimeout(r, 20))
+  assert.equal(opened, 0, '没有任何活动/正文时不应建卡（避免会话里留空卡片）')
+})
+
+test('[活动] 分片阈值应小于宿主常见文本块长度（否则退化为一次性出现）', async () => {
+  // 实测本机 763 个文本块：中位 111 字；原阈值 150 → 77% 的块只有 1 片（无打字机效果）。
+  // 通过**节点真实路径**断言：111 字的块必须产生 ≥2 次卡片写入（打字机效果）。
+  const { Context } = await import('@deepseek-ai/cordis')
+  const app = new Context()
+  const root = app.isolate('slice-threshold')
+  for (const [n, v] of Object.entries({
+    sessions: { list: () => [], get: () => undefined },
+    agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
+    approval: {},
+    workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
+    sessionPersistence: {},
+  })) root.provide(n, v)
+  const writes = []
+  root.provide('feishu', {
+    status: 'online', configured: true, botInfo: { openId: 'x' },
+    async openStream() { return { setContent: async (t) => { writes.push(t) }, finish: async () => {} } },
+    async sendText() { return { success: true } },
+    async sendCard() { return { success: true } },
+    async createCard() { return null },
+  })
+  const { FeishuConversationNode } = await import('../lib/feishu/node.js')
+  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false, activityIntervalSec: 0 },
+    { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
+  node._lastPeer = { peerId: 'oc', isGroup: false }
+  node.activeSessionId = 's1'
+  await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
+
+  const medianBlock = '这是一段真实的回复内容，长度接近实测中位数左右。'.repeat(6).slice(0, 111)
+  writes.length = 0
+  await node.sendText(medianBlock)
+  assert.ok(writes.length >= 2,
+    `111 字的块应产生 ≥2 次卡片写入（打字机效果），实际 ${writes.length} 次——阈值过大会"一次性出现"`)
+  // 且内容单调累积、不丢字
+  assert.equal(writes.at(-1), medianBlock, '最终内容应与输入一致')
+})
