@@ -4321,7 +4321,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
         },
         React.createElement("input", {
           type: "checkbox",
-          checked: cfgDraft?.showActivity !== false,
+          checked: cfgDraft?.showActivity === true,
           disabled: busy,
           onChange: (e) => {
             const checked = e.target.checked;
@@ -4329,7 +4329,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
             act(BRIDGE_ENDPOINTS.platformSetConfig, { showActivity: checked });
           }
         }),
-        React.createElement("span", null, "\u5B9E\u65F6\u6D3B\u52A8\u72B6\u6001\uFF08\u5361\u7247\u9876\u90E8\u663E\u793A\u300C\u6B63\u5728\u8FD0\u884C\u547D\u4EE4\u300D\u7B49\uFF0C\u9ED8\u8BA4\u5F00\u542F\uFF09")
+        React.createElement("span", null, "\u5B9E\u65F6\u6D3B\u52A8\u72B6\u6001\uFF08\u5361\u7247\u9876\u90E8\u663E\u793A\u300C\u6B63\u5728\u8FD0\u884C\u547D\u4EE4\u300D\u7B49\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09")
       ),
       // 高级设置：会话级配置（工作区 / Agent 预设 / 模型路由）+ 会话节奏参数
       React.createElement(

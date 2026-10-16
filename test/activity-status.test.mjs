@@ -122,7 +122,8 @@ test('[活动] 桥只在状态变化且节流窗口外才推送（避免工具�
   const logger = { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} }
   const platform = new P({ ctx: root, logger })
   // activityIntervalSec: 0 → 不做时间节流，专注验证"文本不变不重复推"
-  const bridge = new ConversationBridge({ ctx: root, logger, config: { activityIntervalSec: 0 }, platform })
+  // showActivity 默认关闭，此用例在测节流逻辑 → 显式开启
+  const bridge = new ConversationBridge({ ctx: root, logger, config: { activityIntervalSec: 0, showActivity: true }, platform })
   bridge.activeSessionId = 's1'
   bridge._turnPeers.set('s1', { outboundPeer: { peerId: 'chat', isGroup: false }, senderId: 'u1' })
   const state = { startedTurns: new Set(), createdFiles: new Set() }
@@ -428,11 +429,13 @@ test('[活动] Telegram 的 HTML 转换：单下划线成斜体，但 my_var / _
 //
 // 这里做**确定性**断言（不依赖时序）：构造"目标很长、已渲染很短"的状态，
 // 观察状态刷新后卡片上出现的是哪一份。
-test('[活动] 状态刷新必须基于 rendered（已上屏），不能跳到 text（完整目标）', async () => {
+test('[活动] 应用层不再自行做打字机：每次写入都是完整累积文本（避免与飞书原生动画叠加）', async () => {
+  // 真凶（2026-10-17）：飞书流式卡片自带逐字动画（print_frequency_ms=70/print_step=1）。
+  // 应用层若再切片 + sleep + setContent，每次更新都会让飞书**从头重播**整段动画
+  // → 用户看到"反复覆盖、重复打字"。故应用层只写入完整文本，一次调用一次写入。
   const { Context } = await import('@deepseek-ai/cordis')
-  const { activityParts } = await import('../lib/platform/activity.js')
   const app = new Context()
-  const root = app.isolate('race-check')
+  const root = app.isolate('no-app-anim')
   for (const [n, v] of Object.entries({
     sessions: { list: () => [], get: () => undefined },
     agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
@@ -440,54 +443,41 @@ test('[活动] 状态刷新必须基于 rendered（已上屏），不能跳到 t
     workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
     sessionPersistence: {},
   })) root.provide(n, v)
-
-  // 打字机延迟放大：确保首片仍在推进时我们插入状态更新
   const written = []
   root.provide('feishu', {
     status: 'online', configured: true, botInfo: { openId: 'x' },
-    async openStream() {
-      return {
-        setContent: async (t) => { written.push(t) },
-        finish: async () => {},
-      }
-    },
+    async openStream() { return { setContent: async (t) => { written.push(t) }, finish: async () => {} } },
     async sendText() { return { success: true } },
     async sendCard() { return { success: true } },
     async createCard() { return null },
   })
   const { FeishuConversationNode } = await import('../lib/feishu/node.js')
-  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false, sendChunkDelayMs: 50 },
+  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false, showActivity: false },
     { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
-  node.peerId = 'oc'; node.activeSessionId = 's1'
+  node._lastPeer = { peerId: 'oc', isGroup: false }
+  node.activeSessionId = 's1'
   await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
 
-  // 首片：大块（>240 字才分片），不 await，让打字机停在第一片附近
-  const long = '首段。' + '很长内容。'.repeat(80)   // 大块（>240 字）才分片
-  const streaming = node.sendText(long)
-  await new Promise((r) => setTimeout(r, 30))
-
-  // 此刻：text = 完整目标；rendered = 已上屏的片（更短）
-  const st = node._stream
-  assert.ok(st, '应有流式卡片')
-  assert.ok(st.text.length > st.rendered.length,
-    `前提：目标(${st.text.length}) 应长于已上屏(${st.rendered.length})，否则用例失去意义`)
-
-  // 状态刷新：写入内容必须**不超过已上屏长度**（含状态行前缀）
+  // 一个很长的块：只应产生 **1 次**写入（不再被应用层切成几十片）
+  const longText = '这是一段很长的回复，用来确认应用层不再自行分片。'.repeat(80)
   written.length = 0
-  await node.platform.setActivityStatus(null, null, activityParts({ turn: 1, toolName: 'bash', args: { command: 'npm test' } }))
-  const rendered = written.at(-1) ?? ''
-  const bodyLen = rendered.replace(/^> _[^\n]*_\n\n/, '').length
-  assert.ok(bodyLen <= st.rendered.length + 1,
-    `状态刷新不得跳到完整目标：正文长度 ${bodyLen} 应 ≤ 已上屏 ${st.rendered.length}`)
-  assert.ok(bodyLen < st.text.length, '不应等于/超过完整目标长度（那正是"反复覆盖"的成因）')
+  await node.sendText(longText)
+  assert.equal(written.length, 1, `长块应只写 1 次（实际 ${written.length} 次 → 会与飞书原生动画叠加成"反复打字"）`)
+  assert.equal(written[0], longText, '写入内容应是完整正文')
 
-  await streaming
+  // 后续块同样是"累积后完整写入"、单次
+  written.length = 0
+  await node.sendText('第二段。')
+  assert.equal(written.length, 1)
+  assert.ok(written[0].includes('第二段。') && written[0].includes('这是一段很长的回复'), '两次内容都应保留')
 })
 
 // ---------- 节流不得丢状态（真机反馈：只有第一句有状态） ----------
 
 /** 造一个记录推送的桥，用于节流测试。 */
 async function makeThrottleHarness(config = {}) {
+  // 注意：showActivity 现已**默认关闭**；测节流逻辑的用例需显式开启（除非用例本身在测开关）。
+  config = { showActivity: true, ...config }
   const { Context } = await import('@deepseek-ai/cordis')
   const { ConversationBridge } = await import('../lib/platform/conversation-bridge.js')
   const { Platform } = await import('../lib/platform/base.js')
@@ -577,55 +567,6 @@ test('[活动] 默认节流足够灵敏：一轮内多次工具调用可看到�
 // min(max(config.sendChunkDelayMs ?? 200, 100), 1000)，配置默认 **1500ms** 被截成
 // **1000ms/片** → 600 字回复要 3 秒才显示完，片间呈现"卡住不动"。
 // 修复：整体按片数均分总时长（每片 30–250ms），保证整段尽快可见。
-test('[活动] 打字机总耗时应与内容长度相称，不得"每片固定等 1 秒"', async () => {
-  const { Context } = await import('@deepseek-ai/cordis')
-  const app = new Context()
-  const root = app.isolate('typing-pace')
-  for (const [n, v] of Object.entries({
-    sessions: { list: () => [], get: () => undefined },
-    agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
-    approval: {},
-    workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
-    sessionPersistence: {},
-  })) root.provide(n, v)
-  const stamps = []
-  root.provide('feishu', {
-    status: 'online', configured: true, botInfo: { openId: 'x' },
-    async openStream() {
-      return { setContent: async () => { stamps.push(Date.now()) }, finish: async () => {} }
-    },
-    async sendText() { return { success: true } },
-    async sendCard() { return { success: true } },
-    async createCard() { return null },
-  })
-  const { FeishuConversationNode } = await import('../lib/feishu/node.js')
-  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false },
-    { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
-  node.peerId = 'oc'; node.activeSessionId = 's1'
-  await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
-
-  const text = '这是一段真实的回复内容。'.repeat(50)   // ~550 字
-  const t0 = Date.now()
-  await node.sendText(text)
-  const dur = Date.now() - t0
-
-  assert.ok(stamps.length >= 2, '应有多次写入（打字机效果）')
-  // 旧实现：约 4 片 × 1000ms ≈ 3s。这里给足余量但仍能拦住"每片 1 秒"
-  assert.ok(dur < 2000, `600 字回复不应耗时 ${dur}ms（旧实现约 3s，暴露"卡住后一次性出来"）`)
-  // 片间隔也不应接近 1 秒
-  if (stamps.length > 1) {
-    const gap = (stamps.at(-1) - stamps[0]) / (stamps.length - 1)
-    assert.ok(gap < 500, `片间隔 ${Math.round(gap)}ms 过大（不应每片固定 1 秒）`)
-  }
-})
-
-// ---------- 状态可见性：没有文本时也要能看到状态 ----------
-//
-// 真机反馈（2026-10-16）："还是没有出来"。
-// 实测本机数据：当前轮首块文本在 turn 开始后 **39 秒**才到达；而状态行只能渲染进
-// **已存在的卡片**，卡片原先要等首块文本才创建 → 这 39 秒里用户看不到任何状态。
-// 修复：有活动状态但还没有卡片时**按需预热**一张（空轮次不预热，避免留垃圾卡片）。
-
 test('[活动] 飞书：状态不得引入"孤儿空卡片"（曾显示为 "(no content)"）', async () => {
   // 真机截图（2026-10-17）：会话里出现一张只有 "(no content)" 的卡片，且上面的卡片不停覆盖重写。
   // 成因：曾尝试"有状态就先预热建卡"，但建卡异步，一旦与"文本到达建卡"竞态，
@@ -720,12 +661,39 @@ test('[活动] showActivity=false 时不推送任何状态（用户可自行关�
   h.bridge.dispose()
 })
 
-test('[活动] showActivity 默认开启（不传配置也照常推送）', async () => {
-  const h = await makeThrottleHarness({})
-  h.emitTool('bash', { command: 'npm test' })
+test('[活动] showActivity 默认关闭（用户要求"只要正文"）：不传配置时零推送', async () => {
+  // 用户明确要求移出状态显示。需绕过 harness 的显式开启，直接构造默认配置。
+  const { Context } = await import('@deepseek-ai/cordis')
+  const { ConversationBridge } = await import('../lib/platform/conversation-bridge.js')
+  const { Platform } = await import('../lib/platform/base.js')
+  const app = new Context()
+  const root = app.isolate('default-off')
+  for (const [n, v] of Object.entries({
+    sessions: { list: () => [], get: () => undefined },
+    agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
+    approval: {},
+    workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
+    sessionPersistence: {},
+  })) root.provide(n, v)
+  const pushed = []
+  class P extends Platform {
+    constructor(o) { super(o); this.id = 'mock'; this.name = 'M'; this.status = 'connected' }
+    get configured() { return true }
+    get capabilities() { return { supportsGroup: true, supportsMedia: true, supportsVoice: false, supportsTyping: true, maxMessageChars: 2000 } }
+    async sendText() { return { success: true } }
+    async sendMediaFile() { return { success: true } }
+    async sendTyping() { return { success: true } }
+    async setActivityStatus(l) { pushed.push(l) }
+  }
+  const logger = { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} }
+  const bridge = new ConversationBridge({ ctx: root, logger, config: {}, platform: new P({ ctx: root, logger }) })
+  bridge.activeSessionId = 's1'
+  bridge._turnPeers.set('s1', { outboundPeer: { peerId: 'chat', isGroup: false }, senderId: 'u1' })
+  bridge._digestState.set('s1', { startedTurns: new Set(), createdFiles: new Set() })
+  root.emit('session/event', { id: 's1' }, { type: 'tool/call', data: { turn: 1, name: 'bash', arguments: '{"command":"npm test"}' } })
   await new Promise((r) => setTimeout(r, 30))
-  assert.equal(h.pushed.length, 1, '默认应开启')
-  h.bridge.dispose()
+  assert.deepEqual(pushed, [], '默认必须零推送（只要正文）')
+  bridge.dispose()
 })
 
 // ---------- 打字机开销：小块不再二次分片 ----------
@@ -768,40 +736,6 @@ test('[活动] 宿主常见的文本块长度只写一次卡片（避免"反复�
     await node.sendText('字'.repeat(len))
     assert.equal(writes, 1, `${len} 字的块应只写 1 次（实际 ${writes} 次 → 表现为"反复重写"）`)
   }
-})
-
-test('[活动] 超过阈值的大块仍保留打字机动效，但总耗时有硬上限', async () => {
-  const { Context } = await import('@deepseek-ai/cordis')
-  const app = new Context()
-  const root = app.isolate('pacing-big')
-  for (const [n, v] of Object.entries({
-    sessions: { list: () => [], get: () => undefined },
-    agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
-    approval: {},
-    workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
-    sessionPersistence: {},
-  })) root.provide(n, v)
-  let writes = 0
-  root.provide('feishu', {
-    status: 'online', configured: true, botInfo: { openId: 'x' },
-    async openStream() { return { setContent: async () => { writes += 1 }, finish: async () => {} } },
-    async sendText() { return { success: true } },
-    async sendCard() { return { success: true } },
-    async createCard() { return null },
-  })
-  const { FeishuConversationNode } = await import('../lib/feishu/node.js')
-  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false },
-    { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
-  node._lastPeer = { peerId: 'oc', isGroup: false }
-  node.activeSessionId = 's1'
-  await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
-  writes = 0
-  const t0 = Date.now()
-  await node.sendText('这是一段很长的回复内容，需要触发打字机动效。'.repeat(100))
-  const dur = Date.now() - t0
-  assert.ok(writes > 1, `大块应有多片动效（实际 ${writes} 次）`)
-  assert.ok(writes <= 20, `大块写入次数应受控（实际 ${writes} 次，旧实现 33 次）`)
-  assert.ok(dur <= 2000, `大块动效总耗时应受控（实际 ${dur}ms，旧实现 ~960ms+网络）`)
 })
 
 test('[活动] 配置恢复：showActivity 显式 false 时关闭，缺省/显式 true 时保持开启', async () => {
