@@ -569,3 +569,52 @@ test('[活动] 默认节流足够灵敏：一轮内多次工具调用可看到�
   assert.match(h.pushed.at(-1), /git status/, '最后一条应对应最后一次操作')
   h.bridge.dispose()
 })
+
+// ---------- 打字机节奏：不能"每片固定等 1 秒" ----------
+//
+// 真机反馈（2026-10-16）："流卡了一会然后一次性出来的所有内容"。
+// 根因：首片打字机把 `sleep(delayMs)` 放在**每片之后**，而 delayMs =
+// min(max(config.sendChunkDelayMs ?? 200, 100), 1000)，配置默认 **1500ms** 被截成
+// **1000ms/片** → 600 字回复要 3 秒才显示完，片间呈现"卡住不动"。
+// 修复：整体按片数均分总时长（每片 30–250ms），保证整段尽快可见。
+test('[活动] 打字机总耗时应与内容长度相称，不得"每片固定等 1 秒"', async () => {
+  const { Context } = await import('@deepseek-ai/cordis')
+  const app = new Context()
+  const root = app.isolate('typing-pace')
+  for (const [n, v] of Object.entries({
+    sessions: { list: () => [], get: () => undefined },
+    agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
+    approval: {},
+    workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
+    sessionPersistence: {},
+  })) root.provide(n, v)
+  const stamps = []
+  root.provide('feishu', {
+    status: 'online', configured: true, botInfo: { openId: 'x' },
+    async openStream() {
+      return { setContent: async () => { stamps.push(Date.now()) }, finish: async () => {} }
+    },
+    async sendText() { return { success: true } },
+    async sendCard() { return { success: true } },
+    async createCard() { return null },
+  })
+  const { FeishuConversationNode } = await import('../lib/feishu/node.js')
+  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false },
+    { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
+  node.peerId = 'oc'; node.activeSessionId = 's1'
+  await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
+
+  const text = '这是一段真实的回复内容。'.repeat(50)   // ~550 字
+  const t0 = Date.now()
+  await node.sendText(text)
+  const dur = Date.now() - t0
+
+  assert.ok(stamps.length >= 2, '应有多次写入（打字机效果）')
+  // 旧实现：约 4 片 × 1000ms ≈ 3s。这里给足余量但仍能拦住"每片 1 秒"
+  assert.ok(dur < 2000, `600 字回复不应耗时 ${dur}ms（旧实现约 3s，暴露"卡住后一次性出来"）`)
+  // 片间隔也不应接近 1 秒
+  if (stamps.length > 1) {
+    const gap = (stamps.at(-1) - stamps[0]) / (stamps.length - 1)
+    assert.ok(gap < 500, `片间隔 ${Math.round(gap)}ms 过大（不应每片固定 1 秒）`)
+  }
+})
