@@ -273,3 +273,90 @@ test('[飞书提问卡片] 超长选项：正文完整、按钮仍简短（平�
     assert.doesNotMatch(b.text.content, /…$/, '按钮不应以省略号结尾（那是被截断的表现）')
   }
 })
+
+// ---------- 同一轮内多次出站必须**累积**，不能覆盖 ----------
+//
+// 真机反馈（2026-10-16）："消息流输出一半，然后又突然全部消失，又重新输出…只保留了最后一条"。
+// 根因：宿主对每个 step 发一条独立的 assistant/message（该步片段，非整轮全文），
+// 旧实现直接用最新片段 setContent 覆盖整张卡片。
+
+test('[飞书流式] 同一轮内多次输出必须累积，旧内容不能被覆盖', async () => {
+  const { node } = await makeFeishuNode()
+  const sets = []
+  let finished = 0
+  node.gateway = {
+    async openStream() {
+      return {
+        setContent: async (t) => { sets.push(t) },
+        finish: async () => { finished += 1 },
+      }
+    },
+  }
+  node._inTurn = true
+  const peer = { peerId: 'oc_chat' }
+  await node._sendTurnOutput('oc_chat', '第一段：正在分析', peer)
+  await node._sendTurnOutput('oc_chat', '第二段：找到问题了', peer)
+  await node._sendTurnOutput('oc_chat', '第三段：已经修复', peer)
+
+  // 最后一次写入必须已包含全部三段（累积），而不是只剩最后一段
+  const last = sets.at(-1)
+  assert.match(last, /第一段/)
+  assert.match(last, /第二段/)
+  assert.match(last, /第三段/)
+  assert.equal(node._stream.text, '第一段：正在分析\n\n第二段：找到问题了\n\n第三段：已经修复')
+  await node._finishStream()
+  assert.equal(finished, 1)
+})
+
+test('[飞书流式] 新轮次开始时内容重新计（不把上一轮文本带进来）', async () => {
+  const { node } = await makeFeishuNode()
+  const sets = []
+  node.gateway = {
+    async openStream() {
+      return { setContent: async (t) => { sets.push(t) }, finish: async () => {} }
+    },
+  }
+  await node._sendTurnOutput('oc_chat', '第一轮内容', { peerId: 'oc_chat' })
+  await node._finishStream()
+  sets.length = 0
+  await node._sendTurnOutput('oc_chat', '第二轮内容', { peerId: 'oc_chat' })
+  const last = sets.at(-1)
+  assert.match(last, /第二轮内容/)
+  assert.doesNotMatch(last, /第一轮内容/, '新轮次不应携带上一轮文本')
+  await node._finishStream()
+})
+
+test('[飞书流式] 切换会话目标时不串台（旧卡片先收尾、内容重置）', async () => {
+  const { node } = await makeFeishuNode()
+  const sets = []
+  let finished = 0
+  node.gateway = {
+    async openStream() {
+      return { setContent: async (t) => { sets.push(t) }, finish: async () => { finished += 1 } }
+    },
+  }
+  await node._sendTurnOutput('chat-a', 'A 会话内容', { peerId: 'chat-a' })
+  await node._sendTurnOutput('chat-b', 'B 会话内容', { peerId: 'chat-b' })
+  assert.equal(finished, 1, '切目标时应先收尾旧卡片')
+  const last = sets.at(-1)
+  assert.match(last, /B 会话内容/)
+  assert.doesNotMatch(last, /A 会话内容/, '不同会话不得串台')
+  await node._finishStream()
+})
+
+test('[飞书流式] 若调用方传入的已是累积全文，则直接替换（不重复拼接）', async () => {
+  const { node } = await makeFeishuNode()
+  const sets = []
+  node.gateway = {
+    async openStream() {
+      return { setContent: async (t) => { sets.push(t) }, finish: async () => {} }
+    },
+  }
+  // 形态 2：第二条 content 已包含第一条（调用方自己累积过）
+  await node._sendTurnOutput('oc_chat', '正在思考...', { peerId: 'oc_chat' })
+  await node._sendTurnOutput('oc_chat', '正在思考...\n已完成代码生成', { peerId: 'oc_chat' })
+  const last = sets.at(-1)
+  assert.equal(last, '正在思考...\n已完成代码生成', '已累积全文应原样替换，不得重复拼接')
+  assert.equal((last.match(/正在思考/g) || []).length, 1, '"正在思考" 不应出现两次')
+  await node._finishStream()
+})
