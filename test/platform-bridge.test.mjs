@@ -469,6 +469,75 @@ test('本轮改动摘要：开关关闭 / 宿主无该服务 / 本轮无改动 �
   }
 })
 
+test('回归：cordis 未 inject 的服务必须"探测"而非直接取属性 —— 否则崩掉整个宿主', async () => {
+  // 真实事故（2026-10-16 03:02）：宿主 session 事件回调里直接读 this.ctx.workspaceChanges，
+  // 而该服务不在 inject 列表里，cordis 取属性即抛 `cannot get property "workspaceChanges"
+  // without inject`；异常从 onEvent 冒泡成 `dsh: fatal load failure`，主进程退出、
+  // systemd 重启 dsh-web（IM 侧表现为"改动摘要一条都没播报"）。
+  //
+  // 为什么既有用例没拦住：makeMockCtx 是普通对象，取不存在的键只得到 undefined，
+  // 与真正 cordis ctx 的"抛错"行为不同。这里补一个**忠实模拟 cordis** 的 ctx：
+  // 未声明（未 inject）的属性一律抛错，已声明的正常返回。
+  const makeCordisLikeCtx = (declared = []) => {
+    const { ctx } = makeMockCtx()
+    const declaredSet = new Set(declared)
+    return new Proxy(ctx, {
+      get(target, prop, recv) {
+        if (typeof prop === 'string' && !(prop in target) && !declaredSet.has(prop) && !prop.startsWith('_')) {
+          throw new Error(`cannot get property "${prop}" without inject`)
+        }
+        return Reflect.get(target, prop, recv)
+      },
+    })
+  }
+
+  // ① 未 inject workspaceChanges（老宿主 / 未装 workspace-changes 的 composition）：
+  //    必须静默跳过，绝不抛错
+  {
+    const ctx = makeCordisLikeCtx([])
+    const platform = new MockPlatform({ ctx, logger: ctx.logger })
+    const bridge = new ConversationBridge({ ctx, logger: ctx.logger, config: {}, platform })
+    bridge.peerId = 'peer-1'
+    bridge.activeSessionId = 's-cordis'
+    assert.doesNotThrow(() => {
+      ctx.emit('session/event', { id: 's-cordis' }, { type: 'workspace/changes', seq: 1, data: { turn: 1 } })
+    }, '未 inject 的服务不得让事件回调抛错（会升级为 fatal load failure）')
+    await new Promise((r) => setTimeout(r, 10))
+    assert.equal(platform.sent.length, 0, '无服务时静默跳过')
+    bridge.dispose(); platform.dispose()
+  }
+
+  // ② /diff 同一条路径：未 inject 时给友好提示，同样不得抛错
+  {
+    const ctx = makeCordisLikeCtx([])
+    const platform = new MockPlatform({ ctx, logger: ctx.logger })
+    const bridge = new ConversationBridge({ ctx, logger: ctx.logger, config: {}, platform })
+    bridge.peerId = 'peer-1'
+    bridge.activeSessionId = 's-cordis'
+    await assert.doesNotReject(() => bridge.sendSessionDiff(), '未 inject 时 /diff 不得抛错')
+    assert.match(platform.sent.at(-1)?.text ?? '', /还没有可导出的改动记录/)
+    bridge.dispose(); platform.dispose()
+  }
+
+  // ③ 已声明的服务照常工作（探测不能把正常路径一起让掉）
+  {
+    const ctx = makeCordisLikeCtx([])
+    ctx.workspaceChanges = {
+      summary: () => ({ turn: 2, total: 1, added: 3, deleted: 1, files: [{ path: 'a.js', display: 'a.js', added: 3, deleted: 1 }] }),
+      diff: async () => undefined,
+    }
+    const platform = new MockPlatform({ ctx, logger: ctx.logger })
+    const bridge = new ConversationBridge({ ctx, logger: ctx.logger, config: {}, platform })
+    bridge.peerId = 'peer-1'
+    bridge.activeSessionId = 's-cordis'
+    ctx.emit('session/event', { id: 's-cordis' }, { type: 'workspace/changes', seq: 2, data: { turn: 2 } })
+    await new Promise((r) => setTimeout(r, 10))
+    assert.equal(platform.sent.length, 1, '有服务时摘要照常播报')
+    assert.match(platform.sent[0].text, /本轮改动/)
+    bridge.dispose(); platform.dispose()
+  }
+})
+
 test('/diff：导出本轮改动为 .patch 附件 + 摘要文本；无记录时友好提示', async () => {
   const fs = await import('node:fs')
   const { ctx } = makeMockCtx()
