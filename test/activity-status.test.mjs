@@ -418,3 +418,68 @@ test('[活动] Telegram 的 HTML 转换：单下划线成斜体，但 my_var / _
   // 双下划线是加粗，不是斜体
   assert.equal(formatTelegramHtml('__bold__'), '<b>bold</b>')
 })
+
+// ---------- 并发写竞态：状态刷新不得跳到"完整目标" ----------
+//
+// 真机反馈（2026-10-16）："流好像一直在被反复覆盖…中间的完全没输出出来"。
+// 根因：首片打字机是**逐片推进**的，而 `_stream.text` 存的是**本轮完整目标**。
+// 若状态刷新渲染 text，卡片会直接跳到全文，紧接着打字机又把内容**倒回**更小的片
+// → 用户看到内容反复覆盖。修复：状态刷新只渲染 `rendered`（已真正上屏的部分）。
+//
+// 这里做**确定性**断言（不依赖时序）：构造"目标很长、已渲染很短"的状态，
+// 观察状态刷新后卡片上出现的是哪一份。
+test('[活动] 状态刷新必须基于 rendered（已上屏），不能跳到 text（完整目标）', async () => {
+  const { Context } = await import('@deepseek-ai/cordis')
+  const { activityParts } = await import('../lib/platform/activity.js')
+  const app = new Context()
+  const root = app.isolate('race-check')
+  for (const [n, v] of Object.entries({
+    sessions: { list: () => [], get: () => undefined },
+    agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
+    approval: {},
+    workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
+    sessionPersistence: {},
+  })) root.provide(n, v)
+
+  // 打字机延迟放大：确保首片仍在推进时我们插入状态更新
+  const written = []
+  root.provide('feishu', {
+    status: 'online', configured: true, botInfo: { openId: 'x' },
+    async openStream() {
+      return {
+        setContent: async (t) => { written.push(t) },
+        finish: async () => {},
+      }
+    },
+    async sendText() { return { success: true } },
+    async sendCard() { return { success: true } },
+    async createCard() { return null },
+  })
+  const { FeishuConversationNode } = await import('../lib/feishu/node.js')
+  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false, sendChunkDelayMs: 50 },
+    { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
+  node.peerId = 'oc'; node.activeSessionId = 's1'
+  await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
+
+  // 首片：很长的内容（会分成多片），不 await，让打字机停在第一片附近
+  const long = '首段。' + '很长内容。'.repeat(40)
+  const streaming = node.sendText(long)
+  await new Promise((r) => setTimeout(r, 20))
+
+  // 此刻：text = 完整目标；rendered = 已上屏的片（更短）
+  const st = node._stream
+  assert.ok(st, '应有流式卡片')
+  assert.ok(st.text.length > st.rendered.length,
+    `前提：目标(${st.text.length}) 应长于已上屏(${st.rendered.length})，否则用例失去意义`)
+
+  // 状态刷新：写入内容必须**不超过已上屏长度**（含状态行前缀）
+  written.length = 0
+  await node.platform.setActivityStatus(null, null, activityParts({ turn: 1, toolName: 'bash', args: { command: 'npm test' } }))
+  const rendered = written.at(-1) ?? ''
+  const bodyLen = rendered.replace(/^> _[^\n]*_\n\n/, '').length
+  assert.ok(bodyLen <= st.rendered.length + 1,
+    `状态刷新不得跳到完整目标：正文长度 ${bodyLen} 应 ≤ 已上屏 ${st.rendered.length}`)
+  assert.ok(bodyLen < st.text.length, '不应等于/超过完整目标长度（那正是"反复覆盖"的成因）')
+
+  await streaming
+})
