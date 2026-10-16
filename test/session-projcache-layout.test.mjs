@@ -7,10 +7,16 @@
 // 新布局（0.1.7+）: <DSH_HOME>/storages/session_projcache/sessions/<id>.json
 //                    { version, record: { identity, rows } }
 //
+// 第三种（2026-10 起）：第三方插件接管该存储域并改名/搬迁目录 + 改文件名命名。
+// 实测 @michengai/dsh-archive-manager 把域换成 session_projcache_archive_manager_v2，
+// 文件名改为 session_<base64url(sha256(sessionId))>.json。只认官方裸 id 命名就会读空，
+// /sessions 里所有标题退化成「新会话」、「[当前]」标记也随之错位。
+//
 // 两种布局都必须能读出 rows.title.val——这是 /sessions 标题的唯一数据源。
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync } from 'node:fs'
+import { createHash } from 'node:crypto'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { getSessionProjCache } from '../lib/platform/dsh-storage.js'
@@ -136,5 +142,47 @@ test('惰性读取：构造 cache 不遍历全部 per-record 文件', () => {
     assert.ok(constructMs < 20, `构造耗时 ${constructMs.toFixed(2)}ms，疑似全量读取`)
     // 按 id 取值仍然正确
     assert.equal(cache['s7']?.rows?.title?.val, '标题7')
+  })
+})
+
+// ---------- 第三方接管存储域（@michengai/dsh-archive-manager 实测场景） ----------
+
+/** 复刻该插件的存储键：session_<base64url(sha256(sessionId))> */
+const takeoverFileName = (id) => `session_${createHash('sha256').update(id, 'utf8').digest('base64url')}.json`
+
+test('第三方接管域（改名 + 哈希文件名）：标题仍可读出，不退化成「新会话」', () => {
+  withHome((home) => {
+    const dir = join(home, 'storages', 'session_projcache_archive_manager_v2', 'sessions')
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(dir, takeoverFileName('session-a736c38e')), JSON.stringify(recordOf('修复飞书')))
+
+    const cache = getSessionProjCache({})
+    assert.equal(cache['session-a736c38e']?.rows?.title?.val, '修复飞书')
+  })
+})
+
+test('官方裸 id 命名与第三方哈希命名并存时，两者都能读出', () => {
+  withHome((home) => {
+    const legacyDir = join(home, 'storages', 'session_projcache', 'sessions')
+    const takeoverDir = join(home, 'storages', 'session_projcache_archive_manager_v2', 'sessions')
+    mkdirSync(legacyDir, { recursive: true })
+    mkdirSync(takeoverDir, { recursive: true })
+    // 老会话在官方目录（裸 id），新会话被搬到第三方目录（哈希名）
+    writeFileSync(join(legacyDir, 'session-old.json'), JSON.stringify(recordOf('老会话标题')))
+    writeFileSync(join(takeoverDir, takeoverFileName('session-new')), JSON.stringify(recordOf('新会话标题')))
+
+    const cache = getSessionProjCache({})
+    assert.equal(cache['session-old']?.rows?.title?.val, '老会话标题', '官方裸 id 命名必须仍可读')
+    assert.equal(cache['session-new']?.rows?.title?.val, '新会话标题', '第三方哈希命名必须可读')
+  })
+})
+
+test('v1 时代的旧域名（session_projcache_archive_manager）同样兼容', () => {
+  withHome((home) => {
+    const dir = join(home, 'storages', 'session_projcache_archive_manager', 'sessions')
+    mkdirSync(dir, { recursive: true })
+    writeFileSync(join(dir, takeoverFileName('sess-v1')), JSON.stringify(recordOf('v1 域标题')))
+
+    assert.equal(getSessionProjCache({})['sess-v1']?.rows?.title?.val, 'v1 域标题')
   })
 })
