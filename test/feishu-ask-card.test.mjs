@@ -77,17 +77,29 @@ test('[飞书提问卡片] 选项按钮整行铺满（width: fill），不塞进
     '不得用 column_set 约束按钮宽度（会导致选项文字被截断）')
 })
 
-test('[飞书提问卡片] 选项文字完整下发，不做 slice 截断', async () => {
+test('[飞书提问卡片] 选项全文进正文（markdown 不截断），按钮只放短标签', async () => {
   const { node, sent } = await makeFeishuNode()
   const q = QUESTION()
   const entry = { number: 1, questions: [q], timeoutSec: 0 }
   await node.sendAskCard({ peerId: 'oc_chat', isGroup: false }, q, entry)
-  const buttons = sent[0].card.body.elements.filter((e) => e.tag === 'button')
-  // 完整标签（含推荐项星标与描述）都应出现在按钮文本里
-  assert.match(buttons[0].text.content, /现在发布 \(Recommended\)/)
-  assert.match(buttons[0].text.content, /同步更新 CHANGELOG 与发布说明/)
-  assert.match(buttons[0].text.content, /^⭐/, '推荐项应带星标')
-  assert.match(buttons[1].text.content, /继续攒改动，等你说发再发/)
+  const card = sent[0].card
+  const buttons = card.body.elements.filter((e) => e.tag === 'button')
+  const body = card.body.elements.filter((e) => e.tag === 'markdown').map((e) => e.content).join('\n')
+
+  // 关键回归（2026-10-16 两次真机截图）：飞书**按钮文字有平台级单行截断**（约 13 字），
+  // `width: fill` 只能加宽、不能避免截断。故选项全文必须进正文，按钮只放短标签。
+  assert.match(body, /1\. ⭐ 现在发布/, '正文应含完整选项一（含推荐星标）')
+  assert.match(body, /现在发布 \(Recommended\)/, '正文应保留推荐标注')
+  assert.match(body, /同步更新 CHANGELOG 与发布说明/, '正文应含选项描述')
+  assert.match(body, /2\. 先不发布/, '正文应含选项二')
+  assert.match(body, /3\. 先只推代码不发布/, '正文应含选项三')
+
+  // 按钮保持简短（主动压到 12 字内），不依赖"平台到底截多少"
+  for (const b of buttons) {
+    const t = b.text.content
+    assert.ok(t.length <= 16, `按钮文字应保持简短以免被平台截断，实际「${t}」(${t.length})`)
+  }
+  assert.match(buttons[0].text.content, /^⭐ 1\./, '推荐项按钮带星标与序号')
   // 按钮 value 必须带齐回调所需字段（否则点击无反应）
   assert.deepEqual(buttons[2].value, { action: 'ask', askId: 1, askOption: 2 })
   // 推荐项用 primary 高亮
@@ -234,4 +246,30 @@ test('[飞书附件] 音视频同理：无文件名时按魔数识别，带名�
     )
     assert.equal(named[0].filename, '录屏.mov', '带名字的视频保留原名')
   } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('[飞书提问卡片] 超长选项：正文完整、按钮仍简短（平台会单行截断按钮）', async () => {
+  const { node, sent } = await makeFeishuNode()
+  const longLabel = '选项一：完整的按钮文字应该完整显示不被截断（含这段说明）'
+  const q = {
+    id: 'long',
+    question: '选项文字是否完整显示了？',
+    options: [
+      { label: longLabel, description: '这一段描述相当长，用来验证按钮文字不会再被截断成省略号' },
+      { label: '选项二：另一段同样很长的选项文字用来确认每个按钮都完整' },
+      { label: '选项三：短选项作为对照' },
+    ],
+  }
+  await node.sendAskCard({ peerId: 'oc_chat', isGroup: false }, q, { number: 1, questions: [q], timeoutSec: 0 })
+  const card = sent[0].card
+  const body = card.body.elements.filter((e) => e.tag === 'markdown').map((e) => e.content).join('\n')
+  const buttons = card.body.elements.filter((e) => e.tag === 'button')
+
+  // 完整长标签必须能在正文里读到（这是"信息不丢失"的保证）
+  assert.ok(body.includes(longLabel), '正文必须包含完整选项文字')
+  // 而按钮不能长到被平台截断 —— 历史事故就是按钮里放了长文字
+  for (const b of buttons) {
+    assert.ok(b.text.content.length <= 16, `按钮应简短，实际「${b.text.content}」(${b.text.content.length})`)
+    assert.doesNotMatch(b.text.content, /…$/, '按钮不应以省略号结尾（那是被截断的表现）')
+  }
 })
