@@ -136,7 +136,7 @@ test('[飞书附件] 无文件名的 JPEG 图片应存成 .jpg（旧实现一律
   }
 })
 
-test('[飞书附件] PNG 保持 .png，非图片资源不动扩展名', async () => {
+test('[飞书附件] 用户明确给的文件名不被改写；占位扩展名才按魔数补全', async () => {
   const dir = mkdtempSync(join(tmpdir(), 'dsh-feishu-ext2-'))
   try {
     const pngMagic = Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0x00, 0x00, 0x00, 0x0d])
@@ -151,14 +151,87 @@ test('[飞书附件] PNG 保持 .png，非图片资源不动扩展名', async ()
     const imgs = await node._processMedia({ messageId: 'm2', resources: [{ type: 'image', fileKey: 'k2' }] }, dir)
     assert.match(imgs[0].filename, /\.png$/)
 
-    // 非图片（文件）：即使是 PNG 字节也不按图片改名（尊重用户原始扩展名语义）
-    const files = await node._processMedia(
-      { messageId: 'm3', resources: [{ type: 'file', fileKey: 'k3', fileName: 'data.bin' }] },
+    // 用户明确给了扩展名（.zip）→ 尊重原样，不按内容改成 .png
+    // （避免"自作聪明"改掉用户/发送方明确的名字；解压软件看的是内容，不看重扩展名）
+    const named = await node._processMedia(
+      { messageId: 'm3', resources: [{ type: 'file', fileKey: 'k3', fileName: 'archive.zip' }] },
       dir,
     )
-    assert.equal(files[0].filename, 'data.bin')
-    assert.equal(readFileSync(files[0].path).length, pngMagic.length)
+    assert.equal(named[0].filename, 'archive.zip', '明确给出的文件名不应被改写')
+    assert.equal(readFileSync(named[0].path).length, pngMagic.length)
   } finally {
     rmSync(dir, { recursive: true, force: true })
   }
+})
+
+// ---------- 用户发来「文件」（而非图片）的场景 ----------
+//
+// 触发这次补测的提问：「如果我发送的不是图片，是个文件呢？」
+// SDK 的 ResourceDescriptor.fileName 是**可选**的（见 channel-sdk 类型定义），
+// 因此"文件没有名字"是真实可达的；旧实现会退化成无意义的 `.bin`。
+
+test('[飞书附件] 文件带文件名：原样保留（含中文与 .pdf）', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dsh-file-named-'))
+  try {
+    const pdf = Buffer.from('%PDF-1.7\n%\xE2\xE3\xCF\xD3\nbody')
+    const { node } = await makeFeishuNode()
+    node.gateway = {
+      async downloadResourceToFile(_m, _k, _t, p) { writeFileSync(p, pdf); return { bytesWritten: pdf.length } },
+    }
+    const out = await node._processMedia({ messageId: 'f1', resources: [{ type: 'file', fileKey: 'k', fileName: '季度报告.pdf' }] }, dir)
+    assert.equal(out[0].filename, '季度报告.pdf', '用户给的文件名应原样保留')
+    assert.match(out[0].path, /季度报告\.pdf$/)
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('[飞书附件] 文件无文件名：按魔数补全扩展名，不退化成 .bin', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dsh-file-noname-'))
+  try {
+    const { node } = await makeFeishuNode()
+    const cases = [
+      { bytes: Buffer.from('%PDF-1.7\n...'), want: /\.pdf$/, name: 'PDF' },
+      { bytes: Buffer.from([0x50, 0x4b, 0x03, 0x04, 0x14, 0x00]), want: /\.zip$/, name: 'ZIP/docx' },
+      { bytes: Buffer.from([0x1f, 0x8b, 0x08, 0x00]), want: /\.gz$/, name: 'gzip' },
+    ]
+    for (const c of cases) {
+      node.gateway = {
+        async downloadResourceToFile(_m, _k, _t, p) { writeFileSync(p, c.bytes); return { bytesWritten: c.bytes.length } },
+      }
+      const out = await node._processMedia({ messageId: `n-${c.name}`, resources: [{ type: 'file', fileKey: 'k' }] }, dir)
+      assert.match(out[0].filename, c.want, `${c.name} 应按魔数补全扩展名，实际 ${out[0].filename}`)
+      assert.doesNotMatch(out[0].filename, /\.bin$/, `${c.name} 不应退化成 .bin`)
+    }
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('[飞书附件] 无法识别的格式保持 .bin（宁可留占位，也不瞎猜）', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dsh-file-unknown-'))
+  try {
+    const { node } = await makeFeishuNode()
+    const weird = Buffer.from('just some text, no magic bytes at all')
+    node.gateway = {
+      async downloadResourceToFile(_m, _k, _t, p) { writeFileSync(p, weird); return { bytesWritten: weird.length } },
+    }
+    const out = await node._processMedia({ messageId: 'u1', resources: [{ type: 'file', fileKey: 'k' }] }, dir)
+    assert.match(out[0].filename, /\.bin$/, '识别不出格式时应保持 .bin，不猜')
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('[飞书附件] 音视频同理：无文件名时按魔数识别，带名字则保留', async () => {
+  const dir = mkdtempSync(join(tmpdir(), 'dsh-file-av-'))
+  try {
+    const { node } = await makeFeishuNode()
+    const mp4 = Buffer.concat([Buffer.from([0, 0, 0, 0x18]), Buffer.from('ftypisom'), Buffer.from([0, 0, 0, 0])])
+    node.gateway = {
+      async downloadResourceToFile(_m, _k, _t, p) { writeFileSync(p, mp4); return { bytesWritten: mp4.length } },
+    }
+    const noName = await node._processMedia({ messageId: 'av1', resources: [{ type: 'video', fileKey: 'k' }] }, dir)
+    assert.match(noName[0].filename, /\.mp4$/, `无文件名视频应按魔数识别，实际 ${noName[0].filename}`)
+
+    const named = await node._processMedia(
+      { messageId: 'av2', resources: [{ type: 'video', fileKey: 'k', fileName: '录屏.mov' }] },
+      dir,
+    )
+    assert.equal(named[0].filename, '录屏.mov', '带名字的视频保留原名')
+  } finally { rmSync(dir, { recursive: true, force: true }) }
 })
