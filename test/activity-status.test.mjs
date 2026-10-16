@@ -483,3 +483,89 @@ test('[活动] 状态刷新必须基于 rendered（已上屏），不能跳到 t
 
   await streaming
 })
+
+// ---------- 节流不得丢状态（真机反馈：只有第一句有状态） ----------
+
+/** 造一个记录推送的桥，用于节流测试。 */
+async function makeThrottleHarness(config = {}) {
+  const { Context } = await import('@deepseek-ai/cordis')
+  const { ConversationBridge } = await import('../lib/platform/conversation-bridge.js')
+  const { Platform } = await import('../lib/platform/base.js')
+  const app = new Context()
+  const root = app.isolate('throttle-' + Math.random().toString(36).slice(2, 8))
+  for (const [n, v] of Object.entries({
+    sessions: { list: () => [], get: () => undefined },
+    agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
+    approval: {},
+    workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
+    sessionPersistence: {},
+  })) root.provide(n, v)
+  const pushed = []
+  class P extends Platform {
+    constructor(o) { super(o); this.id = 'mock'; this.name = 'M'; this.status = 'connected' }
+    get configured() { return true }
+    get capabilities() { return { supportsGroup: true, supportsMedia: true, supportsVoice: false, supportsTyping: true, maxMessageChars: 2000 } }
+    async sendText() { return { success: true } }
+    async sendMediaFile() { return { success: true } }
+    async sendTyping() { return { success: true } }
+    async setActivityStatus(line) { pushed.push(line) }
+  }
+  const logger = { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} }
+  const platform = new P({ ctx: root, logger })
+  const bridge = new ConversationBridge({ ctx: root, logger, config, platform })
+  bridge.activeSessionId = 's1'
+  bridge._turnPeers.set('s1', { outboundPeer: { peerId: 'chat', isGroup: false }, senderId: 'u1' })
+  bridge._digestState.set('s1', { startedTurns: new Set(), createdFiles: new Set() })
+  const emitTool = (name, args) => root.emit('session/event', { id: 's1' }, { type: 'tool/call', data: { turn: 2, name, arguments: JSON.stringify(args) } })
+  return { root, bridge, pushed, emitTool }
+}
+
+test('[活动] 节流窗口内的状态必须**延迟补发**，绝不丢弃（真机反馈：只有第一句有状态）', async () => {
+  // 窗口 10 秒（确保测试期间不会到点），发 3 个不同状态
+  const h = await makeThrottleHarness({ activityIntervalSec: 10 })
+  h.emitTool('bash', { command: 'npm test' })     // 前缘：立即推
+  h.emitTool('read', { file_path: 'a.js' })        // 窗口内 → 记为待补发
+  h.emitTool('edit', { file_path: 'b.md' })        // 窗口内 → 覆盖待补发（保留最新）
+  await new Promise((r) => setTimeout(r, 50))
+
+  // 前缘 1 条已发；后 2 条合并为"最新那一条"等待补发
+  assert.equal(h.pushed.length, 1, `前缘应只推 1 条，实际 ${JSON.stringify(h.pushed)}`)
+  const state = h.bridge._digestState.get('s1')
+  assert.ok(state.pendingActivity, '窗口内的变化必须记为待补发（不能直接丢弃）')
+  assert.match(state.pendingActivity.line, /b\.md/, '待补发的应是**最新**状态')
+  h.bridge.dispose()
+})
+
+test('[活动] 后缘补发：窗口到点后把最新状态发出去（不会永久丢失）', async () => {
+  // 窗口 0.15 秒，便于快速验证后缘
+  const h = await makeThrottleHarness({ activityIntervalSec: 0.15 })
+  h.emitTool('bash', { command: 'npm test' })
+  await new Promise((r) => setTimeout(r, 20))
+  h.emitTool('read', { file_path: 'a.js' })
+  h.emitTool('edit', { file_path: 'b.md' })
+  assert.equal(h.pushed.length, 1, '前缘 1 条')
+  await new Promise((r) => setTimeout(r, 220))   // 等窗口到点
+  assert.equal(h.pushed.length, 2, `后缘应补发 1 条，实际 ${JSON.stringify(h.pushed)}`)
+  assert.match(h.pushed.at(-1), /b\.md/, '补发的必须是最新状态')
+  h.bridge.dispose()
+})
+
+test('[活动] 默认节流足够灵敏：一轮内多次工具调用可看到多条不同状态', async () => {
+  // 真机反馈：默认 5 秒会把一轮的工具调用压成首尾两条 → "中间没状态"。
+  // 现在默认 1 秒（且 SDK 自身按 100ms 限流、卡片原地更新不刷屏）。
+  const h = await makeThrottleHarness({})   // 用默认配置
+  const seq = [
+    ['bash', { command: 'npm test' }, 150],
+    ['read', { file_path: 'a.js' }, 150],
+    ['edit', { file_path: 'b.md' }, 1200],
+    ['bash', { command: 'git status' }, 1200],
+  ]
+  for (const [name, args, gap] of seq) {
+    h.emitTool(name, args)
+    await new Promise((r) => setTimeout(r, gap))
+  }
+  await new Promise((r) => setTimeout(r, 1200))
+  assert.ok(h.pushed.length >= 3, `应看到多条状态，实际只有 ${h.pushed.length} 条：${JSON.stringify(h.pushed)}`)
+  assert.match(h.pushed.at(-1), /git status/, '最后一条应对应最后一次操作')
+  h.bridge.dispose()
+})
