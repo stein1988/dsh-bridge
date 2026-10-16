@@ -404,6 +404,10 @@ test('ConversationBridge 仅在收到 [SEND_FILE: path] 指令时发送媒体文
 test('本轮改动摘要：workspace/changes 播报一次（同轮重复事件去重）', async () => {
   const { ctx } = makeMockCtx()
   const platform = new MockPlatform({ ctx, logger: ctx.logger })
+  // 记录 opts：摘要必须带 standalone（否则会被飞书/Telegram 的流式卡片吞掉）
+  const sentOpts = []
+  const origSendText = platform.sendText.bind(platform)
+  platform.sendText = async (peerId, text, opts) => { sentOpts.push(opts); return origSendText(peerId, text) }
   const summary = {
     turn: 3, cwd: '/w', total: 2, added: 12, deleted: 4,
     files: [
@@ -421,6 +425,10 @@ test('本轮改动摘要：workspace/changes 播报一次（同轮重复事件�
   assert.equal(platform.sent.length, 1, '应播报一条摘要')
   assert.match(platform.sent[0].text, /本轮改动\*\* 2 个文件（\+12\/-4）/)
   assert.match(platform.sent[0].text, /src\/a\.js/)
+  // 回归（2026-10-16 真机）：宿主顺序是 workspace/changes → turn/end，摘要发送时
+  // 飞书/Telegram 的 _inTurn 仍为 true；不带 standalone 就会被并入流式卡片、随即被
+  // turn/end 的收尾覆盖 → 用户侧"摘要一条都收不到"。这里锁死该 opts。
+  assert.equal(sentOpts.at(-1)?.standalone, true, '摘要必须标记 standalone 以绕过流式卡片')
 
   // 同一轮重复事件（宿主可能追加多次）→ 不重复播报
   ctx.emit('session/event', { id: 's-chg' }, { type: 'workspace/changes', seq: 8, data: { turn: 3 } })
