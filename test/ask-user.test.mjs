@@ -172,3 +172,12 @@ test('[ask] 回执把选择回显出来，便于用户确认被正确理解', ()
   assert.match(skipped, /已跳过/)
   assert.match(skipped, /自定义/)
 })
+
+test('[ask] 多选问题的提示不能写成"选一项"（否则用户会以为只能单选）', () => {
+  const multiSel = [{ id: 'x', question: '开哪些监控？', multiSelect: true, options: [{ label: '日志' }, { label: '指标' }] }]
+  const text = formatAskPrompt(multiSel, { number: 1 })
+  assert.match(text, /选多项/)
+  assert.doesNotMatch(text, /选一项/)
+  // 单选仍应提示"选一项"
+  assert.match(formatAskPrompt(single(), { number: 1 }), /选一项/)
+})
