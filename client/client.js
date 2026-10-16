@@ -4311,6 +4311,26 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
         }),
         React.createElement("span", null, "\u672C\u8F6E\u6539\u52A8\u6458\u8981\uFF08\u6BCF\u8F6E\u64AD\u62A5\u6539\u52A8\u6587\u4EF6\u6E05\u5355\uFF0C\u9ED8\u8BA4\u5F00\u542F\uFF09")
       ),
+      // 实时活动状态开关：仅"卡片可原地更新"的平台支持（飞书 / Telegram）。
+      // 用户反馈（2026-10-17）希望"能自己关掉、不要这个状态"，故提供显式开关。
+      (platformId === "feishu" || platformId === "telegram") && React.createElement(
+        "label",
+        {
+          style: { display: "flex", alignItems: "center", gap: 6, marginTop: 8, fontSize: 12, cursor: "pointer", width: "fit-content", color: "var(--dsw-alias-label-secondary,#6b7280)" },
+          title: "\u5F00\u542F\u540E Agent \u5E72\u6D3B\u65F6\u5361\u7247\u9876\u90E8\u4F1A\u5B9E\u65F6\u663E\u793A\u5F53\u524D\u52A8\u4F5C\uFF08\u5982\u300C\u6B63\u5728\u8FD0\u884C\u547D\u4EE4\u300D\uFF09\uFF1B\u5173\u95ED\u540E\u4E0D\u518D\u663E\u793A"
+        },
+        React.createElement("input", {
+          type: "checkbox",
+          checked: cfgDraft?.showActivity !== false,
+          disabled: busy,
+          onChange: (e) => {
+            const checked = e.target.checked;
+            setCfgDraft((d) => ({ ...d ?? {}, showActivity: checked }));
+            act(BRIDGE_ENDPOINTS.platformSetConfig, { showActivity: checked });
+          }
+        }),
+        React.createElement("span", null, "\u5B9E\u65F6\u6D3B\u52A8\u72B6\u6001\uFF08\u5361\u7247\u9876\u90E8\u663E\u793A\u300C\u6B63\u5728\u8FD0\u884C\u547D\u4EE4\u300D\u7B49\uFF0C\u9ED8\u8BA4\u5F00\u542F\uFF09")
+      ),
       // 高级设置：会话级配置（工作区 / Agent 预设 / 模型路由）+ 会话节奏参数
       React.createElement(
         "div",

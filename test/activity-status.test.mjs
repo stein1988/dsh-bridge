@@ -461,10 +461,10 @@ test('[活动] 状态刷新必须基于 rendered（已上屏），不能跳到 t
   node.peerId = 'oc'; node.activeSessionId = 's1'
   await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
 
-  // 首片：很长的内容（会分成多片），不 await，让打字机停在第一片附近
-  const long = '首段。' + '很长内容。'.repeat(40)
+  // 首片：大块（>240 字才分片），不 await，让打字机停在第一片附近
+  const long = '首段。' + '很长内容。'.repeat(80)   // 大块（>240 字）才分片
   const streaming = node.sendText(long)
-  await new Promise((r) => setTimeout(r, 20))
+  await new Promise((r) => setTimeout(r, 30))
 
   // 此刻：text = 完整目标；rendered = 已上屏的片（更短）
   const st = node._stream
@@ -709,12 +709,35 @@ test('[活动] 飞书：空轮次（无正文无活动）不得留下垃圾卡�
   assert.equal(opened, 0, '没有任何活动/正文时不应建卡（避免会话里留空卡片）')
 })
 
-test('[活动] 分片阈值应小于宿主常见文本块长度（否则退化为一次性出现）', async () => {
-  // 实测本机 763 个文本块：中位 111 字；原阈值 150 → 77% 的块只有 1 片（无打字机效果）。
-  // 通过**节点真实路径**断言：111 字的块必须产生 ≥2 次卡片写入（打字机效果）。
+// ---------- showActivity 开关 ----------
+
+test('[活动] showActivity=false 时不推送任何状态（用户可自行关闭）', async () => {
+  const h = await makeThrottleHarness({ showActivity: false })
+  h.emitTool('bash', { command: 'npm test' })
+  h.emitTool('edit', { file_path: 'a.js' })
+  await new Promise((r) => setTimeout(r, 30))
+  assert.deepEqual(h.pushed, [], '关闭后不得推送任何状态')
+  h.bridge.dispose()
+})
+
+test('[活动] showActivity 默认开启（不传配置也照常推送）', async () => {
+  const h = await makeThrottleHarness({})
+  h.emitTool('bash', { command: 'npm test' })
+  await new Promise((r) => setTimeout(r, 30))
+  assert.equal(h.pushed.length, 1, '默认应开启')
+  h.bridge.dispose()
+})
+
+// ---------- 打字机开销：小块不再二次分片 ----------
+
+test('[活动] 宿主常见的文本块长度只写一次卡片（避免"反复重写"与人为延迟）', async () => {
+  // 真机反馈（2026-10-17）："还是会反复重写卡片内容，而且感觉打字效果超级慢。"
+  // 根因：在**宿主已分块**的内容上再按 60 字切一遍 —— 1954 字的块会变成 33 次卡片更新
+  // （每次一次飞书网络调用、且全量重发）。而宿主的块间隔本来就是天然节奏。
+  // 修复：小块（≤240 字）不再二次分片；大块才动效且总延迟有上限。
   const { Context } = await import('@deepseek-ai/cordis')
   const app = new Context()
-  const root = app.isolate('slice-threshold')
+  const root = app.isolate('pacing')
   for (const [n, v] of Object.entries({
     sessions: { list: () => [], get: () => undefined },
     agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
@@ -722,26 +745,77 @@ test('[活动] 分片阈值应小于宿主常见文本块长度（否则退化�
     workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
     sessionPersistence: {},
   })) root.provide(n, v)
-  const writes = []
+  let writes = 0
   root.provide('feishu', {
     status: 'online', configured: true, botInfo: { openId: 'x' },
-    async openStream() { return { setContent: async (t) => { writes.push(t) }, finish: async () => {} } },
+    async openStream() { return { setContent: async () => { writes += 1 }, finish: async () => {} } },
     async sendText() { return { success: true } },
     async sendCard() { return { success: true } },
     async createCard() { return null },
   })
   const { FeishuConversationNode } = await import('../lib/feishu/node.js')
-  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false, activityIntervalSec: 0 },
+  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false },
     { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
   node._lastPeer = { peerId: 'oc', isGroup: false }
   node.activeSessionId = 's1'
   await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
 
-  const medianBlock = '这是一段真实的回复内容，长度接近实测中位数左右。'.repeat(6).slice(0, 111)
-  writes.length = 0
-  await node.sendText(medianBlock)
-  assert.ok(writes.length >= 2,
-    `111 字的块应产生 ≥2 次卡片写入（打字机效果），实际 ${writes.length} 次——阈值过大会"一次性出现"`)
-  // 且内容单调累积、不丢字
-  assert.equal(writes.at(-1), medianBlock, '最终内容应与输入一致')
+  // 注意：打字机只作用于**本轮首块**（后续块走累积分支、天然单次写入）。
+  // 因此必须**每块都从新流开始**（收尾后再写），否则用例是"空转"、测不到分片逻辑。
+  for (const len of [23, 70, 97, 181, 105, 114, 159, 202]) {
+    await node._finishStream()   // 结束上一张流，让下一块重新走"首块"路径
+    writes = 0
+    await node.sendText('字'.repeat(len))
+    assert.equal(writes, 1, `${len} 字的块应只写 1 次（实际 ${writes} 次 → 表现为"反复重写"）`)
+  }
+})
+
+test('[活动] 超过阈值的大块仍保留打字机动效，但总耗时有硬上限', async () => {
+  const { Context } = await import('@deepseek-ai/cordis')
+  const app = new Context()
+  const root = app.isolate('pacing-big')
+  for (const [n, v] of Object.entries({
+    sessions: { list: () => [], get: () => undefined },
+    agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
+    approval: {},
+    workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
+    sessionPersistence: {},
+  })) root.provide(n, v)
+  let writes = 0
+  root.provide('feishu', {
+    status: 'online', configured: true, botInfo: { openId: 'x' },
+    async openStream() { return { setContent: async () => { writes += 1 }, finish: async () => {} } },
+    async sendText() { return { success: true } },
+    async sendCard() { return { success: true } },
+    async createCard() { return null },
+  })
+  const { FeishuConversationNode } = await import('../lib/feishu/node.js')
+  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false },
+    { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
+  node._lastPeer = { peerId: 'oc', isGroup: false }
+  node.activeSessionId = 's1'
+  await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
+  writes = 0
+  const t0 = Date.now()
+  await node.sendText('这是一段很长的回复内容，需要触发打字机动效。'.repeat(100))
+  const dur = Date.now() - t0
+  assert.ok(writes > 1, `大块应有多片动效（实际 ${writes} 次）`)
+  assert.ok(writes <= 20, `大块写入次数应受控（实际 ${writes} 次，旧实现 33 次）`)
+  assert.ok(dur <= 2000, `大块动效总耗时应受控（实际 ${dur}ms，旧实现 ~960ms+网络）`)
+})
+
+test('[活动] 配置恢复：showActivity 显式 false 时关闭，缺省/显式 true 时保持开启', async () => {
+  const { applyRestoredPlatformConfig } = await import('../lib/platform/config-restore.js')
+  // 显式 false → 关闭
+  const a = {}
+  applyRestoredPlatformConfig(a, { showActivity: false }, {})
+  assert.equal(a.showActivity, false, '显式 false 应写为 false')
+  // 显式 true → 开启
+  const b = {}
+  applyRestoredPlatformConfig(b, { showActivity: true }, {})
+  assert.equal(b.showActivity, true)
+  // 缺省 → 不写（保留构造期默认：开启）
+  const c = {}
+  applyRestoredPlatformConfig(c, {}, {})
+  assert.equal('showActivity' in c, false, '缺省时不应写入（构造函数按 !== false 视为开启）')
 })

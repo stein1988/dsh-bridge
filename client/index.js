@@ -1954,6 +1954,24 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
         }),
         React.createElement('span', null, '本轮改动摘要（每轮播报改动文件清单，默认开启）'),
       ),
+      // 实时活动状态开关：仅"卡片可原地更新"的平台支持（飞书 / Telegram）。
+      // 用户反馈（2026-10-17）希望"能自己关掉、不要这个状态"，故提供显式开关。
+      (platformId === 'feishu' || platformId === 'telegram') && React.createElement('label', {
+        style: { display: 'flex', alignItems: 'center', gap: 6, marginTop: 8, fontSize: 12, cursor: 'pointer', width: 'fit-content', color: 'var(--dsw-alias-label-secondary,#6b7280)' },
+        title: '开启后 Agent 干活时卡片顶部会实时显示当前动作（如「正在运行命令」）；关闭后不再显示',
+      },
+        React.createElement('input', {
+          type: 'checkbox',
+          checked: cfgDraft?.showActivity !== false,
+          disabled: busy,
+          onChange: (e) => {
+            const checked = e.target.checked;
+            setCfgDraft(d => ({ ...(d ?? {}), showActivity: checked }));
+            act(BRIDGE_ENDPOINTS.platformSetConfig, { showActivity: checked });
+          },
+        }),
+        React.createElement('span', null, '实时活动状态（卡片顶部显示「正在运行命令」等，默认开启）'),
+      ),
       // 高级设置：会话级配置（工作区 / Agent 预设 / 模型路由）+ 会话节奏参数
       React.createElement('div', { style: { marginTop: 12 } },
         React.createElement('button', {
