@@ -477,52 +477,80 @@ test('回归：cordis 未 inject 的服务必须"探测"而非直接取属性 �
   //
   // 为什么既有用例没拦住：makeMockCtx 是普通对象，取不存在的键只得到 undefined，
   // 与真正 cordis ctx 的"抛错"行为不同。这里补一个**忠实模拟 cordis** 的 ctx：
-  // 未声明（未 inject）的属性一律抛错，已声明的正常返回。
-  const makeCordisLikeCtx = (declared = []) => {
+  // 未声明（未 inject）的**服务**属性抛错，框架成员（inject/on/emit/logger…）正常返回。
+  //
+  // 注意：真 cordis 的 ctx 是代理，`inject` 是内置方法（非服务），所以这里也放行。
+  // 并且模拟真 cordis 的 `inject(deps, cb)` 语义：**依赖存在才回调**，回调收到的是
+  // 声明了该依赖的子 ctx（可安全读取）。
+  const makeCordisLikeCtx = (services = {}) => {
     const { ctx } = makeMockCtx()
-    const declaredSet = new Set(declared)
+    const FRAMEWORK = new Set(['inject', 'on', 'off', 'emit', 'effect', 'logger', 'get', 'set', 'plugin', 'extend', 'isolate'])
+    // 「服务是否存在」按 provide 与否判定（真 cordis 看配置里有没有该服务，
+    // 而非当前读出来的值）
+    const hasService = (d) => Object.prototype.hasOwnProperty.call(services, d)
+    Object.assign(ctx, services)
     return new Proxy(ctx, {
       get(target, prop, recv) {
-        if (typeof prop === 'string' && !(prop in target) && !declaredSet.has(prop) && !prop.startsWith('_')) {
-          throw new Error(`cannot get property "${prop}" without inject`)
+        if (typeof prop !== 'string' || prop.startsWith('_') || FRAMEWORK.has(prop)) {
+          if (prop === 'inject') {
+            // cordis 语义：依赖齐备才回调，回调收到**声明了该依赖的子 ctx**
+            return (deps, cb) => {
+              const list = Array.isArray(deps) ? deps : Object.keys(deps ?? {})
+              if (!list.every(hasService)) return
+              const child = new Proxy(target, this)
+              for (const d of list) {
+                Object.defineProperty(child, d, { value: services[d], enumerable: true, configurable: true })
+              }
+              cb(child)
+            }
+          }
+          return Reflect.get(target, prop, recv)
         }
+        if (!(prop in target)) throw new Error(`cannot get property "${prop}" without inject`)
         return Reflect.get(target, prop, recv)
       },
     })
   }
 
-  // ① 未 inject workspaceChanges（老宿主 / 未装 workspace-changes 的 composition）：
+  // ① 宿主未提供 workspaceChanges（老宿主 / 未装 workspace-changes）：
   //    必须静默跳过，绝不抛错
   {
-    const ctx = makeCordisLikeCtx([])
+    const ctx = makeCordisLikeCtx({})
     const platform = new MockPlatform({ ctx, logger: ctx.logger })
     const bridge = new ConversationBridge({ ctx, logger: ctx.logger, config: {}, platform })
     bridge.peerId = 'peer-1'
     bridge.activeSessionId = 's-cordis'
     assert.doesNotThrow(() => {
       ctx.emit('session/event', { id: 's-cordis' }, { type: 'workspace/changes', seq: 1, data: { turn: 1 } })
-    }, '未 inject 的服务不得让事件回调抛错（会升级为 fatal load failure）')
+    }, '服务缺失不得让事件回调抛错（会升级为 fatal load failure）')
     await new Promise((r) => setTimeout(r, 10))
     assert.equal(platform.sent.length, 0, '无服务时静默跳过')
     bridge.dispose(); platform.dispose()
   }
 
-  // ② /diff 同一条路径：未 inject 时给友好提示，同样不得抛错
+  // ② /diff 同一条路径：服务缺失时给友好提示，同样不得抛错
   {
-    const ctx = makeCordisLikeCtx([])
+    const ctx = makeCordisLikeCtx({})
     const platform = new MockPlatform({ ctx, logger: ctx.logger })
     const bridge = new ConversationBridge({ ctx, logger: ctx.logger, config: {}, platform })
     bridge.peerId = 'peer-1'
     bridge.activeSessionId = 's-cordis'
-    await assert.doesNotReject(() => bridge.sendSessionDiff(), '未 inject 时 /diff 不得抛错')
+    await assert.doesNotReject(() => bridge.sendSessionDiff(), '服务缺失时 /diff 不得抛错')
     assert.match(platform.sent.at(-1)?.text ?? '', /还没有可导出的改动记录/)
     bridge.dispose(); platform.dispose()
   }
 
-  // ③ 已声明的服务照常工作（探测不能把正常路径一起让掉）
+  // ③ 【最关键】宿主提供该服务时，必须**真的拿到**并正常播报。
+  //    只 try/catch 的"不崩"写法会在这里失败（服务永远拿不到 → 摘要静默失效），
+  //    这正是第一版修复的缺陷：宿主不崩了，但功能被悄悄废掉。
   {
-    const ctx = makeCordisLikeCtx([])
-    ctx.workspaceChanges = {
+    let svc
+    const ctx = makeCordisLikeCtx({
+      get workspaceChanges() {
+        return svc
+      },
+    })
+    svc = {
       summary: () => ({ turn: 2, total: 1, added: 3, deleted: 1, files: [{ path: 'a.js', display: 'a.js', added: 3, deleted: 1 }] }),
       diff: async () => undefined,
     }
@@ -530,9 +558,10 @@ test('回归：cordis 未 inject 的服务必须"探测"而非直接取属性 �
     const bridge = new ConversationBridge({ ctx, logger: ctx.logger, config: {}, platform })
     bridge.peerId = 'peer-1'
     bridge.activeSessionId = 's-cordis'
+    assert.ok(bridge._changesSvc, '应通过 ctx.inject 动态注入拿到 workspaceChanges 服务')
     ctx.emit('session/event', { id: 's-cordis' }, { type: 'workspace/changes', seq: 2, data: { turn: 2 } })
     await new Promise((r) => setTimeout(r, 10))
-    assert.equal(platform.sent.length, 1, '有服务时摘要照常播报')
+    assert.equal(platform.sent.length, 1, '有服务时摘要必须照常播报（不能只是"不崩"）')
     assert.match(platform.sent[0].text, /本轮改动/)
     bridge.dispose(); platform.dispose()
   }
