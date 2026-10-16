@@ -626,11 +626,16 @@ test('[活动] 打字机总耗时应与内容长度相称，不得"每片固定�
 // **已存在的卡片**，卡片原先要等首块文本才创建 → 这 39 秒里用户看不到任何状态。
 // 修复：有活动状态但还没有卡片时**按需预热**一张（空轮次不预热，避免留垃圾卡片）。
 
-test('[活动] 飞书：尚无正文时收到状态，必须建卡让状态可见（首块文本前 39 秒空白问题）', async () => {
+test('[活动] 飞书：状态不得引入"孤儿空卡片"（曾显示为 "(no content)"）', async () => {
+  // 真机截图（2026-10-17）：会话里出现一张只有 "(no content)" 的卡片，且上面的卡片不停覆盖重写。
+  // 成因：曾尝试"有状态就先预热建卡"，但建卡异步，一旦与"文本到达建卡"竞态，
+  // 预热那张会因 _stream 已被占用而被收尾成**空卡片**（本地已复现）。
+  // 结论：**不做预热**——实测 tool/call 与文本总是同一时刻到达，文本本身就会建卡并带上状态。
+  // 本用例锁住该不变量：任何情况下都不得出现"从未写入内容"的卡片。
   const { Context } = await import('@deepseek-ai/cordis')
   const { activityParts } = await import('../lib/platform/activity.js')
   const app = new Context()
-  const root = app.isolate('warmup')
+  const root = app.isolate('no-orphan')
   for (const [n, v] of Object.entries({
     sessions: { list: () => [], get: () => undefined },
     agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
@@ -638,11 +643,17 @@ test('[活动] 飞书：尚无正文时收到状态，必须建卡让状态可�
     workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
     sessionPersistence: {},
   })) root.provide(n, v)
-  const written = []
-  let opened = 0
+
+  const cards = []
   root.provide('feishu', {
     status: 'online', configured: true, botInfo: { openId: 'x' },
-    async openStream() { opened += 1; return { setContent: async (t) => { written.push(t) }, finish: async () => {} } },
+    async openStream() {
+      // 模拟建卡耗时，放大竞态窗口
+      const c = { writes: [], finished: false }
+      cards.push(c)
+      await new Promise((r) => setTimeout(r, 30))
+      return { setContent: async (t) => { c.writes.push(t) }, finish: async () => { c.finished = true } }
+    },
     async sendText() { return { success: true } },
     async sendCard() { return { success: true } },
     async createCard() { return null },
@@ -652,23 +663,20 @@ test('[活动] 飞书：尚无正文时收到状态，必须建卡让状态可�
     { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
   node._lastPeer = { peerId: 'oc', isGroup: false }
   node.activeSessionId = 's1'
+
   await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
-
-  // 还没有任何正文，先来一个活动状态
-  await node.setActivityStatus(null, null, activityParts({ turn: 1, toolName: 'bash', args: { command: 'npm test' } }))
-  assert.equal(opened, 1, '应立刻建卡（否则状态无处显示）')
-  assert.match(written.at(-1) ?? '', /正在运行命令/, '卡片里应能看到状态')
-  assert.match(written.at(-1) ?? '', /^> _/, '状态行应为引用块+斜体')
-
-  // 首块正文到达：复用同一张卡（不新建），且不丢状态
-  await node.sendText('第一段正文。')
-  assert.equal(opened, 1, '正文到达不应新建卡片（复用预热的那张）')
-  const merged = written.at(-1) ?? ''
-  assert.match(merged, /第一段正文/)
-  assert.match(merged, /正在运行命令/, '正文到达后状态行仍应保留')
-
+  // 关键：**不 await** 状态推送（生产里桥就是 fire-and-forget 调用 `setActivityStatus`），
+  // 这样才能复现"建卡异步进行中、轮次就结束"的竞态。若 await 就测不出该 bug。
+  const pushing = node.setActivityStatus(null, null, activityParts({ turn: 1, toolName: 'bash', args: { command: 'npm test' } }))
+  await new Promise((r) => setTimeout(r, 5))   // 让建卡进入 await（未完成）
   await root.emit('session/event', { id: 's1' }, { type: 'turn/end', data: { reason: { kind: 'complete' } } })
-  await new Promise((r) => setTimeout(r, 20))
+  await pushing
+  await new Promise((r) => setTimeout(r, 120))
+
+  const empty = cards.filter((c) => c.writes.every((w) => !w || !w.trim()))
+  assert.equal(empty.length, 0, `不得出现空卡片（飞书显示为 "(no content)"），实际 ${empty.length} 张`)
+  const hanging = cards.filter((c) => !c.finished)
+  assert.equal(hanging.length, 0, '所有卡片都应被收尾')
 })
 
 test('[活动] 飞书：空轮次（无正文无活动）不得留下垃圾卡片', async () => {
