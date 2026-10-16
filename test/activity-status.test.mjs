@@ -8,7 +8,7 @@
 // 否则同一工具在 Web 与 IM 会给出不同说法。这里用宿主的口径逐条锁住。
 import test from 'node:test'
 import assert from 'node:assert/strict'
-import { activityOf, activityText, formatActivityLine, toolDetail } from '../lib/platform/activity.js'
+import { activityOf, activityText, activityParts, escapeMarkdown, formatActivityLine, toolDetail } from '../lib/platform/activity.js'
 
 test('[活动] 工具→活动种类与宿主 activity() 逐条对齐', () => {
   // 逐条对照宿主 dsh-client-ui-chat 的实现（本机核实）
@@ -289,4 +289,75 @@ test('[活动] 飞书：轮次结束后卡片必须去掉状态行（否则显�
   await new Promise((r) => setTimeout(r, 20))
   assert.ok(!/正在运行命令/.test(finishedWith ?? ''), `结束后不得残留状态行，实际: ${finishedWith}`)
   assert.match(finishedWith ?? '', /正文内容/, '正文必须保留')
+})
+
+// ---------- 样式：状态行要与正文区分 ----------
+
+test('[活动] 结构化片段：受控文案与用户可控 detail 分开', () => {
+  const p = activityParts({ turn: 3, toolName: 'bash', args: { command: 'npm test' } })
+  assert.equal(p.icon, '⌨️')
+  assert.equal(p.text, '正在运行命令')
+  assert.equal(p.detail, 'npm test')
+  assert.equal(p.suffix, ' · 第 3 轮')
+  // 无轮次时 suffix 为空
+  assert.equal(activityParts({ toolName: 'read', args: { file_path: 'a.js' } }).suffix, '')
+})
+
+test('[活动] 转义：命令里的 markdown 元字符不得破坏样式', () => {
+  // 不加转义时 `echo *bold*` 会让外层斜体提前闭合、甚至吞掉后续正文
+  assert.equal(escapeMarkdown('echo *bold*'), 'echo \\*bold\\*')
+  assert.equal(escapeMarkdown('a_b'), 'a\\_b')
+  assert.equal(escapeMarkdown('`code`'), '\\`code\\`')
+  assert.equal(escapeMarkdown('~~del~~'), '\\~\\~del\\~\\~')
+  assert.equal(escapeMarkdown('[x](y)'), '\\[x\\]\\(y\\)')
+  // 普通文本不受影响
+  assert.equal(escapeMarkdown('npm test'), 'npm test')
+  assert.equal(escapeMarkdown('中文命令 --flag'), '中文命令 \\-\\-flag')
+})
+
+test('[活动] 飞书：状态行用引用块+斜体（与正文区分），且 detail 被转义', async () => {
+  const { Context } = await import('@deepseek-ai/cordis')
+  const { activityParts } = await import('../lib/platform/activity.js')
+  const app = new Context()
+  const root = app.isolate('style-check')
+  for (const [n, v] of Object.entries({
+    sessions: { list: () => [], get: () => undefined },
+    agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
+    approval: {},
+    workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
+    sessionPersistence: {},
+  })) root.provide(n, v)
+  const written = []
+  root.provide('feishu', {
+    status: 'online', configured: true, botInfo: { openId: 'x' },
+    async openStream() { return { setContent: async (t) => { written.push(t) }, finish: async () => {} } },
+    async sendText() { return { success: true } },
+    async sendCard() { return { success: true } },
+    async createCard() { return null },
+  })
+  const { FeishuConversationNode } = await import('../lib/feishu/node.js')
+  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false },
+    { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
+  node.peerId = 'oc'; node.activeSessionId = 's1'
+  await root.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
+  await node.sendText('这是正文。')
+
+  await node.setActivityStatus(null, null, activityParts({ turn: 3, toolName: 'bash', args: { command: 'npm test' } }))
+  const out = written.at(-1)
+  // 样式：引用块 + 斜体（飞书原生支持，见官方 md 文档）
+  assert.match(out, /^> _/, '状态行应以引用块+斜体开头')
+  assert.match(out, /_\n\n这是正文。/, '引用块后必须空行再接正文（官方硬性要求）')
+  assert.match(out, /正在运行命令/, '应含活动文案')
+  assert.doesNotMatch(out, /（\s*）/, '无细节时不应出现空括号')
+
+  // 恶意命令：元字符必须被转义，不能破坏斜体
+  await node.setActivityStatus(null, null, activityParts({
+    turn: 3, toolName: 'bash', args: { command: 'echo *bold* _x_ `code`' },
+  }))
+  const evil = written.at(-1)
+  assert.match(evil, /echo \\\*bold\\\*/, '星号必须转义')
+  assert.match(evil, /\\_x\\_/, '下划线必须转义')
+  assert.match(evil, /\\`code\\`/, '反引号必须转义')
+  // 结构仍然完好（外层斜体闭合在行尾）
+  assert.match(evil, /^> _[\s\S]*_\n\n这是正文。$/, '转义后样式结构应保持完整')
 })
