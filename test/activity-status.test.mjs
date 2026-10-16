@@ -217,3 +217,32 @@ test('[活动] 飞书：状态行拼在正文前，轮次结束清空（不留�
   await root.emit('session/event', { id: 's1' }, { type: 'turn/end', data: { reason: { kind: 'complete' } } })
   assert.equal(node._activityLine, '', '收尾后状态应清空')
 })
+
+test('[活动] 飞书：桥调用的 this.platform 必须真的暴露 setActivityStatus（曾写错在节点上）', async () => {
+  // 真机前自查发现的错：能力只定义在 FeishuConversationNode 上，而桥调用的是
+  // `this.platform.setActivityStatus`（makePlatform 返回的包装对象）——两者不是同一对象，
+  // 于是桥的鸭子类型探测失败、**状态永远不显示**（静默，无报错）。
+  // 这条用例锁住"钩子确实挂在 platform 上"，防止再退化。
+  const { Context } = await import('@deepseek-ai/cordis')
+  const app = new Context()
+  const root = app.isolate('hook-check')
+  for (const [n, v] of Object.entries({
+    sessions: { list: () => [], get: () => undefined },
+    agents: { get: () => undefined, create: async () => ({}), resume: async () => ({}), roots: () => [] },
+    approval: {},
+    workspaceRegistry: { archivedSessionIds: [], list: async () => [] },
+    sessionPersistence: {},
+  })) root.provide(n, v)
+  root.provide('feishu', {
+    status: 'online', configured: true, botInfo: { openId: 'x' },
+    async openStream() { return { setContent: async () => {}, finish: async () => {} } },
+    async sendText() { return { success: true } },
+    async sendCard() { return { success: true } },
+    async createCard() { return null },
+  })
+  const { FeishuConversationNode } = await import('../lib/feishu/node.js')
+  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false },
+    { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
+  assert.equal(typeof node.platform?.setActivityStatus, 'function',
+    'platform 上必须有 setActivityStatus，否则桥会静默跳过状态推送')
+})
