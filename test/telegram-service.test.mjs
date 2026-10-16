@@ -242,6 +242,63 @@ test('TelegramConversationNode streams turn output incrementally with editMessag
   assert.equal(node._streamMsgId, null)
 })
 
+test('TelegramConversationNode 同轮多次输出必须累积，不得覆盖（内容消失回归）', async () => {
+  // 真机事故（2026-10-16）：宿主每个 step 发一条独立的 assistant/message（该步片段），
+  // 旧实现用最新片段 editMessageText **覆盖**整条消息 → 用户看到"输出一半突然消失、
+  // 又重新输出"，最终只剩最后一段。飞书侧同一实现，一并修。
+  const ctx = makeMockCordisCtx()
+  const edited = []
+  ctx.telegram = {
+    sendText: async () => ({ message_id: 10086 }),
+    editMessageText: async (chatId, messageId, text) => {
+      edited.push(text)
+      return {}
+    },
+  }
+  const node = new TelegramConversationNode(ctx, { allowFrom: ['1003'], sendChunkDelayMs: 1 }, ctx.logger())
+  node._lastPeer = { chatId: '1003' }
+  node.activeSessionId = 'sess_1'
+  await ctx.emit('session/event', { id: 'sess_1' }, { type: 'turn/start' })
+
+  await node.sendText('第一段：正在分析')      // 建消息
+  await node.sendText('第二段：找到问题了')    // 同轮后续 → 累积
+  await node.sendText('第三段：已经修复')
+
+  const last = edited.at(-1)
+  assert.ok(last.includes('第一段'), `应保留第一段，实际: ${last}`)
+  assert.ok(last.includes('第二段'), `应保留第二段，实际: ${last}`)
+  assert.ok(last.includes('第三段'), `应保留第三段，实际: ${last}`)
+
+  await ctx.emit('session/event', { id: 'sess_1' }, { type: 'turn/end' })
+})
+
+test('TelegramConversationNode 新轮次重置累积内容，不把上一轮带进来', async () => {
+  const ctx = makeMockCordisCtx()
+  const edited = []
+  const sent = []
+  ctx.telegram = {
+    sendText: async (chatId, text) => { sent.push(text); return { message_id: 10086 } },
+    editMessageText: async (chatId, messageId, text) => { edited.push(text); return {} },
+  }
+  const node = new TelegramConversationNode(ctx, { allowFrom: ['1003'], sendChunkDelayMs: 1 }, ctx.logger())
+  node._lastPeer = { chatId: '1003' }
+  node.activeSessionId = 'sess_1'
+
+  await ctx.emit('session/event', { id: 'sess_1' }, { type: 'turn/start' })
+  await node.sendText('第一轮内容')
+  await ctx.emit('session/event', { id: 'sess_1' }, { type: 'turn/end' })
+
+  // 只看第二轮产生的出站（新轮次会用**新消息**起流，不是编辑上一条）
+  const sentBefore = sent.length
+  const editedBefore = edited.length
+  await ctx.emit('session/event', { id: 'sess_1' }, { type: 'turn/start' })
+  await node.sendText('第二轮内容')
+  const secondTurnOut = [...sent.slice(sentBefore), ...edited.slice(editedBefore)].join('\n')
+  assert.ok(secondTurnOut.includes('第二轮内容'), `应包含第二轮内容，实际: ${secondTurnOut}`)
+  assert.ok(!secondTurnOut.includes('第一轮内容'), `新轮次不得携带上一轮文本，实际: ${secondTurnOut}`)
+  await ctx.emit('session/event', { id: 'sess_1' }, { type: 'turn/end' })
+})
+
 test('TelegramConversationNode handles cmd:xxx callback query action button click', async () => {
   const ctx = makeMockCordisCtx()
   const answered = []
