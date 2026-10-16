@@ -56,6 +56,17 @@ bin/cloudflared*
 # Scratch / 复现与验收产物（含 Chrome for Testing 缓存，体积可达数百 MB）
 scratch/
 
+# IM 接收附件落盘目录（各平台把用户发来的图片与文件存到**会话工作区**里）。
+# 内容属于**用户隐私数据**（截图、文档等），绝不能被提交进仓库。
+# 路径由各平台 node.js 的 _processMedia/_processAttachments 决定：
+#   lib/feishu/node.js   → .feishu-media
+#   lib/qq/node.js       → .qq-media
+#   lib/wechat/node.js   → .wechat-media
+# 用 `**/` 前缀：这些目录位于会话工作区内，可能出现在仓库任意层级。
+**/.feishu-media/
+**/.qq-media/
+**/.wechat-media/
+
 # Debug
 debug.log
 
