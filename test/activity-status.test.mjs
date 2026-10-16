@@ -361,3 +361,60 @@ test('[活动] 飞书：状态行用引用块+斜体（与正文区分），且 
   // 结构仍然完好（外层斜体闭合在行尾）
   assert.match(evil, /^> _[\s\S]*_\n\n这是正文。$/, '转义后样式结构应保持完整')
 })
+
+// ---------- Telegram：同一套状态呈现 ----------
+
+test('[活动] Telegram：状态行同样是引用块+斜体，且能正确转成 HTML', async () => {
+  const { TelegramConversationNode } = await import('../lib/telegram/node.js')
+  const { activityParts } = await import('../lib/platform/activity.js')
+  const { formatTelegramHtml } = await import('../lib/telegram/gateway.js')
+
+  const events = {}
+  const ctx = {
+    on(e, f) { (events[e] ??= []).push(f); return () => {} },
+    async emit(e, ...a) { for (const f of [...(events[e] ?? [])]) await f(...a) },
+    effect(f) { return f() },
+    logger: () => ({ info() {}, warn() {}, error() {}, debug() {} }),
+    sessions: { list: () => [], get: () => undefined },
+    agents: { create: async () => ({}), get: () => undefined },
+  }
+  const edited = []
+  ctx.telegram = {
+    sendText: async () => ({ message_id: 1 }),
+    editMessageText: async (c, m, t) => { edited.push(t); return {} },
+  }
+  const node = new TelegramConversationNode(ctx, { allowFrom: ['1003'], sendChunkDelayMs: 1 }, ctx.logger())
+  node._lastPeer = { chatId: '1003' }
+  node.activeSessionId = 's1'
+
+  // 桥调的是 platform 上的方法（与飞书同一约定）
+  assert.equal(typeof node.platform?.setActivityStatus, 'function')
+
+  await ctx.emit('session/event', { id: 's1' }, { type: 'turn/start', data: { turn: 1 } })
+  await node.sendText('第一段正文')
+  await node.setActivityStatus(null, null, activityParts({ turn: 3, toolName: 'bash', args: { command: 'npm test' } }))
+
+  const md = edited.at(-1)
+  assert.match(md, /^> _/, '状态行应为引用块+斜体')
+  assert.match(md, /第一段正文/, '正文不能丢')
+  // 关键：Telegram 若不支持 `_斜体_` 会把下划线原样显示（实测过），这里锁住转换结果
+  const html = formatTelegramHtml(md)
+  assert.match(html, /<blockquote><i>/, `应转成 blockquote+italic，实际: ${html}`)
+  assert.doesNotMatch(html, /_⌨️/, '不得把下划线原样显示出来')
+
+  // 结束后状态消失
+  await ctx.emit('session/event', { id: 's1' }, { type: 'turn/end', data: { reason: { kind: 'complete' } } })
+  await new Promise((r) => setTimeout(r, 10))
+  assert.ok(!/正在运行命令/.test(edited.at(-1) ?? ''), '结束后不应残留状态')
+})
+
+test('[活动] Telegram 的 HTML 转换：单下划线成斜体，但 my_var / __bold__ 不受影响', async () => {
+  const { formatTelegramHtml } = await import('../lib/telegram/gateway.js')
+  assert.equal(formatTelegramHtml('> _状态_'), '<blockquote><i>状态</i></blockquote>')
+  assert.equal(formatTelegramHtml('普通的 _斜体_ 文本'), '普通的 <i>斜体</i> 文本')
+  // 词内下划线（变量名）不能被当成斜体
+  assert.equal(formatTelegramHtml('my_var'), 'my_var')
+  assert.equal(formatTelegramHtml('a_b_c'), 'a_b_c')
+  // 双下划线是加粗，不是斜体
+  assert.equal(formatTelegramHtml('__bold__'), '<b>bold</b>')
+})
