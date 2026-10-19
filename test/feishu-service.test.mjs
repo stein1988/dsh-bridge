@@ -1415,3 +1415,29 @@ test('[飞书] issue #77①：getStatus().config 回读 showActivity / changesDi
     svc.dispose()
   }
 })
+
+test('issue #78: FeishuService 支持 instanceId / displayName 与备注名回显持久化', async () => {
+  const ctx = makeMockCordisCtx()
+  const persisted = []
+  const svc = new FeishuService({
+    ctx,
+    logger: ctx.logger(),
+    config: { name: '老备注' },
+    instanceId: 'feishu:2',
+    onPersist: async (patch) => { persisted.push(patch) },
+  })
+  try {
+    svc.displayName = 'feishu 2'
+    const status = svc.getStatus()
+    assert.equal(status.instanceId, 'feishu:2')
+    assert.equal(status.platformId, 'feishu')
+    assert.equal(status.displayName, 'feishu 2')
+    assert.equal(status.config.name, '老备注', '备注名必须可回显')
+
+    await svc.setConfig({ name: '  新备注  ' })
+    assert.equal(svc.getStatus().config.name, '新备注', '备注名应 trim 后回显')
+    assert.equal(persisted.at(-1).name, '新备注', '备注名应随 setConfig 持久化到该 account')
+  } finally {
+    await svc.destroy?.()
+  }
+})

@@ -296,6 +296,8 @@ dsh plugin --profile desktop add @wenbin_wb/dsh-bridge
 
 无需打开浏览器，直接在常用聊天软件中与本地 Agent 对话、下达任务、接收进度与审批操作：
 
+* **🔀 同平台多账号**：微信 / QQ / 飞书 / Telegram 均可在一台机器上并行挂**多个同平台机器人**（例如两个飞书自建应用「小鲸」「小秤」），凭证、人设、工作区、白名单与会话归属各自隔离；设置页「＋ 添加账号」即可新增，单平台最多 10 个。详见 [同平台多账号指南](docs/multi-account.md)。
+
 ---
 
 #### 🟢 微信 Bot（ClawBot / iLink）

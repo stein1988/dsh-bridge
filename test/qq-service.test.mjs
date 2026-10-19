@@ -358,3 +358,29 @@ test('QqGateway sendStream passes content_type markdown through', () => {
     gw.dispose()
   }
 })
+
+test('issue #78: QqService 支持 instanceId / displayName 与备注名回显持久化', async () => {
+  const ctx = makeMockCordisCtx()
+  const persisted = []
+  const svc = new QqService({
+    ctx,
+    logger: ctx.logger,
+    config: { name: '老备注' },
+    instanceId: 'qq:2',
+    onPersist: async (patch) => { persisted.push(patch) },
+  })
+  try {
+    svc.displayName = 'qq 2'
+    const status = svc.getStatus()
+    assert.equal(status.instanceId, 'qq:2')
+    assert.equal(status.platformId, 'qq')
+    assert.equal(status.displayName, 'qq 2')
+    assert.equal(status.config.name, '老备注', '备注名必须可回显')
+
+    await svc.setConfig({ name: '  新备注  ' })
+    assert.equal(svc.getStatus().config.name, '新备注', '备注名应 trim 后回显')
+    assert.equal(persisted.at(-1).name, '新备注', '备注名应随 setConfig 持久化到该 account')
+  } finally {
+    await svc.destroy?.()
+  }
+})

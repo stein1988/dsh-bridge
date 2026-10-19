@@ -1612,14 +1612,99 @@ const AccessAuthCard = React.memo(function AccessAuthCard({ auth, rpcCall, onUpd
   );
 });
 
+// ---- 同平台多账号（issue #78）----
+//
+// 一个平台类型（platformId：feishu/wechat/qq/telegram）下可以有 N 个账号实例
+// （instanceId：迁移来的首个账号为 type，新增账号为 type:2、type:3…）。
+// 每个实例独立凭证/白名单/会话归属，服务端 listPlatforms 以 instanceId 为键返回
+// status（含 instanceId / platformId / displayName），面板据此按类型过滤出账号列表。
+
+/** 单类型账号上限：与服务端硬校验保持一致（超出时服务端返回可读错误） */
+const PLATFORM_ACCOUNT_LIMIT = 10;
+
+/**
+ * 从 listPlatforms 返回值里过滤出某个平台类型下的全部账号（保持服务端返回顺序 =
+ * 账号配置顺序）。兼容旧服务端：没有 platformId/instanceId 时按对象键推断类型，
+ * 旧数据 `platforms[type]` 视为该类型唯一的账号。
+ * @param {Record<string, object>|null|undefined} platforms
+ * @param {string} type
+ * @returns {{ instanceId: string, status: object }[]}
+ */
+function platformAccountsOf(platforms, type) {
+  const accounts = [];
+  for (const [key, status] of Object.entries(platforms ?? {})) {
+    if (!status || typeof status !== 'object') continue;
+    const keyType = String(status.instanceId ?? key).split(':')[0];
+    const platformType = status.platformId ?? status.id ?? keyType;
+    if (platformType !== type) continue;
+    accounts.push({ instanceId: status.instanceId ?? key, status });
+  }
+  return accounts;
+}
+
+/**
+ * 账号展示名：优先用服务端 displayName（name 为空时由服务端合成「平台名 + 序号」，
+ * 见契约 §1）；旧服务端没有该字段时按同样的规则在本地兜底。
+ */
+function accountDisplayName(status, platformLabel, index) {
+  const displayName = typeof status?.displayName === 'string' ? status.displayName.trim() : '';
+  return displayName || `${platformLabel} ${index}`;
+}
+
+function isPlatformStatusActive(status) {
+  return status === 'connected' || status === 'starting' || status === 'reconnecting';
+}
+
 // ---- 通用 IM 平台卡片 ----
 
-function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platformRecommended = false }) {
+function PlatformCard({
+  platformId,
+  platformName,
+  platformDesc,
+  rpcCall,
+  platformRecommended = false,
+  // 多账号（issue #78）：instanceId 是服务端唯一键，卡片内所有平台 RPC 都用它定位账号；
+  // displayName 用于卡片头部展示；accountIndex/accountCount 用于「账号 N/M」标记。
+  instanceId,
+  displayName = '',
+  accountIndex = 1,
+  accountCount = 1,
+  highlight = false,
+  onAccountRemoved,
+  onAccountRenamed,
+}) {
   const [platform, setPlatform] = React.useState(null);
   const [err, setErr] = React.useState(null);
   const [busy, setBusy] = React.useState(false);
   const [showAdvanced, setShowAdvanced] = React.useState(false);
   const [showHelp, setShowHelp] = React.useState(false);
+
+  // 账号备注名草稿：服务端在 status.config.name 回传已保存的备注名（未设置为空串）；
+  // 输入框失焦 / 回车时经 platformSetConfig 保存，空串表示清除备注、回到自动展示名。
+  const savedAccountName = typeof platform?.config?.name === 'string' ? platform.config.name : undefined;
+  const [nameDraft, setNameDraft] = React.useState('');
+  React.useEffect(() => {
+    if (savedAccountName !== undefined) setNameDraft(savedAccountName);
+  }, [savedAccountName, instanceId]);
+
+  // 「添加账号」后新卡片要滚入可视区并短暂高亮（highlight 由父组件按 instanceId 下发）
+  const cardRef = React.useRef(null);
+  React.useEffect(() => {
+    if (!highlight) return;
+    const el = cardRef.current;
+    if (el && typeof el.scrollIntoView === 'function') {
+      try { el.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); } catch {}
+    }
+  }, [highlight, platform?.instanceId]);
+
+  // 卡片容器：新添账号短暂高亮（品牌色描边），便于在账号列表里定位
+  const cardStyle = highlight
+    ? {
+        ...s.card,
+        border: '1px solid var(--dsw-alias-brand-primary,#4f6ef7)',
+        boxShadow: '0 0 0 1px var(--dsw-alias-brand-primary,#4f6ef7)',
+      }
+    : s.card;
 
   // 高级设置本地草稿
   const [cfgDraft, setCfgDraft] = React.useState(null);
@@ -1672,14 +1757,16 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
       if (currentSeq !== seqRef.current) return; // 丢弃过时响应
       if (!r?.ok) throw new Error(r?.error?.message ?? 'RPC failed');
       const allPlatforms = r.value ?? {};
-      setPlatform(allPlatforms[platformId] ?? null);
+      // 多账号：listPlatforms 以 instanceId 为键；旧服务端键仍是 platformId（= 迁移账号的
+      // instanceId），两种情况下按 instanceId 精确取本卡片对应的那一个账号。
+      setPlatform(allPlatforms[instanceId] ?? null);
       if (!quiet) setErr(null);
     } catch (e) {
       if (currentSeq === seqRef.current && !quiet) setErr(e.message);
     } finally {
       loadInFlightRef.current = false;
     }
-  }, [rpcCall, platformId]);
+  }, [rpcCall, instanceId]);
 
   // 轮询：登录中（qr/scaned）快速刷新，其余放慢
   React.useEffect(() => {
@@ -1693,7 +1780,8 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
   const act = React.useCallback(async (endpoint, payload) => {
     setBusy(true);
     try {
-      const r = await rpcCall(endpoint, { platformId, ...payload });
+      // 多账号：所有平台操作统一按 instanceId 定位账号（服务端兼容回退 platformId）
+      const r = await rpcCall(endpoint, { instanceId, ...payload });
       if (!r?.ok) throw new Error(r?.error?.message ?? 'RPC failed');
       setPlatform(r.value);
       setErr(null);
@@ -1703,7 +1791,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
     } finally {
       setBusy(false);
     }
-  }, [rpcCall, load, platformId]);
+  }, [rpcCall, load, instanceId]);
 
   const onLogin = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformLogin, {}), [act]);
   // 飞书一键创建应用：官方 registerApp 扫码流程（返回后由轮询刷新二维码与结果）
@@ -1718,6 +1806,35 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
     return act(BRIDGE_ENDPOINTS.platformLogin, {});
   }, [act, platform?.configured]);
 
+  // 保存备注名（失焦 / 回车触发，不增加额外按钮点击）：只写本账号的 name 字段
+  const saveAccountName = React.useCallback(async () => {
+    const next = nameDraft.trim();
+    if (next === (savedAccountName ?? '').trim()) return;
+    await act(BRIDGE_ENDPOINTS.platformSetConfig, { name: next });
+    onAccountRenamed?.(instanceId);
+  }, [act, nameDraft, savedAccountName, onAccountRenamed, instanceId]);
+
+  // 移除账号（高危）：二次确认后按 instanceId 删除该账号的配置与会话归属；
+  // 只删该插件账号，不动 DSH 会话本身。最后一个账号也允许移除（类型回到空状态）。
+  const removeAccount = React.useCallback(async () => {
+    if (busy) return;
+    const label = displayName || platformName;
+    // displayName 可能是服务端合成的中文展示名（如「飞书 2」）：英文界面下先过本地化
+    // 词典再嵌入确认文案；用户自定义备注名不在词典中，原样展示。
+    if (!window.confirm(localeT('确认移除账号「${name}」？将停止该账号并删除其配置与会话归属；DSH 会话本身不会被删除。', { name: localeT(label) }))) return;
+    setBusy(true);
+    try {
+      const r = await rpcCall(BRIDGE_ENDPOINTS.platformRemoveAccount, { instanceId });
+      if (!r?.ok) throw new Error(r?.error?.message ?? '移除账号失败');
+      setErr(null);
+      onAccountRemoved?.(instanceId);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }, [busy, displayName, platformName, rpcCall, instanceId, onAccountRemoved]);
+
   // 白名单管理
   const [newId, setNewId] = React.useState('');
   const addAllow = React.useCallback(async () => {
@@ -1726,7 +1843,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
     const list = [...(platform?.allowFrom ?? []), id];
     setBusy(true);
     try {
-      const r = await rpcCall(BRIDGE_ENDPOINTS.platformSetAllowFrom, { platformId, allowFrom: list });
+      const r = await rpcCall(BRIDGE_ENDPOINTS.platformSetAllowFrom, { instanceId, allowFrom: list });
       if (!r?.ok) throw new Error(r?.error?.message ?? '添加白名单失败');
       setPlatform(r.value);
       setNewId('');
@@ -1737,7 +1854,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
     } finally {
       setBusy(false);
     }
-  }, [rpcCall, platformId, newId, platform?.allowFrom, load]);
+  }, [rpcCall, instanceId, newId, platform?.allowFrom, load]);
   const removeAllow = React.useCallback(async (id) => {
     const list = (platform?.allowFrom ?? []).filter((x) => x !== id);
     await act(BRIDGE_ENDPOINTS.platformSetAllowFrom, { allowFrom: list });
@@ -1815,13 +1932,13 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
   );
 
   if (!platform && !err) {
-    return h('div', { style: s.card },
-      h('div', { style: s.label }, platformName),
+    return h('div', { style: cardStyle, ref: cardRef },
+      h('div', { style: s.label }, displayName || platformName),
       h('div', { style: { ...s.muted, marginTop: 6 } }, '加载中…'),
     );
   }
 
-  const connected = platform?.status === 'connected' || platform?.status === 'starting' || platform?.status === 'reconnecting';
+  const connected = isPlatformStatusActive(platform?.status);
   const login = platform?.login ?? {};
   const showQr = login.phase === 'qr' || login.phase === 'scaned';
   const statusLabel = platform?.status === 'connected' ? '已连接'
@@ -1831,16 +1948,26 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
     : platform?.status === 'error' ? '错误'
     : '未连接';
 
-  return h('div', { style: s.card },
+  return h('div', { style: cardStyle, ref: cardRef },
+    // 卡片头部：account displayName（用户备注名或「平台名 + 序号」）+ 状态 + 移除账号
     h('div', { style: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: 10 } },
       h('div', { style: { flex: '1 1 auto', minWidth: 0 } },
-        h('div', { style: { ...s.label, display: 'flex', alignItems: 'center', gap: 7 } },
+        h('div', { style: { ...s.label, display: 'flex', alignItems: 'center', gap: 7, flexWrap: 'wrap' } },
           platformId === 'wechat' && h(Icons.wechat, { style: { color: '#07C160', width: 20, height: 20 } }),
           platformId === 'qq' && h(Icons.qq, { style: { color: '#12B7F5', width: 20, height: 20 } }),
           platformId === 'feishu' && h(Icons.feishu, { style: { color: '#00D6B9', width: 20, height: 20 } }),
           platformId === 'telegram' && h(Icons.telegram, { style: { color: '#24A1DE', width: 20, height: 20 } }),
-          platformName,
-          platformRecommended && h('span', {
+          displayName || platformName,
+          accountCount > 1 && h('span', {
+            style: {
+              fontSize: 10, lineHeight: '16px', padding: '0 6px', borderRadius: 8,
+              border: '1px solid var(--dsw-alias-border-l2,#d1d5db)',
+              color: 'var(--dsw-alias-label-tertiary,#6b7280)',
+              background: 'var(--dsw-alias-bg-layer-1,#fff)',
+              fontWeight: 500, flexShrink: 0,
+            },
+          }, localeT('账号 ${index}/${total}', { index: accountIndex, total: accountCount })),
+          platformRecommended && accountIndex === 1 && h('span', {
             style: {
               fontSize: 10, lineHeight: '16px', padding: '0 6px', borderRadius: 8,
               border: '1px solid var(--dsw-alias-brand-primary,#4f6ef7)',
@@ -1852,7 +1979,37 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
         ),
         h('div', { style: { ...s.muted, marginTop: 2 } }, platformDesc),
       ),
-      h(StatusTag, { status: platform?.status, running: connected }),
+      h('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6, flexShrink: 0 } },
+        h(StatusTag, { status: platform?.status, running: connected }),
+        h('button', {
+          style: {
+            ...s.btnGhost,
+            color: 'var(--dsw-alias-label-primary, #0f1115)',
+            borderColor: 'var(--dsw-alias-state-error-primary,#dc2626)',
+            height: 28,
+            padding: '0 10px',
+            fontSize: 12,
+            opacity: busy ? 0.5 : 1,
+          },
+          disabled: busy,
+          onClick: removeAccount,
+          title: localeT('停止该账号并删除其配置与会话归属（不会删除 DSH 会话本身）'),
+        }, '移除账号'),
+      ),
+    ),
+
+    // 账号备注名：失焦 / 回车保存（走 platformSetConfig 的 name 字段）。
+    // 单账号时也展示（用于给账号起个可读名字），不引入额外点击步骤。
+    h('div', { style: { display: 'flex', gap: 8, alignItems: 'center', marginTop: 10, flexWrap: 'wrap' } },
+      h('input', {
+        style: { ...s.input, flex: '1 1 220px', minWidth: 0 },
+        placeholder: localeT('备注名（可选，用于区分同平台多个账号）'),
+        value: nameDraft,
+        onChange: (e) => setNameDraft(e.target.value),
+        onBlur: () => { void saveAccountName(); },
+        onKeyDown: (e) => { if (e.key === 'Enter') e.currentTarget.blur(); },
+        disabled: busy,
+      }),
     ),
 
     // 快捷入口：使用说明 / 开放平台 / 命令速查
@@ -2193,6 +2350,8 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
 
     // 未配置 / 登录中：表单（QQ / 飞书 / Telegram）或二维码（微信）
     (!platform?.configured || showQr) && h('div', { style: s.block },
+      !platform?.configured && !showQr && h('div', { style: { ...s.muted, marginBottom: 8 } },
+        '未配置凭证 — 请先完成下方配置。'),
       showQr && login.qr
         ? h('div', null,
             h('img', { src: login.qr, alt: 'login QR', style: s.qr }),
@@ -3474,6 +3633,18 @@ function BridgePanel({ rpcCall, preferredTab }) {
   const [platformsSeq, setPlatformsSeq] = React.useState(0);
   // 默认选中飞书（面板顺序第一、接入门槛最低：扫码一键创建）
   const [selectedPlatform, setSelectedPlatform] = React.useState('feishu');
+  // 多账号（issue #78）：添加账号请求状态 / 错误（服务端错误原样展示）、
+  // 以及「刚添加的账号」高亮定位（新卡片滚入可视区并短暂描边）。
+  const [addingAccount, setAddingAccount] = React.useState(false);
+  const [accountsError, setAccountsError] = React.useState(null);
+  const [recentAccountId, setRecentAccountId] = React.useState(null);
+  React.useEffect(() => {
+    if (!recentAccountId) return;
+    const t = setTimeout(() => setRecentAccountId(null), 4000);
+    return () => clearTimeout(t);
+  }, [recentAccountId]);
+  // 切换平台类型时清掉上一个类型的添加错误，避免串台展示
+  React.useEffect(() => { setAccountsError(null); }, [selectedPlatform]);
 
   // 隧道页"主入口"地址复制反馈
   const [copiedUrl, setCopiedUrl] = React.useState('');
@@ -3695,6 +3866,41 @@ function BridgePanel({ rpcCall, preferredTab }) {
   // 这里与服务端同源地提前判断，点击时立即给出可读原因，而不是只写顶部横幅。
   const tunnelGate = needsTunnelPassword(status?.auth);
 
+  // ---- 多账号（issue #78）：添加 / 移除账号后的列表刷新与定位 ----
+  // 刷新由 listPlatforms 轮询 effect 承担：platformsSeq 变化会立即重跑一次轮询。
+  const refreshPlatforms = React.useCallback(() => setPlatformsSeq((seq) => seq + 1), []);
+  const addPlatformAccount = React.useCallback(async () => {
+    if (addingAccount) return;
+    setAddingAccount(true);
+    setAccountsError(null);
+    try {
+      const r = await authRpcCall(BRIDGE_ENDPOINTS.platformAddAccount, { platformId: selectedPlatform });
+      if (!r?.ok) throw new Error(r?.error?.message ?? '添加账号失败');
+      const addedInstanceId = r.value?.instanceId ?? null;
+      refreshPlatforms();
+      // 新账号追加在列表末尾：高亮并滚入可视区，凭证为空由卡片展示「未配置凭证」
+      if (addedInstanceId) setRecentAccountId(addedInstanceId);
+    } catch (e) {
+      setAccountsError(e.message);
+    } finally {
+      setAddingAccount(false);
+    }
+  }, [addingAccount, authRpcCall, selectedPlatform, refreshPlatforms]);
+
+  // 移除成功后先在本地列表删掉该账号（卡片立即消失），随后轮询以服务端结果为准
+  const removePlatformAccountLocally = React.useCallback((removedInstanceId) => {
+    setPlatforms((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev };
+      if (Object.hasOwn(next, removedInstanceId)) delete next[removedInstanceId];
+      for (const [key, value] of Object.entries(next)) {
+        if (value && value.instanceId === removedInstanceId) delete next[key];
+      }
+      return next;
+    });
+    refreshPlatforms();
+  }, [refreshPlatforms]);
+
   const act = React.useCallback(async (endpoint, payload) => {
     try {
       const r = await authRpcCall(endpoint, payload ?? {});
@@ -3914,8 +4120,9 @@ function BridgePanel({ rpcCall, preferredTab }) {
       h(RestartDshCard, { rpcCall: authRpcCall }),
     );
   } else if (activeTab === 'im') {
-    // 从 listPlatforms 动态生成平台列表
-    // 顺序即面板顺序：飞书置顶（扫码一键创建 + 原生斜杠指令 + 云文档评论，接入门槛最低）
+    // 平台类型列表保持静态四项（顺序即面板顺序：飞书置顶——扫码一键创建 + 原生斜杠指令 +
+    // 云文档评论，接入门槛最低）。一个类型下可以有多个账号实例（issue #78），实例列表来自
+    // listPlatforms 的实时轮询；0 账号是合法状态（删光后显示空状态 +「＋ 添加账号」）。
     const IM_PLATFORMS = [
       { id: 'feishu',   label: '飞书',     icon: Icons.feishu,   brandColor: '#00D6B9', desc: '扫码一键创建 · 斜杠指令 · 文档评论', recommended: true },
       { id: 'wechat',   label: '微信',     icon: Icons.wechat,   brandColor: '#07C160', desc: 'ClawBot 扫码直连 · 无需公网' },
@@ -3936,7 +4143,21 @@ function BridgePanel({ rpcCall, preferredTab }) {
         flexShrink: 0,
       },
     }, '推荐');
-    
+
+    const platformsLoaded = platforms !== null && !platformsError;
+    const selectedMeta = IM_PLATFORMS.find((p) => p.id === selectedPlatform);
+    const selectedLabel = selectedMeta?.label ?? selectedPlatform;
+    const accounts = platformAccountsOf(platforms, selectedPlatform);
+    const atAccountLimit = accounts.length >= PLATFORM_ACCOUNT_LIMIT;
+    const renderAddAccountButton = ({ primary = false } = {}) => h('button', {
+      style: { ...(primary ? s.btnPri : s.btnGhost), opacity: (addingAccount || atAccountLimit) ? 0.5 : 1, whiteSpace: 'nowrap' },
+      onClick: addPlatformAccount,
+      disabled: addingAccount || atAccountLimit,
+      title: atAccountLimit
+        ? localeT('每个平台最多 ${limit} 个账号', { limit: PLATFORM_ACCOUNT_LIMIT })
+        : localeT('添加一个新账号（同一平台可接入多个账号）'),
+    }, addingAccount ? '添加中…' : '＋ 添加账号');
+
     tabContent = h('div', null,
       // #55：清单查询失败时显错 + 重试，不再静默画成“即将支持”
       platformsError && h('div', {
@@ -3948,17 +4169,15 @@ function BridgePanel({ rpcCall, preferredTab }) {
           style: { cursor: 'pointer', borderRadius: 6, padding: '4px 12px' },
         }, '重试'),
       ),
-      // 平台选择器（可点击切换）
+      // 平台类型选择器：四个类型恒可点击（0 账号也必须能进入空状态添加第一个账号；
+      // 不能按「至少一个实例」置灰，否则删光账号后永远回不来）。点击后进入该类型账号列表。
       h('div', {
         style: { display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' },
       },
         IM_PLATFORMS.map(({ id, label, icon: IconComponent, brandColor, desc, recommended }) => {
-          // #55：四个平台全量支持，不存在“即将支持”——缺数据只可能是加载中或异常
-          const loaded = platforms !== null && !platformsError;
-          const platformData = loaded ? platforms[id] : undefined;
-          const available = !!platformData;
-          const active = platformData?.status === 'connected' || platformData?.status === 'starting' || platformData?.status === 'reconnecting';
-          
+          // 可用性只用于展示（有账号 / 未连接 / 未添加账号），不作为进入 Tab 的前置条件
+          const typeAccounts = platformAccountsOf(platforms, id);
+          const active = typeAccounts.some(({ status }) => isPlatformStatusActive(status?.status));
           return h('div', {
             key: id,
             style: {
@@ -3966,13 +4185,12 @@ function BridgePanel({ rpcCall, preferredTab }) {
               border: `1px solid ${selectedPlatform === id ? 'var(--dsw-alias-brand-primary,#4f6ef7)' : active ? 'var(--dsw-alias-state-success-primary,#10b981)' : 'var(--dsw-alias-border-l2,#e5e7eb)'}`,
               borderRadius: 10,
               padding: '12px 14px',
-              opacity: available ? 1 : 0.5,
-              cursor: available ? 'pointer' : 'not-allowed',
+              cursor: 'pointer',
               background: selectedPlatform === id ? 'var(--dsw-alias-state-info-bg,#eff6ff)' : active ? 'var(--dsw-alias-state-success-bg,#ecfdf5)' : 'var(--dsw-alias-bg-layer-2,#f9fafb)',
               boxShadow: selectedPlatform === id ? '0 0 0 1px var(--dsw-alias-brand-primary,#4f6ef7)' : 'none',
               transition: 'all 0.15s ease',
             },
-            onClick: available ? () => setSelectedPlatform(id) : undefined,
+            onClick: () => setSelectedPlatform(id),
           },
             h('div', { style: { ...s.label, fontSize: 13, display: 'flex', alignItems: 'center', justifyContent: 'space-between' } },
               h('span', { style: { display: 'flex', alignItems: 'center', gap: 7, minWidth: 0 } },
@@ -3983,26 +4201,66 @@ function BridgePanel({ rpcCall, preferredTab }) {
               active && h('span', {
                 style: { width: 6, height: 6, borderRadius: '50%', background: 'var(--dsw-alias-state-success-primary,#10b981)', flexShrink: 0 },
               }),
-              !active && available && h('span', {
+              platformsError && h('span', {
+                style: { fontSize: 11, color: 'var(--dsw-alias-label-tertiary,#9ca3af)', fontWeight: 400 },
+              }, '数据缺失'),
+              !platformsError && platforms === null && h('span', {
+                style: { fontSize: 11, color: 'var(--dsw-alias-label-tertiary,#9ca3af)', fontWeight: 400 },
+              }, '加载中…'),
+              !platformsError && platformsLoaded && typeAccounts.length === 0 && h('span', {
+                style: { fontSize: 11, color: 'var(--dsw-alias-label-tertiary,#9ca3af)', fontWeight: 400 },
+              }, '未添加账号'),
+              !active && !platformsError && platformsLoaded && typeAccounts.length > 0 && h('span', {
                 style: { fontSize: 11, color: 'var(--dsw-alias-label-tertiary,#6b7280)', fontWeight: 400 },
               }, '未连接'),
-              !available && h('span', {
-                style: { fontSize: 11, color: 'var(--dsw-alias-label-tertiary,#9ca3af)', fontWeight: 400 },
-              }, !loaded ? '加载中…' : '数据缺失'),
             ),
             h('div', { style: { ...s.muted, marginTop: 4, fontSize: 11 } }, desc),
+            typeAccounts.length > 1 && h('div', {
+              style: { marginTop: 6, fontSize: 11, color: 'var(--dsw-alias-brand-primary,#4f6ef7)', fontWeight: 500 },
+            }, localeT('${count} 个账号', { count: typeAccounts.length })),
           );
         }),
       ),
-      // 显示选中的平台卡片（带有 key 保证切换时重置表单状态）
-      selectedPlatform && platforms?.[selectedPlatform] && h(PlatformCard, {
-        key: selectedPlatform,
-        platformRecommended: IM_PLATFORMS.find(p => p.id === selectedPlatform)?.recommended === true,
-        platformId: selectedPlatform,
-        platformName: IM_PLATFORMS.find(p => p.id === selectedPlatform)?.label ?? selectedPlatform,
-        platformDesc: IM_PLATFORMS.find(p => p.id === selectedPlatform)?.desc ?? '',
-        rpcCall: authRpcCall,
-      }),
+      // 选中类型的账号列表：每个账号一张完整卡片；0 账号显示空状态
+      platformsLoaded && h('div', null,
+        accounts.length > 0 && h('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 10, flexWrap: 'wrap' } },
+          h('div', { style: { ...s.muted } }, localeT('账号列表（${count} 个）', { count: accounts.length })),
+          renderAddAccountButton(),
+        ),
+        // 服务端错误（添加失败 / 上限 / 查重等）原样展示，不吞
+        accountsError && h('div', { style: { ...s.err, marginBottom: 12 } }, accountsError),
+        atAccountLimit && h('div', { style: { ...s.muted, marginBottom: 10 } },
+          localeT('已达单平台账号上限（最多 ${limit} 个）', { limit: PLATFORM_ACCOUNT_LIMIT })),
+        accounts.length === 0
+          ? h('div', {
+              style: { ...s.card, textAlign: 'center', padding: '28px 20px' },
+            },
+              h('div', { style: { fontSize: 30, lineHeight: '38px', marginBottom: 8 } }, '➕'),
+              h('div', { style: { ...s.label, fontSize: 14, fontWeight: 600 } },
+                localeT('还没有添加「${name}」账号', { name: localeT(selectedLabel) })),
+              h('div', { style: { ...s.muted, marginTop: 6, marginBottom: 14, lineHeight: 1.6 } },
+                localeT('添加账号后可填写该账号的凭证并独立连接；同一平台支持同时接入多个账号，凭证、白名单与会话归属互不影响。')),
+              renderAddAccountButton({ primary: true }),
+            )
+          : accounts.map(({ instanceId, status }, index) => h(PlatformCard, {
+              // key 用 instanceId：切换类型 / 账号增删时保证每张卡片状态跟随账号，不串号
+              key: instanceId,
+              instanceId,
+              displayName: accountDisplayName(status, selectedLabel, index + 1),
+              accountIndex: index + 1,
+              accountCount: accounts.length,
+              highlight: recentAccountId === instanceId,
+              platformRecommended: selectedMeta?.recommended === true,
+              platformId: selectedPlatform,
+              platformName: selectedLabel,
+              platformDesc: selectedMeta?.desc ?? '',
+              rpcCall: authRpcCall,
+              onAccountRemoved: removePlatformAccountLocally,
+              onAccountRenamed: refreshPlatforms,
+            })),
+      ),
+      // 清单还没回来时给个明确的加载态（不是“数据缺失”）
+      platforms === null && !platformsError && h('div', { style: { ...s.muted, padding: '12px 2px' } }, '加载中…'),
     );
   }
 

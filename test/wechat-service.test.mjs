@@ -107,3 +107,29 @@ test('WechatService registers into PlatformManager and aggregates status', async
     manager.dispose()
   }
 })
+
+test('issue #78: WechatService 支持 instanceId / displayName 与备注名回显持久化', async () => {
+  const ctx = makeMockCordisCtx()
+  const persisted = []
+  const svc = new WechatService({
+    ctx,
+    logger: ctx.logger,
+    config: { name: '老备注' },
+    instanceId: 'wechat:2',
+    onPersist: async (patch) => { persisted.push(patch) },
+  })
+  try {
+    svc.displayName = 'wechat 2'
+    const status = svc.getStatus()
+    assert.equal(status.instanceId, 'wechat:2')
+    assert.equal(status.platformId, 'wechat')
+    assert.equal(status.displayName, 'wechat 2')
+    assert.equal(status.config.name, '老备注', '备注名必须可回显')
+
+    await svc.setConfig({ name: '  新备注  ' })
+    assert.equal(svc.getStatus().config.name, '新备注', '备注名应 trim 后回显')
+    assert.equal(persisted.at(-1).name, '新备注', '备注名应随 setConfig 持久化到该 account')
+  } finally {
+    await svc.destroy?.()
+  }
+})

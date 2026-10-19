@@ -274,6 +274,8 @@ Open **"Security"** tab to establish bank-grade protection for your local develo
 
 Interact with local AI agents directly inside your favorite messaging apps without opening a browser:
 
+* **🔀 Multiple accounts per platform**: WeChat / QQ / Feishu / Telegram can each run **several bots of the same platform in parallel** on one machine (e.g. two Feishu self-built apps, "Whale" and "Scale"), with credentials, persona, workspace, allow-list and session ownership fully isolated. Add one via **"+ Add account"** in Settings (up to 10 per platform). See the [multi-account guide](docs/multi-account.md) (Chinese).
+
 ---
 
 #### 🟢 WeChat Bot (ClawBot / iLink)

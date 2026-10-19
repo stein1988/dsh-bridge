@@ -2076,6 +2076,25 @@ var panelEn = {
   "\u5E73\u53F0\u6E05\u5355\u52A0\u8F7D\u5931\u8D25\uFF1A${reason}": "Failed to load the platform list: ${reason}",
   "\u91CD\u8BD5": "Retry",
   "\u6570\u636E\u7F3A\u5931": "Missing data",
+  // 同平台多账号（issue #78）
+  "\u672A\u6DFB\u52A0\u8D26\u53F7": "No accounts",
+  "${count} \u4E2A\u8D26\u53F7": ["${count} account", "${count} accounts"],
+  "\u8D26\u53F7\u5217\u8868\uFF08${count} \u4E2A\uFF09": "Accounts (${count})",
+  "\u8D26\u53F7 ${index}/${total}": "Account ${index}/${total}",
+  "\uFF0B \u6DFB\u52A0\u8D26\u53F7": "+ Add account",
+  "\u6DFB\u52A0\u4E2D\u2026": "Adding\u2026",
+  "\u6DFB\u52A0\u8D26\u53F7\u5931\u8D25": "Failed to add the account",
+  "\u6DFB\u52A0\u4E00\u4E2A\u65B0\u8D26\u53F7\uFF08\u540C\u4E00\u5E73\u53F0\u53EF\u63A5\u5165\u591A\u4E2A\u8D26\u53F7\uFF09": "Add another account (a platform can host multiple accounts)",
+  "\u8FD8\u6CA1\u6709\u6DFB\u52A0\u300C${name}\u300D\u8D26\u53F7": "No ${name} account added yet",
+  "\u6DFB\u52A0\u8D26\u53F7\u540E\u53EF\u586B\u5199\u8BE5\u8D26\u53F7\u7684\u51ED\u8BC1\u5E76\u72EC\u7ACB\u8FDE\u63A5\uFF1B\u540C\u4E00\u5E73\u53F0\u652F\u6301\u540C\u65F6\u63A5\u5165\u591A\u4E2A\u8D26\u53F7\uFF0C\u51ED\u8BC1\u3001\u767D\u540D\u5355\u4E0E\u4F1A\u8BDD\u5F52\u5C5E\u4E92\u4E0D\u5F71\u54CD\u3002": "After adding an account, fill in its credentials to connect it independently. A platform can host multiple accounts with separate credentials, allowlists and session bindings.",
+  "\u6BCF\u4E2A\u5E73\u53F0\u6700\u591A ${limit} \u4E2A\u8D26\u53F7": "Up to ${limit} accounts per platform",
+  "\u5DF2\u8FBE\u5355\u5E73\u53F0\u8D26\u53F7\u4E0A\u9650\uFF08\u6700\u591A ${limit} \u4E2A\uFF09": "Account limit reached for this platform (max ${limit})",
+  "\u5907\u6CE8\u540D\uFF08\u53EF\u9009\uFF0C\u7528\u4E8E\u533A\u5206\u540C\u5E73\u53F0\u591A\u4E2A\u8D26\u53F7\uFF09": "Note name (optional, tells same-platform accounts apart)",
+  "\u79FB\u9664\u8D26\u53F7": "Remove account",
+  "\u79FB\u9664\u8D26\u53F7\u5931\u8D25": "Failed to remove the account",
+  "\u505C\u6B62\u8BE5\u8D26\u53F7\u5E76\u5220\u9664\u5176\u914D\u7F6E\u4E0E\u4F1A\u8BDD\u5F52\u5C5E\uFF08\u4E0D\u4F1A\u5220\u9664 DSH \u4F1A\u8BDD\u672C\u8EAB\uFF09": "Stop this account and delete its configuration and session binding (the DSH session itself is not deleted)",
+  "\u786E\u8BA4\u79FB\u9664\u8D26\u53F7\u300C${name}\u300D\uFF1F\u5C06\u505C\u6B62\u8BE5\u8D26\u53F7\u5E76\u5220\u9664\u5176\u914D\u7F6E\u4E0E\u4F1A\u8BDD\u5F52\u5C5E\uFF1BDSH \u4F1A\u8BDD\u672C\u8EAB\u4E0D\u4F1A\u88AB\u5220\u9664\u3002": "Remove the account \u201C${name}\u201D? This stops it and deletes its configuration and session binding; the DSH session itself is not deleted.",
+  "\u672A\u914D\u7F6E\u51ED\u8BC1 \u2014 \u8BF7\u5148\u5B8C\u6210\u4E0B\u65B9\u914D\u7F6E\u3002": "No credentials configured \u2014 complete the setup below first.",
   "\u8BBF\u95EE\u5BC6\u7801": "access password",
   "\u8BF7\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\u7BA1\u7406\u6743\u9650\u3002": "Enter the admin password to unlock management.",
   "\u5F53\u524D\u672A\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801\uFF0C\u8F93\u5165\u60A8\u7684\u8BBF\u95EE\u5BC6\u7801\u5373\u53EF\u89E3\u9501\u3002": "No dedicated admin password is set; enter your access password to unlock.",
@@ -2183,6 +2202,11 @@ var serverEn = {
   "PlatformManager \u672A\u521D\u59CB\u5316\uFF0CIM \u5E73\u53F0\u6E05\u5355\u4E0D\u53EF\u7528": "PlatformManager is not initialized; the IM platform list is unavailable",
   "PlatformManager \u672A\u521D\u59CB\u5316": "PlatformManager is not initialized",
   "\u7F3A\u5C11 platformId \u53C2\u6570": "Missing platformId parameter",
+  // 同平台多账号（issue #78）：服务端 add/remove 账号错误
+  "\u5355\u4E2A\u5E73\u53F0\u6700\u591A\u6DFB\u52A0 10 \u4E2A\u8D26\u53F7": "Up to 10 accounts per platform",
+  "\u7F3A\u5C11 instanceId \u53C2\u6570": "Missing instanceId parameter",
+  "\u7F3A\u5C11 instanceId/platformId \u53C2\u6570": "Missing instanceId/platformId parameter",
+  "\u591A\u8D26\u53F7\u80FD\u529B\u672A\u63A5\u7EBF": "Multi-account capability is not wired up",
   "\u96A7\u9053\u670D\u52A1\u5730\u5740\u5FC5\u987B\u662F ws:// \u6216 wss://\uFF08\u4E5F\u63A5\u53D7 http/https\uFF09": "The tunnel server URL must be ws:// or wss:// (http/https is also accepted)",
   "\u8BF7\u8F93\u5165\u5408\u6CD5\u7684\u516C\u7F51\u96A7\u9053\u5730\u5740\uFF08https://...\uFF09": "Enter a valid public tunnel URL (https://...)",
   "\u81EA\u5EFA\u96A7\u9053\u5DF2\u5728\u8FD0\u884C": "The self-hosted tunnel is already running",
@@ -2250,6 +2274,13 @@ var serverEn = {
 };
 var serverPatterns = [
   [/^(.+)（(access_denied|expired_token)）$/, "$1t ($2)"],
+  // 同平台多账号（issue #78）：账号展示名 / 查重 / 类型 / 移除错误（$1t 会再走一遍词典，
+  // 让「飞书 2」这类 displayName 整体英文化）
+  [/^(飞书|微信|QQ|Telegram) (\d+)$/, "$1t $2"],
+  [/^同一应用不能重复添加：该凭证已被「(.*)」使用$/, "This app cannot be added twice: its credentials are already used by \u201C$1t\u201D"],
+  [/^不支持的平台类型: \(空\)$/, "Unsupported platform type: (empty)"],
+  [/^不支持的平台类型: (.*)$/, "Unsupported platform type: $1"],
+  [/^账号不存在: (.*)$/, "Account not found: $1"],
   [/^systemctl 退出码 (.*)$/, "systemctl exit code $1"],
   [/^cloudflared 进程意外退出 \(code=(.*?)(, .*)?\)$/, "cloudflared exited unexpectedly (code=$1$2)"],
   [/^cloudflared 退出，code=(.*) signal=(.*)$/, "cloudflared exited (code=$1, signal=$2)"],
@@ -2841,6 +2872,9 @@ var BRIDGE_ENDPOINTS = {
   platformStop: "platformStop",
   platformStart: "platformStart",
   platformUnbind: "platformUnbind",
+  // issue #78：同平台多账号运行时增删（高危，需管理员鉴权）
+  platformAddAccount: "platformAddAccount",
+  platformRemoveAccount: "platformRemoveAccount",
   // 本机可用的 DSH agent preset（设置页下拉用；老版本 DSH 返回 available:false）
   listAgentPresets: "listAgentPresets",
   // 微信 Bot（v1.x 向后兼容别名，deprecated）
@@ -4639,12 +4673,67 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
     )
   );
 });
-function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platformRecommended = false }) {
+var PLATFORM_ACCOUNT_LIMIT = 10;
+function platformAccountsOf(platforms, type) {
+  const accounts = [];
+  for (const [key, status] of Object.entries(platforms ?? {})) {
+    if (!status || typeof status !== "object") continue;
+    const keyType = String(status.instanceId ?? key).split(":")[0];
+    const platformType = status.platformId ?? status.id ?? keyType;
+    if (platformType !== type) continue;
+    accounts.push({ instanceId: status.instanceId ?? key, status });
+  }
+  return accounts;
+}
+function accountDisplayName(status, platformLabel, index) {
+  const displayName = typeof status?.displayName === "string" ? status.displayName.trim() : "";
+  return displayName || `${platformLabel} ${index}`;
+}
+function isPlatformStatusActive(status) {
+  return status === "connected" || status === "starting" || status === "reconnecting";
+}
+function PlatformCard({
+  platformId,
+  platformName,
+  platformDesc,
+  rpcCall,
+  platformRecommended = false,
+  // 多账号（issue #78）：instanceId 是服务端唯一键，卡片内所有平台 RPC 都用它定位账号；
+  // displayName 用于卡片头部展示；accountIndex/accountCount 用于「账号 N/M」标记。
+  instanceId,
+  displayName = "",
+  accountIndex = 1,
+  accountCount = 1,
+  highlight = false,
+  onAccountRemoved,
+  onAccountRenamed
+}) {
   const [platform, setPlatform] = React.useState(null);
   const [err, setErr] = React.useState(null);
   const [busy, setBusy] = React.useState(false);
   const [showAdvanced, setShowAdvanced] = React.useState(false);
   const [showHelp, setShowHelp] = React.useState(false);
+  const savedAccountName = typeof platform?.config?.name === "string" ? platform.config.name : void 0;
+  const [nameDraft, setNameDraft] = React.useState("");
+  React.useEffect(() => {
+    if (savedAccountName !== void 0) setNameDraft(savedAccountName);
+  }, [savedAccountName, instanceId]);
+  const cardRef = React.useRef(null);
+  React.useEffect(() => {
+    if (!highlight) return;
+    const el = cardRef.current;
+    if (el && typeof el.scrollIntoView === "function") {
+      try {
+        el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } catch {
+      }
+    }
+  }, [highlight, platform?.instanceId]);
+  const cardStyle = highlight ? {
+    ...s.card,
+    border: "1px solid var(--dsw-alias-brand-primary,#4f6ef7)",
+    boxShadow: "0 0 0 1px var(--dsw-alias-brand-primary,#4f6ef7)"
+  } : s.card;
   const [cfgDraft, setCfgDraft] = React.useState(null);
   React.useEffect(() => {
     if (platform?.config && !cfgDraft) {
@@ -4694,14 +4783,14 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
       if (currentSeq !== seqRef.current) return;
       if (!r?.ok) throw new Error(r?.error?.message ?? "RPC failed");
       const allPlatforms = r.value ?? {};
-      setPlatform(allPlatforms[platformId] ?? null);
+      setPlatform(allPlatforms[instanceId] ?? null);
       if (!quiet) setErr(null);
     } catch (e) {
       if (currentSeq === seqRef.current && !quiet) setErr(e.message);
     } finally {
       loadInFlightRef.current = false;
     }
-  }, [rpcCall, platformId]);
+  }, [rpcCall, instanceId]);
   React.useEffect(() => {
     load();
     const activeLogin = platform?.login && (platform.login.phase === "qr" || platform.login.phase === "scaned");
@@ -4712,7 +4801,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
   const act = React.useCallback(async (endpoint, payload) => {
     setBusy(true);
     try {
-      const r = await rpcCall(endpoint, { platformId, ...payload });
+      const r = await rpcCall(endpoint, { instanceId, ...payload });
       if (!r?.ok) throw new Error(r?.error?.message ?? "RPC failed");
       setPlatform(r.value);
       setErr(null);
@@ -4722,7 +4811,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
     } finally {
       setBusy(false);
     }
-  }, [rpcCall, load, platformId]);
+  }, [rpcCall, load, instanceId]);
   const onLogin = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformLogin, {}), [act]);
   const onRegisterApp = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformLogin, { qrType: "register" }), [act]);
   const onRefreshQr = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformLogin, { qrType: "register", refresh: true }), [act]);
@@ -4731,6 +4820,28 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
     if (platform?.configured) return act(BRIDGE_ENDPOINTS.platformStart, {});
     return act(BRIDGE_ENDPOINTS.platformLogin, {});
   }, [act, platform?.configured]);
+  const saveAccountName = React.useCallback(async () => {
+    const next = nameDraft.trim();
+    if (next === (savedAccountName ?? "").trim()) return;
+    await act(BRIDGE_ENDPOINTS.platformSetConfig, { name: next });
+    onAccountRenamed?.(instanceId);
+  }, [act, nameDraft, savedAccountName, onAccountRenamed, instanceId]);
+  const removeAccount = React.useCallback(async () => {
+    if (busy) return;
+    const label = displayName || platformName;
+    if (!window.confirm(localeT("\u786E\u8BA4\u79FB\u9664\u8D26\u53F7\u300C${name}\u300D\uFF1F\u5C06\u505C\u6B62\u8BE5\u8D26\u53F7\u5E76\u5220\u9664\u5176\u914D\u7F6E\u4E0E\u4F1A\u8BDD\u5F52\u5C5E\uFF1BDSH \u4F1A\u8BDD\u672C\u8EAB\u4E0D\u4F1A\u88AB\u5220\u9664\u3002", { name: localeT(label) }))) return;
+    setBusy(true);
+    try {
+      const r = await rpcCall(BRIDGE_ENDPOINTS.platformRemoveAccount, { instanceId });
+      if (!r?.ok) throw new Error(r?.error?.message ?? "\u79FB\u9664\u8D26\u53F7\u5931\u8D25");
+      setErr(null);
+      onAccountRemoved?.(instanceId);
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setBusy(false);
+    }
+  }, [busy, displayName, platformName, rpcCall, instanceId, onAccountRemoved]);
   const [newId, setNewId] = React.useState("");
   const addAllow = React.useCallback(async () => {
     const id = newId.trim();
@@ -4738,7 +4849,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
     const list = [...platform?.allowFrom ?? [], id];
     setBusy(true);
     try {
-      const r = await rpcCall(BRIDGE_ENDPOINTS.platformSetAllowFrom, { platformId, allowFrom: list });
+      const r = await rpcCall(BRIDGE_ENDPOINTS.platformSetAllowFrom, { instanceId, allowFrom: list });
       if (!r?.ok) throw new Error(r?.error?.message ?? "\u6DFB\u52A0\u767D\u540D\u5355\u5931\u8D25");
       setPlatform(r.value);
       setNewId("");
@@ -4749,7 +4860,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
     } finally {
       setBusy(false);
     }
-  }, [rpcCall, platformId, newId, platform?.allowFrom, load]);
+  }, [rpcCall, instanceId, newId, platform?.allowFrom, load]);
   const removeAllow = React.useCallback(async (id) => {
     const list = (platform?.allowFrom ?? []).filter((x) => x !== id);
     await act(BRIDGE_ENDPOINTS.platformSetAllowFrom, { allowFrom: list });
@@ -4799,18 +4910,19 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
   if (!platform && !err) {
     return h(
       "div",
-      { style: s.card },
-      h("div", { style: s.label }, platformName),
+      { style: cardStyle, ref: cardRef },
+      h("div", { style: s.label }, displayName || platformName),
       h("div", { style: { ...s.muted, marginTop: 6 } }, "\u52A0\u8F7D\u4E2D\u2026")
     );
   }
-  const connected = platform?.status === "connected" || platform?.status === "starting" || platform?.status === "reconnecting";
+  const connected = isPlatformStatusActive(platform?.status);
   const login = platform?.login ?? {};
   const showQr = login.phase === "qr" || login.phase === "scaned";
   const statusLabel = platform?.status === "connected" ? "\u5DF2\u8FDE\u63A5" : platform?.status === "starting" ? "\u8FDE\u63A5\u4E2D\u2026" : platform?.status === "reconnecting" ? "\u91CD\u8FDE\u4E2D\u2026" : platform?.status === "paused" ? "\u6682\u505C\uFF08\u4F1A\u8BDD\u8FC7\u671F\uFF09" : platform?.status === "error" ? "\u9519\u8BEF" : "\u672A\u8FDE\u63A5";
   return h(
     "div",
-    { style: s.card },
+    { style: cardStyle, ref: cardRef },
+    // 卡片头部：account displayName（用户备注名或「平台名 + 序号」）+ 状态 + 移除账号
     h(
       "div",
       { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 } },
@@ -4819,13 +4931,26 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
         { style: { flex: "1 1 auto", minWidth: 0 } },
         h(
           "div",
-          { style: { ...s.label, display: "flex", alignItems: "center", gap: 7 } },
+          { style: { ...s.label, display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" } },
           platformId === "wechat" && h(Icons.wechat, { style: { color: "#07C160", width: 20, height: 20 } }),
           platformId === "qq" && h(Icons.qq, { style: { color: "#12B7F5", width: 20, height: 20 } }),
           platformId === "feishu" && h(Icons.feishu, { style: { color: "#00D6B9", width: 20, height: 20 } }),
           platformId === "telegram" && h(Icons.telegram, { style: { color: "#24A1DE", width: 20, height: 20 } }),
-          platformName,
-          platformRecommended && h("span", {
+          displayName || platformName,
+          accountCount > 1 && h("span", {
+            style: {
+              fontSize: 10,
+              lineHeight: "16px",
+              padding: "0 6px",
+              borderRadius: 8,
+              border: "1px solid var(--dsw-alias-border-l2,#d1d5db)",
+              color: "var(--dsw-alias-label-tertiary,#6b7280)",
+              background: "var(--dsw-alias-bg-layer-1,#fff)",
+              fontWeight: 500,
+              flexShrink: 0
+            }
+          }, localeT("\u8D26\u53F7 ${index}/${total}", { index: accountIndex, total: accountCount })),
+          platformRecommended && accountIndex === 1 && h("span", {
             style: {
               fontSize: 10,
               lineHeight: "16px",
@@ -4841,7 +4966,44 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
         ),
         h("div", { style: { ...s.muted, marginTop: 2 } }, platformDesc)
       ),
-      h(StatusTag, { status: platform?.status, running: connected })
+      h(
+        "div",
+        { style: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6, flexShrink: 0 } },
+        h(StatusTag, { status: platform?.status, running: connected }),
+        h("button", {
+          style: {
+            ...s.btnGhost,
+            color: "var(--dsw-alias-label-primary, #0f1115)",
+            borderColor: "var(--dsw-alias-state-error-primary,#dc2626)",
+            height: 28,
+            padding: "0 10px",
+            fontSize: 12,
+            opacity: busy ? 0.5 : 1
+          },
+          disabled: busy,
+          onClick: removeAccount,
+          title: localeT("\u505C\u6B62\u8BE5\u8D26\u53F7\u5E76\u5220\u9664\u5176\u914D\u7F6E\u4E0E\u4F1A\u8BDD\u5F52\u5C5E\uFF08\u4E0D\u4F1A\u5220\u9664 DSH \u4F1A\u8BDD\u672C\u8EAB\uFF09")
+        }, "\u79FB\u9664\u8D26\u53F7")
+      )
+    ),
+    // 账号备注名：失焦 / 回车保存（走 platformSetConfig 的 name 字段）。
+    // 单账号时也展示（用于给账号起个可读名字），不引入额外点击步骤。
+    h(
+      "div",
+      { style: { display: "flex", gap: 8, alignItems: "center", marginTop: 10, flexWrap: "wrap" } },
+      h("input", {
+        style: { ...s.input, flex: "1 1 220px", minWidth: 0 },
+        placeholder: localeT("\u5907\u6CE8\u540D\uFF08\u53EF\u9009\uFF0C\u7528\u4E8E\u533A\u5206\u540C\u5E73\u53F0\u591A\u4E2A\u8D26\u53F7\uFF09"),
+        value: nameDraft,
+        onChange: (e) => setNameDraft(e.target.value),
+        onBlur: () => {
+          void saveAccountName();
+        },
+        onKeyDown: (e) => {
+          if (e.key === "Enter") e.currentTarget.blur();
+        },
+        disabled: busy
+      })
     ),
     // 快捷入口：使用说明 / 开放平台 / 命令速查
     h(
@@ -5252,6 +5414,11 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
     (!platform?.configured || showQr) && h(
       "div",
       { style: s.block },
+      !platform?.configured && !showQr && h(
+        "div",
+        { style: { ...s.muted, marginBottom: 8 } },
+        "\u672A\u914D\u7F6E\u51ED\u8BC1 \u2014 \u8BF7\u5148\u5B8C\u6210\u4E0B\u65B9\u914D\u7F6E\u3002"
+      ),
       showQr && login.qr ? h(
         "div",
         null,
@@ -6657,6 +6824,17 @@ function BridgePanel({ rpcCall, preferredTab }) {
   const [platformsError, setPlatformsError] = React.useState(null);
   const [platformsSeq, setPlatformsSeq] = React.useState(0);
   const [selectedPlatform, setSelectedPlatform] = React.useState("feishu");
+  const [addingAccount, setAddingAccount] = React.useState(false);
+  const [accountsError, setAccountsError] = React.useState(null);
+  const [recentAccountId, setRecentAccountId] = React.useState(null);
+  React.useEffect(() => {
+    if (!recentAccountId) return;
+    const t2 = setTimeout(() => setRecentAccountId(null), 4e3);
+    return () => clearTimeout(t2);
+  }, [recentAccountId]);
+  React.useEffect(() => {
+    setAccountsError(null);
+  }, [selectedPlatform]);
   const [copiedUrl, setCopiedUrl] = React.useState("");
   const copyEntryUrl = React.useCallback((url) => {
     const done = () => {
@@ -6840,6 +7018,35 @@ function BridgePanel({ rpcCall, preferredTab }) {
     return () => clearInterval(t2);
   }, [load, adminUnlocked, isLocalhost]);
   const tunnelGate = needsTunnelPassword(status?.auth);
+  const refreshPlatforms = React.useCallback(() => setPlatformsSeq((seq) => seq + 1), []);
+  const addPlatformAccount = React.useCallback(async () => {
+    if (addingAccount) return;
+    setAddingAccount(true);
+    setAccountsError(null);
+    try {
+      const r = await authRpcCall(BRIDGE_ENDPOINTS.platformAddAccount, { platformId: selectedPlatform });
+      if (!r?.ok) throw new Error(r?.error?.message ?? "\u6DFB\u52A0\u8D26\u53F7\u5931\u8D25");
+      const addedInstanceId = r.value?.instanceId ?? null;
+      refreshPlatforms();
+      if (addedInstanceId) setRecentAccountId(addedInstanceId);
+    } catch (e) {
+      setAccountsError(e.message);
+    } finally {
+      setAddingAccount(false);
+    }
+  }, [addingAccount, authRpcCall, selectedPlatform, refreshPlatforms]);
+  const removePlatformAccountLocally = React.useCallback((removedInstanceId) => {
+    setPlatforms((prev) => {
+      if (!prev) return prev;
+      const next = { ...prev };
+      if (Object.hasOwn(next, removedInstanceId)) delete next[removedInstanceId];
+      for (const [key, value] of Object.entries(next)) {
+        if (value && value.instanceId === removedInstanceId) delete next[key];
+      }
+      return next;
+    });
+    refreshPlatforms();
+  }, [refreshPlatforms]);
   const act = React.useCallback(async (endpoint, payload) => {
     try {
       const r = await authRpcCall(endpoint, payload ?? {});
@@ -7113,6 +7320,17 @@ function BridgePanel({ rpcCall, preferredTab }) {
         flexShrink: 0
       }
     }, "\u63A8\u8350");
+    const platformsLoaded = platforms !== null && !platformsError;
+    const selectedMeta = IM_PLATFORMS.find((p) => p.id === selectedPlatform);
+    const selectedLabel = selectedMeta?.label ?? selectedPlatform;
+    const accounts = platformAccountsOf(platforms, selectedPlatform);
+    const atAccountLimit = accounts.length >= PLATFORM_ACCOUNT_LIMIT;
+    const renderAddAccountButton = ({ primary = false } = {}) => h("button", {
+      style: { ...primary ? s.btnPri : s.btnGhost, opacity: addingAccount || atAccountLimit ? 0.5 : 1, whiteSpace: "nowrap" },
+      onClick: addPlatformAccount,
+      disabled: addingAccount || atAccountLimit,
+      title: atAccountLimit ? localeT("\u6BCF\u4E2A\u5E73\u53F0\u6700\u591A ${limit} \u4E2A\u8D26\u53F7", { limit: PLATFORM_ACCOUNT_LIMIT }) : localeT("\u6DFB\u52A0\u4E00\u4E2A\u65B0\u8D26\u53F7\uFF08\u540C\u4E00\u5E73\u53F0\u53EF\u63A5\u5165\u591A\u4E2A\u8D26\u53F7\uFF09")
+    }, addingAccount ? "\u6DFB\u52A0\u4E2D\u2026" : "\uFF0B \u6DFB\u52A0\u8D26\u53F7");
     tabContent = h(
       "div",
       null,
@@ -7131,17 +7349,16 @@ function BridgePanel({ rpcCall, preferredTab }) {
           style: { cursor: "pointer", borderRadius: 6, padding: "4px 12px" }
         }, "\u91CD\u8BD5")
       ),
-      // 平台选择器（可点击切换）
+      // 平台类型选择器：四个类型恒可点击（0 账号也必须能进入空状态添加第一个账号；
+      // 不能按「至少一个实例」置灰，否则删光账号后永远回不来）。点击后进入该类型账号列表。
       h(
         "div",
         {
           style: { display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }
         },
         IM_PLATFORMS.map(({ id, label, icon: IconComponent, brandColor, desc, recommended }) => {
-          const loaded = platforms !== null && !platformsError;
-          const platformData = loaded ? platforms[id] : void 0;
-          const available = !!platformData;
-          const active = platformData?.status === "connected" || platformData?.status === "starting" || platformData?.status === "reconnecting";
+          const typeAccounts = platformAccountsOf(platforms, id);
+          const active = typeAccounts.some(({ status: status2 }) => isPlatformStatusActive(status2?.status));
           return h(
             "div",
             {
@@ -7151,13 +7368,12 @@ function BridgePanel({ rpcCall, preferredTab }) {
                 border: `1px solid ${selectedPlatform === id ? "var(--dsw-alias-brand-primary,#4f6ef7)" : active ? "var(--dsw-alias-state-success-primary,#10b981)" : "var(--dsw-alias-border-l2,#e5e7eb)"}`,
                 borderRadius: 10,
                 padding: "12px 14px",
-                opacity: available ? 1 : 0.5,
-                cursor: available ? "pointer" : "not-allowed",
+                cursor: "pointer",
                 background: selectedPlatform === id ? "var(--dsw-alias-state-info-bg,#eff6ff)" : active ? "var(--dsw-alias-state-success-bg,#ecfdf5)" : "var(--dsw-alias-bg-layer-2,#f9fafb)",
                 boxShadow: selectedPlatform === id ? "0 0 0 1px var(--dsw-alias-brand-primary,#4f6ef7)" : "none",
                 transition: "all 0.15s ease"
               },
-              onClick: available ? () => setSelectedPlatform(id) : void 0
+              onClick: () => setSelectedPlatform(id)
             },
             h(
               "div",
@@ -7172,26 +7388,79 @@ function BridgePanel({ rpcCall, preferredTab }) {
               active && h("span", {
                 style: { width: 6, height: 6, borderRadius: "50%", background: "var(--dsw-alias-state-success-primary,#10b981)", flexShrink: 0 }
               }),
-              !active && available && h("span", {
-                style: { fontSize: 11, color: "var(--dsw-alias-label-tertiary,#6b7280)", fontWeight: 400 }
-              }, "\u672A\u8FDE\u63A5"),
-              !available && h("span", {
+              platformsError && h("span", {
                 style: { fontSize: 11, color: "var(--dsw-alias-label-tertiary,#9ca3af)", fontWeight: 400 }
-              }, !loaded ? "\u52A0\u8F7D\u4E2D\u2026" : "\u6570\u636E\u7F3A\u5931")
+              }, "\u6570\u636E\u7F3A\u5931"),
+              !platformsError && platforms === null && h("span", {
+                style: { fontSize: 11, color: "var(--dsw-alias-label-tertiary,#9ca3af)", fontWeight: 400 }
+              }, "\u52A0\u8F7D\u4E2D\u2026"),
+              !platformsError && platformsLoaded && typeAccounts.length === 0 && h("span", {
+                style: { fontSize: 11, color: "var(--dsw-alias-label-tertiary,#9ca3af)", fontWeight: 400 }
+              }, "\u672A\u6DFB\u52A0\u8D26\u53F7"),
+              !active && !platformsError && platformsLoaded && typeAccounts.length > 0 && h("span", {
+                style: { fontSize: 11, color: "var(--dsw-alias-label-tertiary,#6b7280)", fontWeight: 400 }
+              }, "\u672A\u8FDE\u63A5")
             ),
-            h("div", { style: { ...s.muted, marginTop: 4, fontSize: 11 } }, desc)
+            h("div", { style: { ...s.muted, marginTop: 4, fontSize: 11 } }, desc),
+            typeAccounts.length > 1 && h("div", {
+              style: { marginTop: 6, fontSize: 11, color: "var(--dsw-alias-brand-primary,#4f6ef7)", fontWeight: 500 }
+            }, localeT("${count} \u4E2A\u8D26\u53F7", { count: typeAccounts.length }))
           );
         })
       ),
-      // 显示选中的平台卡片（带有 key 保证切换时重置表单状态）
-      selectedPlatform && platforms?.[selectedPlatform] && h(PlatformCard, {
-        key: selectedPlatform,
-        platformRecommended: IM_PLATFORMS.find((p) => p.id === selectedPlatform)?.recommended === true,
-        platformId: selectedPlatform,
-        platformName: IM_PLATFORMS.find((p) => p.id === selectedPlatform)?.label ?? selectedPlatform,
-        platformDesc: IM_PLATFORMS.find((p) => p.id === selectedPlatform)?.desc ?? "",
-        rpcCall: authRpcCall
-      })
+      // 选中类型的账号列表：每个账号一张完整卡片；0 账号显示空状态
+      platformsLoaded && h(
+        "div",
+        null,
+        accounts.length > 0 && h(
+          "div",
+          { style: { display: "flex", alignItems: "center", justifyContent: "space-between", gap: 10, marginBottom: 10, flexWrap: "wrap" } },
+          h("div", { style: { ...s.muted } }, localeT("\u8D26\u53F7\u5217\u8868\uFF08${count} \u4E2A\uFF09", { count: accounts.length })),
+          renderAddAccountButton()
+        ),
+        // 服务端错误（添加失败 / 上限 / 查重等）原样展示，不吞
+        accountsError && h("div", { style: { ...s.err, marginBottom: 12 } }, accountsError),
+        atAccountLimit && h(
+          "div",
+          { style: { ...s.muted, marginBottom: 10 } },
+          localeT("\u5DF2\u8FBE\u5355\u5E73\u53F0\u8D26\u53F7\u4E0A\u9650\uFF08\u6700\u591A ${limit} \u4E2A\uFF09", { limit: PLATFORM_ACCOUNT_LIMIT })
+        ),
+        accounts.length === 0 ? h(
+          "div",
+          {
+            style: { ...s.card, textAlign: "center", padding: "28px 20px" }
+          },
+          h("div", { style: { fontSize: 30, lineHeight: "38px", marginBottom: 8 } }, "\u2795"),
+          h(
+            "div",
+            { style: { ...s.label, fontSize: 14, fontWeight: 600 } },
+            localeT("\u8FD8\u6CA1\u6709\u6DFB\u52A0\u300C${name}\u300D\u8D26\u53F7", { name: localeT(selectedLabel) })
+          ),
+          h(
+            "div",
+            { style: { ...s.muted, marginTop: 6, marginBottom: 14, lineHeight: 1.6 } },
+            localeT("\u6DFB\u52A0\u8D26\u53F7\u540E\u53EF\u586B\u5199\u8BE5\u8D26\u53F7\u7684\u51ED\u8BC1\u5E76\u72EC\u7ACB\u8FDE\u63A5\uFF1B\u540C\u4E00\u5E73\u53F0\u652F\u6301\u540C\u65F6\u63A5\u5165\u591A\u4E2A\u8D26\u53F7\uFF0C\u51ED\u8BC1\u3001\u767D\u540D\u5355\u4E0E\u4F1A\u8BDD\u5F52\u5C5E\u4E92\u4E0D\u5F71\u54CD\u3002")
+          ),
+          renderAddAccountButton({ primary: true })
+        ) : accounts.map(({ instanceId, status: status2 }, index) => h(PlatformCard, {
+          // key 用 instanceId：切换类型 / 账号增删时保证每张卡片状态跟随账号，不串号
+          key: instanceId,
+          instanceId,
+          displayName: accountDisplayName(status2, selectedLabel, index + 1),
+          accountIndex: index + 1,
+          accountCount: accounts.length,
+          highlight: recentAccountId === instanceId,
+          platformRecommended: selectedMeta?.recommended === true,
+          platformId: selectedPlatform,
+          platformName: selectedLabel,
+          platformDesc: selectedMeta?.desc ?? "",
+          rpcCall: authRpcCall,
+          onAccountRemoved: removePlatformAccountLocally,
+          onAccountRenamed: refreshPlatforms
+        }))
+      ),
+      // 清单还没回来时给个明确的加载态（不是“数据缺失”）
+      platforms === null && !platformsError && h("div", { style: { ...s.muted, padding: "12px 2px" } }, "\u52A0\u8F7D\u4E2D\u2026")
     );
   }
   const auth = status?.auth;
