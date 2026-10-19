@@ -1,3 +1,5 @@
+import { t } from './locales.mjs';
+
 // 统一管理员解锁管理器（client/unlock-manager.js）
 //
 // 背景：多个 RPC 封装（BridgePanel 的 authRpcCall、目录选择器的 authRpc）都会遇到
@@ -124,7 +126,7 @@ export async function unlockAdmin(rpcCall, password) {
       await replayPending();
       return { ok: true };
     }
-    return { ok: false, error: res?.error?.message || '管理员密码错误' };
+    return { ok: false, error: res?.error?.message || t('管理员密码错误') };
   } catch (err) {
     // 访问会话失效（HTTP 401）：authAdminUnlock 即使豁免，主面板后续请求也会 401，
     // 解锁成功也进不去。此时应整页重载回绿色登录页重新获取访问会话。
@@ -137,6 +139,6 @@ export async function unlockAdmin(rpcCall, password) {
         window.location.reload();
       }
     }
-    return { ok: false, error: err?.message || '解锁请求失败' };
+    return { ok: false, error: err?.message || t('解锁请求失败') };
   }
 }

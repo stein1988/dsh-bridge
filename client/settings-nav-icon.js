@@ -13,6 +13,7 @@
 // CSS-module 哈希，0.1.x 与 0.2.0 实测都命中；宿主前缀（VOzbGW_ / wCInkW_）改由
 // client/host-families.js 运行时解析，仅在解析成功时作为补充选择器。
 import { ABSENT_FAMILY } from './host-families.js';
+import { t } from './locales.mjs';
 
 export const SETTINGS_NAV_MARKER = 'data-dsh-bridge-settings-nav';
 
@@ -53,7 +54,7 @@ export function getNavIconCss(customSvg = REMOTE_NAV_SVG) {
  *   —— 该锚点在 0.1.x 与 0.2.0 实测都命中，故即使前缀完全解析失败，本功能也不受影响。
  * @returns {() => void} 清理函数
  */
-export function registerSettingsNavIcon(resolveLabel = () => '远程访问', resolveFamilies = null) {
+export function registerSettingsNavIcon(resolveLabel = () => t('远程访问'), resolveFamilies = null) {
   if (typeof document === 'undefined') return () => {};
 
   const styleId = 'dsh-bridge-settings-nav-icon-style';
@@ -69,7 +70,7 @@ export function registerSettingsNavIcon(resolveLabel = () => '远程访问', res
   let disposed = false;
   const sync = () => {
     if (disposed) return;
-    const currentLabel = typeof resolveLabel === 'function' ? resolveLabel().trim() : '远程访问';
+    const currentLabel = typeof resolveLabel === 'function' ? resolveLabel().trim() : t('远程访问');
     // 结构锚点优先（版本无关）；解析到前缀时再补一条同族选择器，覆盖 nav 结构变化的宿主
     const families = typeof resolveFamilies === 'function' ? (resolveFamilies() || {}) : {};
     const settingsFamily = families.SETTINGS;

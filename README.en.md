@@ -31,7 +31,7 @@
 > 
 > Scan a QR code on your phone to continue using DeepSeek Harness anywhere. Whether relaxing on the sofa, commuting, or working across networks—no need to stay at your PC or set up complex servers.
 > 
-> Seamlessly extends your local DeepSeek Harness instance to mobile web, standalone PWA app, secure public tunnels, and **WeChat / QQ / Feishu / Telegram** bot matrix. Drive AI coding, run tasks, approve operations, and manage workspaces anytime, anywhere.
+> Seamlessly extends your local DeepSeek Harness instance to mobile web, standalone PWA app, secure public tunnels, and **WeChat / QQ / Feishu (Lark) / Telegram** bot matrix. Drive AI coding, run tasks, approve operations, and manage workspaces anytime, anywhere.
 >
 > 📖 Remote-access landing page: [docs/remote-connection.md](docs/remote-connection.md) | 🤖 Summary for AI: [llms.txt](llms.txt)
 
@@ -62,6 +62,7 @@
 - **🌐 Dual-Mode Cloudflare Public Tunnels**: Zero-login 1-click random temporary domains or Cloudflare Named Tunnel Token with auto-start on boot; built-in idle keepalive for SSE streams so remote live channels are never cut by the link;
 - **📡 Tunnel Observability**: end-to-end public-entry probe every 60s (DNS / TLS / edge / origin — catches "/ready looks fine but users cannot get in", flags suspected DNS poisoning with the resolved IP); shows the actual cloudflared path · version · source; warns when another cloudflared uses the same Tunnel Token;
 - **📱 Native-Grade Mobile UI & PWA**: Centered session header, native drawer sidebar with `[|` fold icon, anti-overlap responsive layout, PWA install support;
+- **🌏 UI Follows the DSH Language (Chinese / English)**: the settings panel (all five sections and cards), lock/unlock screens, remote workspace picker, command help and upgrade prompts switch language with `<html lang>`; the visitor login page (rendered before the DSH language is known) follows the browser's `Accept-Language` — no separate language setting;
 - **🗂️ Web Remote Workspace Directory Picker**: Mobile/remote visits pop up responsive tree directory browser; localhost visits route to OS native dialogs; supports `/addworkspace` IM command;
 - **🔐 Comprehensive Access Security & Dual Defenses**: QR code secret Token login, visitor password gate, independent admin anti-tamper lock; host physical privilege (`127.0.0.1`) & emergency terminal reset (`reset-auth`);
 - **🤖 All-in-One IM Bot Matrix (WeChat / QQ / Feishu / Telegram)**: Multi-workspace dispatching, cross-restart session persistence, streaming Markdown typewriter, Card 2.0 interactive approvals, and bidirectional file sharing; every platform also reports a **per-turn change digest** (which files changed) and `/diff` exports a `.patch` attachment;

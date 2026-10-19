@@ -1652,6 +1652,825 @@ function watchHostFamilies(onChange, opts = {}) {
   };
 }
 
+// client/panel-locales.mjs
+var panelEn = {
+  "\u8FD0\u884C\u4E2D": "Running",
+  "\u672A\u542F\u52A8": "Not started",
+  "\u5DF2\u8FDE\u63A5": "Connected",
+  "\u4E0B\u8F7D\u4E2D\u2026": "Downloading\u2026",
+  "\u8FDE\u63A5\u4E2D\u2026": "Connecting\u2026",
+  "\u81EA\u52A8\u91CD\u8FDE\u4E2D\u2026": "Reconnecting\u2026",
+  "\u6682\u505C\u4E2D": "Paused",
+  "\u5F02\u5E38": "Error",
+  "\u70B9\u51FB\u524D\u5F80\u300C\u5B89\u5168\u8BA4\u8BC1\u300D\u914D\u7F6E": "Click to open Security settings",
+  "\u{1F6E1}\uFE0F \u8BBF\u95EE\u5B89\u5168\u8BA4\u8BC1\u5DF2\u751F\u6548 \xB7 \u626B\u7801\u8BBE\u5907\u514D\u5BC6": "\u{1F6E1}\uFE0F Access protection is on \xB7 QR devices skip the password",
+  "\u8BBE\u7F6E \u2794": "Settings \u2794",
+  "\u70B9\u51FB\u524D\u5F80\u300C\u5B89\u5168\u8BA4\u8BC1\u300D\u5F00\u542F\u8BBF\u95EE\u4FDD\u62A4": "Click to enable access protection in \u201CSecurity\u201D",
+  "\u26A0\uFE0F \u5F53\u524D\u672A\u5F00\u542F\u8BBF\u95EE\u8BA4\u8BC1\uFF0C\u5EFA\u8BAE\u5728\u300C\u5B89\u5168\u8BA4\u8BC1\u300D\u5F00\u542F\u5BC6\u7801\u6216\u626B\u7801\u4FDD\u62A4\u3002": "\u26A0\uFE0F Access protection is off. Enable a password or QR protection under \u201CSecurity\u201D.",
+  "\u53BB\u5F00\u542F \u2794": "Enable \u2794",
+  "\u2713 \u5DF2\u590D\u5236": "\u2713 Copied",
+  "\u590D\u5236\u94FE\u63A5": "Copy link",
+  "\u9690\u85CF\u4E8C\u7EF4\u7801": "Hide QR code",
+  "\u663E\u793A\u4E8C\u7EF4\u7801": "Show QR code",
+  "\u8BF7\u5728\u79C1\u5BC6\u73AF\u5883\u4E0B\u4F7F\u7528": "Use in a private environment",
+  "\u{1F4F1} \u63D0\u793A\uFF1A\u624B\u673A\u6D4F\u89C8\u5668\u626B\u7801\u6253\u5F00\u540E\uFF0C\u5728\u83DC\u5355\u70B9\u51FB\u300C\u6DFB\u52A0\u5230\u4E3B\u5C4F\u5E55\u300D\u5373\u53EF\u4F5C\u4E3A\u72EC\u7ACB\u5168\u5C4F App \u8FD0\u884C\u3002": "\u{1F4F1} Tip: after scanning with your phone, tap \u201CAdd to Home Screen\u201D in the browser menu to run it as a standalone full-screen app.",
+  "\u5173\u95ED\u96A7\u9053\u5E76\u91CD\u65B0\u5F00\u542F\uFF0C\u53EF\u83B7\u5F97\u65B0\u7684 URL": "Stop and restart the tunnel to get a new URL",
+  "\u{1F504} \u91CD\u7F6E\u94FE\u63A5": "\u{1F504} Reset link",
+  "\u{1F6DC} \u5C40\u57DF\u7F51\u7F51\u5361 / IP \u9009\u62E9": "\u{1F6DC} LAN adapter / IP selection",
+  "\u5207\u6362\u4E2D\u2026": "Switching\u2026",
+  "\u68C0\u6D4B\u5230\u4E3B\u673A\u5B58\u5728\u591A\u5F20\u7F51\u5361\uFF08\u5982\u7269\u7406 Wi-Fi\u3001\u4EE5\u592A\u7F51\u3001WSL \u6216\u865A\u62DF\u673A\uFF09\u3002\u82E5\u9ED8\u8BA4 IP \u65E0\u6CD5\u88AB\u79FB\u52A8\u7AEF\u8BBF\u95EE\uFF0C\u53EF\u624B\u52A8\u5207\u6362\uFF1A": "Multiple network adapters detected (e.g. Wi-Fi, Ethernet, WSL or a VM). If the default IP is unreachable from your phone, switch manually:",
+  "${address} \xB7 ${name} [\u865A\u62DF/WSL]": "${address} \xB7 ${name} [virtual/WSL]",
+  "\u67E5\u770B\u81EA\u5EFA\u96A7\u9053\u670D\u52A1\u5668\u642D\u5EFA\u6559\u7A0B": "View the self-hosted tunnel server guide",
+  "\u516C\u7F51\u8BBF\u95EE\u5165\u53E3": "Public access entry",
+  "\u5C1A\u672A\u914D\u7F6E\u4EFB\u4F55\u516C\u7F51\u96A7\u9053\uFF0C\u53EF\u5728\u4E0B\u65B9\u5F00\u542F Cloudflare \u96A7\u9053\u6216\u914D\u7F6E\u81EA\u5EFA\u96A7\u9053": "No public tunnel configured yet \u2014 enable the Cloudflare tunnel below or set up a self-hosted tunnel.",
+  "\u590D\u5236": "Copy",
+  "\u505C\u6B62\u91CD\u8FDE": "Stop reconnecting",
+  "\u5173\u95ED": "Close",
+  "\u5173\u95ED\u5E76\u91CD\u65B0\u5F00\u542F\uFF0C\u66F4\u6362\u4E34\u65F6\u5730\u5740": "Stop and restart to get a new temporary address",
+  "\u8BF7\u5148\u5728\u300C\u96A7\u9053\u914D\u7F6E\u300D\u4E2D\u4FDD\u5B58\u670D\u52A1\u5668\u914D\u7F6E": "Save the server configuration under \u201CTunnel configuration\u201D first",
+  "\u5F00\u542F\u516C\u7F51\u96A7\u9053": "Enable public tunnel",
+  "\u8BF7\u5728\u79C1\u5BC6\u73AF\u5883\u4E0B\u626B\u7801\u4F7F\u7528": "Scan in a private environment",
+  "DSH \u542F\u52A8\u65F6\u81EA\u52A8\u6062\u590D\u8BE5\u96A7\u9053\u7684\u8FD0\u884C\u72B6\u6001": "Restore this tunnel automatically when DSH starts",
+  "\u968F DSH \u542F\u52A8\u81EA\u52A8\u5F00\u542F": "Start automatically with DSH",
+  "\u96A7\u9053\u914D\u7F6E": "Tunnel configuration",
+  "Token \xB7 \u56FA\u5B9A\u57DF\u540D \xB7 \u81EA\u5EFA\u670D\u52A1\u5668 \xB7 \u5916\u90E8\u767B\u8BB0": "Token \xB7 fixed domain \xB7 self-hosted server \xB7 external registration",
+  "\u6536\u8D77 \u25B4": "Collapse \u25B4",
+  "\u5C55\u5F00 \u25BE": "Expand \u25BE",
+  "\u4FDD\u5B58\u914D\u7F6E\u5931\u8D25": "Failed to save configuration",
+  "\u96A7\u9053\u670D\u52A1\u5668\u914D\u7F6E": "Tunnel server configuration",
+  "WebSocket \u5730\u5740\uFF0C\u4F8B\u5982 wss://tunnel.example.com/connect": "WebSocket URL, e.g. wss://tunnel.example.com/connect",
+  "\u96A7\u9053\u670D\u52A1\u7AEF\u8FDE\u63A5\u4EE4\u724C\uFF08Tunnel Access Token\uFF09": "Tunnel server access token",
+  "\u{1F4A1} \u7528\u4E8E\u4E0E\u60A8\u7684 VPS \u96A7\u9053\u670D\u52A1\u7AEF\u5EFA\u7ACB\u53CD\u5411\u901A\u9053\uFF08\u4E0E Web \u7F51\u9875\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\u4E92\u76F8\u72EC\u7ACB\uFF09\u3002": "\u{1F4A1} Used to open a reverse channel to your VPS tunnel server (independent of the visitor access password).",
+  "\u4FDD\u5B58\u4E2D\u2026": "Saving\u2026",
+  "\u2713 \u5DF2\u4FDD\u5B58": "\u2713 Saved",
+  "\u4FDD\u5B58\u914D\u7F6E": "Save configuration",
+  "\u8BF7\u5148\u4FDD\u5B58\u670D\u52A1\u5668\u914D\u7F6E": "Save the server configuration first",
+  "\u5F00\u542F": "Enable",
+  "\u2705 \u6570\u636E\u9762\u6B63\u5E38\uFF08\u6BCF 60s \u63A2\u6D4B\u516C\u7F51\u5165\u53E3${ip}\uFF09": "\u2705 Data plane healthy (public entry probed every 60s${ip})",
+  "\u26A0\uFE0F \u6570\u636E\u9762\u95F4\u6B47\u5931\u8D25\uFF08\u8FDE\u7EED ${count} \u6B21\uFF09\uFF1A${reason}": "\u26A0\uFE0F Data plane failing intermittently (${count} in a row): ${reason}",
+  "\u539F\u56E0\u672A\u77E5": "Unknown cause",
+  "\u274C \u6570\u636E\u9762\u4E0D\u53EF\u8FBE\uFF08\u8FDE\u7EED ${count} \u6B21\uFF09\uFF1A${reason}": "\u274C Data plane unreachable (${count} in a row): ${reason}",
+  "\u6570\u636E\u9762\u63A2\u6D4B\uFF1A${reason}": "Data plane probe: ${reason}",
+  "\u26A0\uFE0F \u68C0\u6D4B\u5230\u53E6\u4E00\u4E2A cloudflared\uFF08PID ${pid}\uFF0C\u51ED\u636E\u6765\u6E90 --${via}\uFF09\u6B63\u5728\u4F7F\u7528\u76F8\u540C\u7684 tunnel token\uFF1A\u96A7\u9053\u72B6\u6001\u53EF\u80FD\u53EA\u53CD\u6620\u4E00\u534A\uFF0C\u8BF7\u505C\u7528\u5176\u4E2D\u4E00\u4FA7": "\u26A0\uFE0F Another cloudflared (PID ${pid}, credentials via --${via}) is using the same tunnel token: the status may only reflect half the picture \u2014 stop one of them.",
+  "\u7CFB\u7EDF\u5B89\u88C5\uFF08\u4E0D\u53C2\u4E0E\u7248\u672C\u9489\u6B7B\uFF09": "System installation (version not pinned)",
+  "\u63D2\u4EF6\u5185\u7F6E": "Bundled with the plugin",
+  "\u5916\u90E8\u6307\u5B9A": "Externally specified",
+  "\u7248\u672C\u672A\u77E5": "Version unknown",
+  "\u7F51\u7EDC\u534F\u8BAE": "Network protocol",
+  "\u9ED8\u8BA4\uFF08auto\uFF09": "Default (auto)",
+  "\u5F3A\u5236 QUIC": "Force QUIC",
+  "\u5F3A\u5236 HTTP/2": "Force HTTP/2",
+  "\u8FB9\u7F18 IP": "Edge IP",
+  "\u9ED8\u8BA4\uFF084\uFF09": "Default (4)",
+  "\u81EA\u52A8\uFF08auto\uFF09": "Auto",
+  "\u8FB9\u7F18\u533A\u57DF": "Edge region",
+  "\u5168\u7403\uFF08\u9ED8\u8BA4\uFF09": "Global (default)",
+  "\u7F8E\u56FD\uFF08us\uFF09": "United States (us)",
+  "\u2713 \u56FA\u5B9A\u57DF\u540D\u914D\u7F6E\u5DF2\u4FDD\u5B58": "\u2713 Fixed-domain configuration saved",
+  "\u4FDD\u5B58\u5931\u8D25": "Save failed",
+  "\u2699\uFE0F \u9AD8\u7EA7\u914D\u7F6E\uFF1A\u56FA\u5B9A\u57DF\u540D (Cloudflare Token) ": "\u2699\uFE0F Advanced: fixed domain (Cloudflare Token) ",
+  "\u25CF \u5DF2\u914D\u7F6E\u56FA\u5B9A\u57DF\u540D": "\u25CF Fixed domain configured",
+  "\u25B4 \u6298\u53E0": "\u25B4 Collapse",
+  "\u25BE \u5C55\u5F00": "\u25BE Expand",
+  "\u5728 Cloudflare Zero Trust \u63A7\u5236\u53F0\u521B\u5EFA Tunnel \u5373\u53EF\u83B7\u53D6\u4E13\u5C5E Token \u5E76\u7ED1\u5B9A\u81EA\u5DF1\u7684\u57DF\u540D\uFF08\u5982 dsh.yourname.com\uFF09\uFF0C\u6BCF\u6B21\u91CD\u542F URL \u6C38\u4E0D\u53D8\u66F4\u3002\u4E0D\u586B\u5219\u4F7F\u7528\u9ED8\u8BA4\u514D\u767B\u5F55\u4E34\u65F6\u968F\u673A\u57DF\u540D\u3002": "Create a Tunnel in the Cloudflare Zero Trust dashboard to get a dedicated Token and bind your own domain (e.g. dsh.yourname.com); the URL then stays the same across restarts. Leave empty to use the default random temporary domain without login.",
+  "\u{1F4D6} \u67E5\u770B\u300CCloudflare \u56FA\u5B9A\u57DF\u540D\u300D\u7533\u8BF7\u4E0E\u914D\u7F6E\u6559\u7A0B": "\u{1F4D6} Read the \u201CCloudflare fixed domain\u201D setup guide",
+  "\u81EA\u5B9A\u4E49\u56FA\u5B9A\u57DF\u540D (\u4F8B\u5982: dsh.yourdomain.com)": "Custom fixed domain (e.g. dsh.yourdomain.com)",
+  "Tunnel Token (\u4F8B\u5982: eyJhIjoi...)": "Tunnel Token (e.g. eyJhIjoi...)",
+  "\u7F51\u7EDC\u53C2\u6570\u53D6\u503C\u6765\u81EA Cloudflare \u5B98\u65B9\u767D\u540D\u5355\uFF1B\u6539\u52A8\u9700\u91CD\u65B0\u5F00\u542F\u96A7\u9053\uFF08\u5173\u95ED\u2192\u5F00\u542F\uFF09\u540E\u751F\u6548\uFF0C\u5F53\u524D\u4E8C\u8FDB\u5236\u4E0D\u652F\u6301\u7684\u53C2\u6570\u4F1A\u81EA\u52A8\u8DF3\u8FC7\u5E76\u5728\u65E5\u5FD7\u544A\u8B66\u3002": "Network parameters come from Cloudflare's official whitelist; changes take effect after restarting the tunnel (stop \u2192 start). Parameters unsupported by the current binary are skipped with a log warning.",
+  "\u4FDD\u5B58\u56FA\u5B9A\u57DF\u540D\u914D\u7F6E": "Save fixed-domain configuration",
+  "\u6E05\u9664": "Clear",
+  "\u2713 \u5916\u90E8\u96A7\u9053\u5730\u5740\u5DF2\u767B\u8BB0": "\u2713 External tunnel address registered",
+  "\u2713 \u5DF2\u6E05\u9664\u767B\u8BB0": "\u2713 Registration cleared",
+  "\u5916\u90E8\u5DF2\u90E8\u7F72\u96A7\u9053": "Externally deployed tunnel",
+  "\u5DF2\u5728 Docker / \u670D\u52A1\u5668\u4E0A\u81EA\u884C\u90E8\u7F72\u96A7\u9053\uFF08\u5982 cloudflared\uFF09\u65F6\uFF0C\u767B\u8BB0\u516C\u7F51\u5730\u5740\u5373\u53EF\u5728\u9762\u677F\u5C55\u793A\u5165\u53E3\u4E0E\u4E8C\u7EF4\u7801\uFF1B\u63D2\u4EF6\u4E0D\u4F1A\u91CD\u590D\u4E0B\u8F7D\u6216\u7BA1\u7406\u8BE5\u96A7\u9053\u3002": "If you already run a tunnel yourself (e.g. cloudflared in Docker or on a server), register its public URL to show the entry and QR code here; the plugin will not download or manage it.",
+  "https://tunnel.yourdomain.com \u6216 trycloudflare \u5730\u5740": "https://tunnel.yourdomain.com or a trycloudflare address",
+  "\u4FDD\u5B58": "Save",
+  "\u300C\u4EC5\u5BC6\u7801 / PIN \u7801\u767B\u5F55\u300D\u6A21\u5F0F\u5FC5\u987B\u5148\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\u624D\u80FD\u5F00\u542F\u5B89\u5168\u9632\u62A4\u3002\n\n\u8BF7\u5148\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801 / PIN \u7801\u300D\u8F93\u5165\u5BC6\u7801\u5E76\u70B9\u51FB\u300C\u4FDD\u5B58\u8BBF\u95EE\u5BC6\u7801\u300D\uFF0C\u7136\u540E\u518D\u5F00\u542F\u3002": "\u201CPassword / PIN only\u201D mode needs an access password before protection can be enabled.\n\nSet one below under \u201CExternal visitor access password / PIN\u201D, click \u201CSave access password\u201D, then enable it.",
+  "\u8BF7\u5148\u8BBE\u7F6E\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\uFF0C\u518D\u5F00\u542F\u5B89\u5168\u9632\u62A4": "Set a visitor access password before enabling protection",
+  '\u26A0\uFE0F \u60A8\u5C1A\u672A\u8BBE\u7F6E\u4EFB\u4F55\u8BBF\u95EE\u5BC6\u7801\u6216\u7BA1\u7406\u5BC6\u7801\u3002\n\n\u5F00\u542F\u5B89\u5168\u9632\u62A4\u540E\uFF0C\u4EFB\u4F55\u77E5\u9053\u5C40\u57DF\u7F51 IP / \u96A7\u9053\u5730\u5740\u7684\u8BBF\u5BA2\u4ECD\u53EF\u76F4\u63A5\u8FDB\u5165\uFF08\u5F53\u524D\u76F8\u5F53\u4E8E"\u514D\u5BC6\u5F00\u653E"\u72B6\u6001\uFF09\u3002\n\n\u662F\u5426\u4ECD\u8981\u5F00\u542F\uFF1F\u5EFA\u8BAE\u5148\u5173\u95ED\uFF0C\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\u300D\u5904\u8BBE\u7F6E\u5BC6\u7801\u540E\u518D\u5F00\u542F\u3002': "\u26A0\uFE0F You have not set any access or admin password yet.\n\nWith protection enabled, anyone who knows the LAN IP / tunnel address can still get in (currently equivalent to \u201Copen, no password\u201D).\n\nEnable anyway? It is better to set a password below under \u201CExternal visitor access password\u201D first.",
+  "\u66F4\u65B0\u5931\u8D25": "Update failed",
+  "\u2713 \u5B89\u5168\u9632\u62A4\u5DF2\u5F00\u542F\uFF08\u6CE8\u610F\uFF1A\u5C1A\u672A\u8BBE\u7F6E\u5BC6\u7801\uFF0C\u8BBF\u5BA2\u4ECD\u53EF\u514D\u5BC6\u8FDB\u5165\uFF0C\u8BF7\u7ACB\u5373\u5728\u4E0B\u65B9\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\uFF09": "\u2713 Protection enabled (note: no password set yet \u2014 visitors can still enter without one; set an access password below now)",
+  "\u2713 \u8BBF\u95EE\u5B89\u5168\u8BA4\u8BC1\u5DF2\u5F00\u542F\uFF08\u73B0\u6709\u767B\u5F55\u6001\u5DF2\u5237\u65B0\uFF09": "\u2713 Access protection enabled (existing sessions refreshed)",
+  "\u2713 \u8BBF\u95EE\u5B89\u5168\u8BA4\u8BC1\u5DF2\u5173\u95ED\uFF08\u8BBF\u95EE\u514D\u5BC6\uFF0C\u7BA1\u7406\u4FDD\u62A4\u4E0D\u53D7\u5F71\u54CD\uFF09": "\u2713 Access protection disabled (access is password-free; admin protection is unaffected)",
+  "\u2713 \u7BA1\u7406\u4FDD\u62A4\u5DF2\u5F00\u542F\uFF08\u4FEE\u6539\u914D\u7F6E\u9700\u7BA1\u7406\u5BC6\u7801\uFF09": "\u2713 Admin protection enabled (configuration changes require the admin password)",
+  "\u2713 \u7BA1\u7406\u4FDD\u62A4\u5DF2\u5173\u95ED\uFF08\u4FEE\u6539\u914D\u7F6E\u514D\u5BC6\uFF0C\u8BF7\u8C28\u614E\uFF09": "\u2713 Admin protection disabled (configuration changes need no password \u2014 be careful)",
+  "\u300C\u4EC5\u5BC6\u7801 / PIN \u7801\u767B\u5F55\u300D\u9700\u8981\u5148\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\u3002\n\n\u8BF7\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801 / PIN \u7801\u300D\u5904\u8F93\u5165\u5BC6\u7801\u5E76\u70B9\u51FB\u300C\u4FDD\u5B58\u8BBF\u95EE\u5BC6\u7801\u300D\uFF0C\u7136\u540E\u518D\u5207\u6362\u5230\u6B64\u6A21\u5F0F\u6216\u5F00\u542F\u5B89\u5168\u9632\u62A4\u3002": "\u201CPassword / PIN only\u201D needs an access password first.\n\nSet one below under \u201CExternal visitor access password / PIN\u201D, click \u201CSave access password\u201D, then switch to this mode or enable protection.",
+  "\u8BF7\u5148\u5728\u4E0B\u65B9\u8BBE\u7F6E\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\uFF0C\u518D\u5207\u6362\u4E3A\u300C\u4EC5\u5BC6\u7801\u767B\u5F55\u300D\u6A21\u5F0F": "Set a visitor access password below before switching to \u201CPassword only\u201D",
+  "\u2713 \u5916\u90E8\u9A8C\u8BC1\u6A21\u5F0F\u5DF2\u5207\u6362\uFF0C\u5DF2\u5237\u65B0\u5168\u57DF\u767B\u5F55\u6001": "\u2713 Verification mode switched; all sessions refreshed",
+  "\u2713 \u9632\u62A4\u751F\u6548\u8303\u56F4\u5DF2\u66F4\u65B0": "\u2713 Protection scope updated",
+  "\u2713 \u8FDC\u7A0B\u7BA1\u7406\u9632\u7BE1\u6539\u7B56\u7565\u5DF2\u66F4\u65B0": "\u2713 Remote management policy updated",
+  "\u2713 \u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\u5DF2\u6210\u529F\u4FDD\u5B58\uFF01\u539F\u6709\u7684\u5386\u53F2\u8BBF\u5BA2\u4F1A\u8BDD\u5DF2\u5168\u90E8\u5B89\u5168\u5237\u65B0\u3002": "\u2713 Visitor access password saved. All previous visitor sessions were refreshed.",
+  "\u2713 \u540E\u53F0\u7BA1\u7406\u5BC6\u7801\u5DF2\u6210\u529F\u4FDD\u5B58\uFF01\u8FDC\u7A0B\u7BA1\u7406\u89E3\u9501\u72B6\u6001\u5DF2\u91CD\u7F6E\u751F\u6548\u3002": "\u2713 Admin password saved. The remote-management unlock state was reset.",
+  "\u91CD\u7F6E\u540E\uFF0C\u4E4B\u524D\u5305\u542B\u65E7 Token \u7684\u4E8C\u7EF4\u7801\u548C\u5206\u4EAB\u94FE\u63A5\u5C06\u7ACB\u5373\u5931\u6548\u3002\u662F\u5426\u786E\u8BA4\u91CD\u7F6E\uFF1F": "Resetting invalidates every previously shared QR code and link containing the old Token. Reset now?",
+  "\u91CD\u7F6E\u5931\u8D25": "Reset failed",
+  "\u2713 \u5B89\u5168 Token \u5DF2\u91CD\u7F6E\uFF0C\u4E8C\u7EF4\u7801\u4E0E\u4E13\u5C5E\u94FE\u63A5\u5DF2\u5237\u65B0": "\u2713 Security Token reset; QR code and share link refreshed",
+  "\u5168\u90E8\u901A\u9053 (\u5C40\u57DF\u7F51+\u516C\u7F51)": "All channels (LAN + public)",
+  "\u4EC5\u516C\u7F51\u96A7\u9053": "Public tunnel only",
+  "\u4EC5\u5C40\u57DF\u7F51": "LAN only",
+  "\u626B\u7801\u514D\u5BC6 + \u5BC6\u7801": "QR (no password) + password",
+  "\u4EC5\u5BC6\u7801\u767B\u5F55": "Password only",
+  "\u4EC5\u5B89\u5168 Token": "Security Token only",
+  "\u9700\u5BC6\u7801\u89E3\u9501": "Password unlock required",
+  "\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406": "This computer only",
+  "\u5BBD\u677E\u6A21\u5F0F": "Relaxed",
+  "\u{1F510} \u5168\u5C40\u8BBF\u95EE\u5B89\u5168\u9632\u62A4\u4F53\u7CFB": "\u{1F510} Global access protection",
+  "\u96C6\u6210\u5916\u90E8\u8BBF\u95EE\u95E8\u7981\u62E6\u622A\u4E0E\u7BA1\u7406\u540E\u53F0\u9632\u7BE1\u6539\u63A7\u5236\uFF0C\u53CC\u91CD\u5B88\u62A4\u8FDC\u7A0B\u4F1A\u8BDD\u4E0E\u7F51\u7EDC\u914D\u7F6E\u5B89\u5168": "External access gating plus admin anti-tamper control, guarding both remote sessions and network configuration",
+  "\u2713 \u5DF2\u542F\u7528\u5B89\u5168\u9632\u62A4": "\u2713 Protection enabled",
+  "\u672A\u5F00\u542F\u5B89\u5168\u9632\u62A4": "Protection disabled",
+  "\u{1F310} \u4FDD\u62A4\u8303\u56F4: ": "\u{1F310} Scope: ",
+  "\u{1F511} \u5916\u90E8\u9A8C\u8BC1: ": "\u{1F511} External verification: ",
+  "\u{1F512} \u540E\u53F0\u9632\u7BE1\u6539: ": "\u{1F512} Admin anti-tamper: ",
+  "\u5C1A\u672A\u8BBE\u7F6E\u4EFB\u4F55\u8BBF\u95EE\u5BC6\u7801\u6216\u7BA1\u7406\u5BC6\u7801": "No access or admin password set yet",
+  " \u2014\u2014 \u6B64\u65F6\u201C\u8BBF\u95EE\u8BA4\u8BC1\u5DF2\u5F00\u542F\u201D\u4F46\u4EFB\u4F55\u77E5\u9053\u5C40\u57DF\u7F51 IP / \u96A7\u9053\u5730\u5740\u7684\u4EBA\u90FD\u80FD\u76F4\u63A5\u8FDB\u5165\uFF08\u96A7\u9053\u5165\u53E3\u81EA\u8EAB\u4E0D\u8BBE\u9632\uFF0C\u8BE6\u89C1\u4E0B\u65B9\u5B89\u5168\u987B\u77E5\uFF09\u3002": " \u2014 access protection is on, but anyone who knows the LAN IP / tunnel address can still enter (the tunnel entry itself is unprotected; see the security notes below).",
+  "\u5EFA\u8BAE\u7ACB\u5373\u5728\u4E0B\u65B9\u8BBE\u7F6E": "Set it below now:",
+  "\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801": "visitor access password",
+  "\u6216": "or",
+  "\u7BA1\u7406\u5BC6\u7801": "admin password",
+  "\u540E\u518D\u5BF9\u5916\u5F00\u653E\u3002": "before exposing it publicly.",
+  "\u{1F6E1}\uFE0F \u7B2C\u4E00\u9053\u9632\u7EBF\uFF1A\u5916\u90E8\u8BBF\u95EE\u95E8\u7981\uFF08\u63A7\u5236\u8C01\u80FD\u4F7F\u7528 AI\uFF09": "\u{1F6E1}\uFE0F First line: external access gate (who may use the AI)",
+  "\u63A7\u5236\u5916\u90E8\u8BBE\u5907\u901A\u8FC7\u5C40\u57DF\u7F51 IP \u6216\u516C\u7F51\u96A7\u9053\uFF08Cloudflare/\u81EA\u5EFA\u96A7\u9053\uFF09\u8FDB\u5165 DSH \u804A\u5929\u754C\u9762\u65F6\u7684\u8EAB\u4EFD\u9A8C\u8BC1\u65B9\u5F0F": "How external devices authenticate when reaching the DSH chat UI over the LAN IP or a public tunnel (Cloudflare / self-hosted)",
+  "\u9A8C\u8BC1\u6A21\u5F0F\u9009\u62E9": "Verification mode",
+  "\u{1F7E2} \u626B\u7801\u514D\u5BC6 + \u5BC6\u7801\u8BA4\u8BC1 (\u63A8\u8350)": "\u{1F7E2} QR (no password) + password (recommended)",
+  "\u4E8C\u7EF4\u7801\u81EA\u5E26\u4E13\u5C5E Token \u626B\u7801\u79D2\u8FDB\uFF1B\u76F4\u63A5\u8F93 IP/\u516C\u7F51\u57DF\u540D\u9700\u8F93\u5BC6\u7801": "QR codes carry a dedicated Token for instant access; typing the IP/public domain requires the password",
+  "\u{1F511} \u4EC5\u5BC6\u7801 / PIN \u7801\u767B\u5F55": "\u{1F511} Password / PIN only",
+  "\u6240\u6709\u5916\u90E8\u8BBF\u95EE\u5FC5\u987B\u624B\u52A8\u8F93\u5165\u8BBF\u95EE\u5BC6\u7801\u65B9\u53EF\u8FDB\u5165": "All external access requires the access password",
+  "\u{1F3AB} \u4EC5\u5B89\u5168 Token \u514D\u5BC6": "\u{1F3AB} Security Token only (no password)",
+  "\u4EC5\u6301\u6709\u5E26\u5B89\u5168 Token \u7684\u4E8C\u7EF4\u7801\u6216\u4E13\u5C5E\u5206\u4EAB\u94FE\u63A5\u65B9\u53EF\u8FDB\u5165": "Only QR codes or share links carrying the Security Token can get in",
+  "\u9632\u62A4\u751F\u6548\u901A\u9053": "Protected channels",
+  "\u5168\u90E8\u901A\u9053\u9632\u62A4 (\u63A8\u8350)": "All channels (recommended)",
+  "\u5C40\u57DF\u7F51 IP \u76F4\u8FDE\u4E0E\u516C\u7F51\u96A7\u9053\u5168\u90E8\u53D7\u5B89\u5168\u4FDD\u62A4": "Both direct LAN IP access and the public tunnel are protected",
+  "\u4EC5\u516C\u7F51\u96A7\u9053\u5F00\u542F\u9632\u62A4": "Public tunnel only",
+  "\u5C40\u57DF\u7F51\u5185\u8BBE\u5907\u76F4\u63A5\u514D\u5BC6\u76F4\u8FDE\uFF0C\u516C\u7F51\u96A7\u9053\u5F3A\u5236\u9A8C\u8BC1": "LAN devices connect without a password; the public tunnel always verifies",
+  "\u4EC5\u5C40\u57DF\u7F51\u5F00\u542F\u9632\u62A4": "LAN only",
+  "\u4EC5\u5C40\u57DF\u7F51\u76F4\u8FDE\u9700\u9A8C\u8BC1\uFF0C\u516C\u7F51\u96A7\u9053\u4E0D\u5F00\u542F": "Direct LAN access is verified; the public tunnel is not protected",
+  "\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801 ${status}": "External visitor access password ${status}",
+  "(\u2713 \u5DF2\u8BBE\u7F6E\u8BBF\u5BA2\u5BC6\u7801)": "(\u2713 visitor password set)",
+  "(\u26A0\uFE0F \u5C1A\u672A\u8BBE\u7F6E\u5BC6\u7801\uFF0C\u76F4\u63A5\u8F93\u5165 IP \u5C06\u514D\u5BC6)": "(\u26A0\uFE0F no password yet \u2014 typing the IP grants access without one)",
+  "\u8F93\u5165\u65B0\u5BC6\u7801\u4EE5\u4FEE\u6539\uFF08\u7559\u7A7A\u4FDD\u5B58\u53EF\u6E05\u9664\u8BBF\u5BA2\u5BC6\u7801\uFF09": "Enter a new password to change it (save empty to clear the visitor password)",
+  "\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801 / PIN \u7801": "Set external visitor access password / PIN",
+  "\u9690\u85CF": "Hide",
+  "\u663E\u793A": "Show",
+  "\u2713 \u5DF2\u6210\u529F\u4FDD\u5B58\uFF01": "\u2713 Saved successfully!",
+  "\u4FDD\u5B58\u8BBF\u95EE\u5BC6\u7801": "Save access password",
+  "\u{1F4A1} \u5F53\u5916\u90E8\u670B\u53CB\u6216\u540C\u4E8B\u672A\u901A\u8FC7\u4E8C\u7EF4\u7801\u626B\u7801\uFF0C\u800C\u662F\u76F4\u63A5\u8F93\u5165 IP \u6216\u516C\u7F51\u57DF\u540D\u8BBF\u95EE\u65F6\uFF0C\u9700\u8F93\u5165\u6B64\u5BC6\u7801\u767B\u5F55\u3002": "\u{1F4A1} Friends or colleagues who type the IP or public domain instead of scanning the QR code must enter this password to sign in.",
+  "\u514D\u5BC6\u626B\u7801 Token (\u4E13\u5C5E\u8BBF\u95EE\u51ED\u636E)": "Password-free QR Token (dedicated credential)",
+  "\u672A\u751F\u6210": "Not generated",
+  "\u91CD\u65B0\u751F\u6210 Token\uFF0C\u4F7F\u4E4B\u524D\u5206\u4EAB\u7684\u65E7\u4E8C\u7EF4\u7801\u548C\u94FE\u63A5\u7ACB\u5373\u5931\u6548": "Regenerate the Token to invalidate previously shared QR codes and links",
+  "\u{1F504} \u91CD\u7F6E\u5B89\u5168 Token": "\u{1F504} Reset Security Token",
+  "\u{1F4A1} \u63A7\u5236\u53F0\u751F\u6210\u7684\u5C40\u57DF\u7F51\u4E0E\u516C\u7F51\u4E8C\u7EF4\u7801\u5DF2\u81EA\u52A8\u5D4C\u5165\u6B64 Token\uFF0C\u624B\u673A\u626B\u7801\u5373\u53EF\u514D\u5BC6\u8FDB\u5165\u804A\u5929\u754C\u9762\uFF08\u4F46\u4E0D\u8D4B\u4E88\u540E\u53F0\u7BA1\u7406\u8BBE\u7F6E\u6743\u9650\uFF09\u3002": "\u{1F4A1} The LAN and public QR codes generated here already embed this Token, so a phone scans straight into the chat without a password (admin settings are not granted).",
+  "\u{1F512} \u7B2C\u4E8C\u9053\u9632\u7EBF\uFF1A\u7BA1\u7406\u540E\u53F0\u9632\u7BE1\u6539\uFF08\u63A7\u5236\u8C01\u80FD\u4FEE\u6539\u672C\u63D2\u4EF6\u6240\u6709\u8BBE\u7F6E\uFF09": "\u{1F512} Second line: admin anti-tamper (who may change this plugin's settings)",
+  "\u9501\u5B9A\u6574\u4E2A\u63D2\u4EF6\u8BBE\u7F6E\u540E\u53F0\uFF08\u5305\u542B\u5C40\u57DF\u7F51\u3001\u516C\u7F51\u96A7\u9053\u3001IM \u673A\u5668\u4EBA\u5BC6\u94A5\u4E0E\u5B89\u5168\u8BBE\u7F6E\uFF09\uFF0C\u9632\u6B62\u4ED6\u4EBA\u968F\u610F\u7BE1\u6539\u914D\u7F6E": "Locks the whole settings console (LAN, public tunnel, IM bot secrets and security settings) against tampering",
+  "\u{1F6E1}\uFE0F \u7BA1\u7406\u4FDD\u62A4\u5DF2\u5F00\u542F\uFF08\u4FEE\u6539\u914D\u7F6E\u9700\u7BA1\u7406\u5BC6\u7801\uFF09": "\u{1F6E1}\uFE0F Admin protection is on (changes require the admin password)",
+  "\u26A0\uFE0F \u7BA1\u7406\u4FDD\u62A4\u5DF2\u5173\u95ED\uFF08\u4FEE\u6539\u914D\u7F6E\u514D\u5BC6\uFF09": "\u26A0\uFE0F Admin protection is off (changes need no password)",
+  "\u5173\u95ED\u7BA1\u7406\u4FDD\u62A4": "Disable admin protection",
+  "\u5F00\u542F\u7BA1\u7406\u4FDD\u62A4": "Enable admin protection",
+  "\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5458\u5BC6\u7801 ${status}": "Set a dedicated admin password ${status}",
+  "(\u2713 \u5DF2\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801)": "(\u2713 dedicated admin password set)",
+  "(\u672A\u5355\u72EC\u8BBE\u7F6E\uFF0C\u9ED8\u8BA4\u4F7F\u7528\u4E0A\u8FF0\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801)": "(not set \u2014 the visitor access password above is used)",
+  "\u8F93\u5165\u65B0\u5BC6\u7801\u4EE5\u4FEE\u6539\uFF08\u7559\u7A7A\u4FDD\u5B58\u53EF\u6E05\u9664\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801\uFF09": "Enter a new password to change it (save empty to clear the dedicated admin password)",
+  "\u8BBE\u7F6E\u540E\u53F0\u7BA1\u7406\u89E3\u9501\u5BC6\u7801\uFF08\u5EFA\u8BAE\u4E0E\u8BBF\u5BA2\u5BC6\u7801\u4E0D\u540C\uFF09": "Set the admin unlock password (different from the visitor password is recommended)",
+  "\u4FDD\u5B58\u7BA1\u7406\u5BC6\u7801": "Save admin password",
+  "\u{1F511} \u6838\u5FC3\u4F5C\u7528\uFF1A\u7528\u4E8E\u8FDC\u7A0B\u8BBE\u5907\u8FDB\u5165\u8BBE\u7F6E\u540E\u53F0\u65F6\u7684\u89E3\u9501\u9A8C\u8BC1\u3002\u8BBE\u7F6E\u540E\uFF0C\u5373\u4FBF\u628A\u8BBF\u95EE\u5BC6\u7801\u544A\u77E5\u4ED6\u4EBA\uFF0C\u4ED6\u4EBA\u4E5F\u65E0\u6CD5\u8FDB\u5165\u8BBE\u7F6E\u540E\u53F0\u6539\u914D\u7F6E\u3002": "\u{1F511} Used to unlock the admin console from remote devices. Once set, sharing the access password no longer lets others change settings here.",
+  "\u8FDC\u7A0B\u8BBE\u5907\u7BA1\u7406\u6743\u9650\u7B56\u7565": "Remote device management policy",
+  "\u{1F512} \u9700\u5BC6\u7801\u89E3\u9501 (\u63A8\u8350)": "\u{1F512} Password unlock (recommended)",
+  "\u8FDC\u7A0B\u624B\u673A/\u5916\u7F51\u6253\u5F00\u672C\u63D2\u4EF6\u8BBE\u7F6E\u65F6\u9ED8\u8BA4\u5168\u5C40\u9501\u5B9A\uFF0C\u8F93\u5165\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\u540E\u65B9\u53EF\u4F7F\u7528": "Remote phones/internet sessions start locked; unlock with the admin password to use the console",
+  "\u{1F6AB} \u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406 (\u6700\u4E25\u683C)": "\u{1F6AB} This computer only (strictest)",
+  "\u8FDC\u7A0B\u8BBE\u5907\u5F7B\u5E95\u9501\u5B9A\u6574\u4E2A\u8BBE\u7F6E\u540E\u53F0\uFF0C\u4EC5\u5141\u8BB8\u5728 127.0.0.1 \u7535\u8111\u672C\u673A\u4E0A\u64CD\u4F5C": "Remote devices are fully locked out; only 127.0.0.1 on this computer may manage",
+  "\u{1F513} \u5BBD\u677E\u6A21\u5F0F": "\u{1F513} Relaxed",
+  "\u4EFB\u4F55\u5DF2\u901A\u8FC7\u7B2C\u4E00\u9053\u9632\u7EBF\u767B\u5F55\u7684\u8BBE\u5907\u5747\u53EF\u76F4\u63A5\u4FEE\u6539\u6240\u6709\u914D\u7F6E": "Any device that passed the first line may change all settings",
+  "\u6DFB\u52A0\u767D\u540D\u5355\u5931\u8D25": "Failed to add to allowlist",
+  "\u52A0\u8F7D\u4E2D\u2026": "Loading\u2026",
+  "\u91CD\u8FDE\u4E2D\u2026": "Reconnecting\u2026",
+  "\u6682\u505C\uFF08\u4F1A\u8BDD\u8FC7\u671F\uFF09": "Paused (session expired)",
+  "\u9519\u8BEF": "Error",
+  "\u672A\u8FDE\u63A5": "Disconnected",
+  "\u63A8\u8350": "Recommended",
+  "\u{1F4D6} \u5FAE\u4FE1\u4F7F\u7528\u8BF4\u660E": "\u{1F4D6} WeChat guide",
+  "\u{1F4D6} QQ \u4F7F\u7528\u8BF4\u660E": "\u{1F4D6} QQ guide",
+  "\u{1F310} QQ \u5F00\u653E\u5E73\u53F0": "\u{1F310} QQ Open Platform",
+  "\u{1F4D6} \u98DE\u4E66\u4F7F\u7528\u8BF4\u660E": "\u{1F4D6} Lark / Feishu guide",
+  "\u{1F310} \u98DE\u4E66\u5F00\u653E\u5E73\u53F0": "\u{1F310} Lark / Feishu Open Platform",
+  "\u{1F4D6} Telegram \u4F7F\u7528\u8BF4\u660E": "\u{1F4D6} Telegram guide",
+  "\u{1F310} @BotFather \u7533\u8BF7 Bot": "\u{1F310} Create a bot via @BotFather",
+  "\u6536\u8D77\u547D\u4EE4": "Hide commands",
+  "\u547D\u4EE4\u5217\u8868": "Command list",
+  "/new <\u63D0\u793A\u8BCD> \u2014 \u65B0\u5EFA\u4F1A\u8BDD\u5E76\u5F00\u59CB\uFF08\u5F53\u524D\u5DE5\u4F5C\u533A\uFF09": "/new <prompt> \u2014 start a new session (current workspace)",
+  "/new <\u63D0\u793A\u8BCD> @N \u2014 \u5728\u6307\u5B9A\u5DE5\u4F5C\u533A\u65B0\u5EFA\u4F1A\u8BDD": "/new <prompt> @N \u2014 start a session in workspace N",
+  "/sessions\uFF08\u6216 /list\uFF09\u2014 \u5217\u51FA\u4F1A\u8BDD\uFF08\u6309\u5DE5\u4F5C\u533A\u5206\u7EC4\uFF0C\u5E26\u6807\u9898\uFF09": "/sessions (or /list) \u2014 list sessions (grouped by workspace, with titles)",
+  "/use N\uFF08\u6216 /resume N\uFF09\u2014 \u5207\u6362\u5230\u4F1A\u8BDD N": "/use N (or /resume N) \u2014 switch to session N",
+  "/workspaces \u2014 \u5217\u51FA\u6240\u6709\u53EF\u7528\u5DE5\u4F5C\u533A": "/workspaces \u2014 list all available workspaces",
+  "/end \u2014 \u7ED3\u675F\u5F53\u524D\u4F1A\u8BDD\uFF08\u56DE\u5230\u65E0\u6D3B\u52A8\u4F1A\u8BDD\u72B6\u6001\uFF09": "/end \u2014 end the current session (back to no active session)",
+  "/stop \u2014 \u505C\u6B62\u5F53\u524D\u4EFB\u52A1": "/stop \u2014 stop the current task",
+  "/status \u2014 \u67E5\u770B Agent \u72B6\u6001\u4E0E\u4F1A\u8BDD\u6458\u8981": "/status \u2014 show agent status and session summary",
+  "/yes \u6216 /no\uFF08\u6216 1/2\uFF09\u2014 \u56DE\u5E94\u6743\u9650\u5BA1\u6279\u8BF7\u6C42": "/yes or /no (or 1/2) \u2014 answer an approval request",
+  "/help \u2014 \u663E\u793A\u5B8C\u6574\u547D\u4EE4\u5E2E\u52A9": "/help \u2014 show full command help",
+  "\u8FDE\u63A5\u72B6\u6001": "Connection status",
+  "\u767B\u5F55\u8D26\u53F7": "Signed-in account",
+  "\u6D3B\u52A8\u4F1A\u8BDD": "Active session",
+  "\u767D\u540D\u5355 (\u5DF2\u6388\u6743 ${count} \u4E2A\u8D26\u53F7/\u7FA4):": "Allowlist (${count} authorized):",
+  "\u79FB\u51FA\u767D\u540D\u5355": "Remove from allowlist",
+  "(\u7A7A \u2014 \u626B\u7801\u540E\u9996\u4E2A\u53D1\u6D88\u606F\u7684\u5FAE\u4FE1\u7528\u6237\u5C06\u81EA\u52A8\u52A0\u5165)": "(empty \u2014 the first WeChat user to message the bot is added automatically)",
+  "(\u7A7A \u2014 \u9996\u4E2A\u53D1\u6D88\u606F\u7684\u7528\u6237\u5C06\u81EA\u52A8\u52A0\u5165)": "(empty \u2014 the first user to message the bot is added automatically)",
+  "\u6DFB\u52A0\u5141\u8BB8\u7684\u5FAE\u4FE1 ID\uFF08\u5982 xxx@im.wechat\uFF09\uFF0C\u6309 Enter \u6DFB\u52A0": "Add an allowed WeChat ID (e.g. xxx@im.wechat), press Enter",
+  "\u6DFB\u52A0\u5141\u8BB8\u7684\u7528\u6237/\u7FA4 ID\uFF0C\u6309 Enter \u6DFB\u52A0": "Add an allowed user/group ID, press Enter",
+  "\u6DFB\u52A0": "Add",
+  "\u4F7F\u7528\u5DF2\u4FDD\u5B58\u7684\u51ED\u8BC1\u76F4\u63A5\u6062\u590D\u8FDE\u63A5\uFF0C\u65E0\u9700\u91CD\u65B0\u626B\u7801": "Reconnect with the saved credentials \u2014 no need to scan again",
+  "\u9996\u6B21\u4F7F\u7528\u9700\u626B\u7801\u7ED1\u5B9A": "First-time use requires scanning to bind",
+  "\u91CD\u65B0\u8FDE\u63A5": "Reconnect",
+  "\u8FDE\u63A5": "Connect",
+  '\u505C\u6B62\u63A5\u6536\u6D88\u606F\uFF1B\u51ED\u8BC1\u4FDD\u7559\uFF0C\u53EF\u968F\u65F6"\u91CD\u65B0\u8FDE\u63A5"\u6062\u590D': "Stop receiving messages; credentials are kept \u2014 use \u201CReconnect\u201D anytime",
+  "\u65AD\u5F00": "Disconnect",
+  "\u786E\u8BA4\u89E3\u7ED1\uFF1F\u8FD9\u5C06\u6E05\u9664\u4FDD\u5B58\u7684\u51ED\u8BC1\u3002": "Unbind? This clears the saved credentials.",
+  "\u6E05\u9664\u767B\u5F55\u51ED\u8BC1\uFF0C\u4E0B\u6B21\u9700\u91CD\u65B0\u914D\u7F6E": "Clear the login credentials; reconfigure next time",
+  "\u89E3\u7ED1\u8D26\u53F7": "Unbind account",
+  "\u5F00\u542F\u540E\uFF0C\u767D\u540D\u5355\u4E4B\u5916\u7684\u65B0\u7FA4\u9996\u6B21 @\u673A\u5668\u4EBA \u5373\u81EA\u52A8\u6388\u6743\u5165\u767D\u540D\u5355\uFF1B\u5173\u95ED\uFF08\u9ED8\u8BA4\uFF09\u65F6\u65B0\u7FA4\u5FC5\u987B\u5148\u5728\u6B64\u624B\u52A8\u6DFB\u52A0": "When on, a new group is auto-authorized the first time it @mentions the bot; when off (default) you must add it here first",
+  "\u7FA4\u804A\u81EA\u52A8\u6388\u6743\uFF08\u65B0\u7FA4\u9996\u6B21 @\u673A\u5668\u4EBA \u81EA\u52A8\u52A0\u5165\u767D\u540D\u5355\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09": "Group auto-authorization (first @mention joins the allowlist; default off)",
+  '\u5F00\u542F\u540E\uFF0C\u6BCF\u8F6E\u7ED3\u675F\u4F1A\u628A"\u6539\u4E86\u54EA\u4E9B\u6587\u4EF6\uFF08+\u589E/-\u5220\uFF09"\u64AD\u62A5\u5230\u5F53\u524D\u4F1A\u8BDD\uFF1B/diff \u53EF\u5BFC\u51FA .patch \u8865\u4E01': "When on, each turn ends with a summary of changed files (+added/-removed); /diff exports a .patch",
+  "\u672C\u8F6E\u6539\u52A8\u6458\u8981\uFF08\u6BCF\u8F6E\u64AD\u62A5\u6539\u52A8\u6587\u4EF6\u6E05\u5355\uFF0C\u9ED8\u8BA4\u5F00\u542F\uFF09": "Turn change summary (broadcast changed files each turn; default on)",
+  "\u5F00\u542F\u540E Agent \u5E72\u6D3B\u65F6\u5361\u7247\u9876\u90E8\u4F1A\u5B9E\u65F6\u663E\u793A\u5F53\u524D\u52A8\u4F5C\uFF08\u5982\u300C\u6B63\u5728\u8FD0\u884C\u547D\u4EE4\u300D\uFF09\uFF1B\u5173\u95ED\u540E\u4E0D\u518D\u663E\u793A": "When on, the card header shows the agent's current action live (e.g. \u201CRunning command\u201D); when off it is hidden",
+  "\u5B9E\u65F6\u6D3B\u52A8\u72B6\u6001\uFF08\u5361\u7247\u9876\u90E8\u663E\u793A\u300C\u6B63\u5728\u8FD0\u884C\u547D\u4EE4\u300D\u7B49\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09": "Live activity status (shows \u201CRunning command\u201D etc. atop the card; default off)",
+  "\u6536\u8D77\u9AD8\u7EA7\u8BBE\u7F6E": "Hide advanced settings",
+  "\u2699\uFE0F \u9AD8\u7EA7\u8BBE\u7F6E": "\u2699\uFE0F Advanced settings",
+  "\u4EE5\u4E0B\u8BBE\u7F6E\u6309\u5E73\u53F0\u4FDD\u5B58\uFF0C\u53EA\u5F71\u54CD\u8BE5\u5E73\u53F0\u901A\u8FC7 Bot \u65B0\u5EFA\u7684\u4F1A\u8BDD\uFF08\u7559\u7A7A = \u4F7F\u7528 DSH \u9ED8\u8BA4\u503C\uFF09\u3002": "These settings are saved per platform and only affect sessions created through that bot (empty = DSH defaults).",
+  "Agent \u9884\u8BBE \u2014 \u51B3\u5B9A\u8FDC\u7A0B\u4F1A\u8BDD\u53EF\u7528\u7684\u5DE5\u5177\u4E0E\u6280\u80FD\uFF0C\u7559\u7A7A\u7528 DSH \u9ED8\u8BA4\u9884\u8BBE": "Agent preset \u2014 which tools and skills remote sessions may use; empty = DSH default preset",
+  "\u7559\u7A7A = DSH \u9ED8\u8BA4\uFF08${name}\uFF09": "Empty = DSH default (${name})",
+  "\u7559\u7A7A = DSH \u9ED8\u8BA4\u9884\u8BBE": "Empty = DSH default preset",
+  "\u6B63\u5728\u8BFB\u53D6\u672C\u673A\u53EF\u7528\u9884\u8BBE\u2026": "Reading available presets\u2026",
+  "\u672C\u673A\u53EF\u7528\uFF1A${list}": "Available: ${list}",
+  "\uFF08\u65E0\uFF09": "(none)",
+  "\u5F53\u524D DSH \u7248\u672C\u672A\u63D0\u4F9B\u9884\u8BBE\u5217\u8868\uFF0C\u8BF7\u624B\u52A8\u586B\u5199\u9884\u8BBE\u540D": "This DSH version exposes no preset list \u2014 type the preset name manually",
+  "\u5DE5\u4F5C\u533A\u76EE\u5F55 \u2014 \u8BE5\u5E73\u53F0 /new \u65B0\u5EFA\u4F1A\u8BDD\u7684\u9ED8\u8BA4\u76EE\u5F55\uFF0C\u7559\u7A7A\u7528\u9996\u4E2A\u5DF2\u6CE8\u518C\u5DE5\u4F5C\u533A": "Workspace directory \u2014 default cwd for /new sessions on this platform; empty = first registered workspace",
+  "\u7EDD\u5BF9\u8DEF\u5F84\uFF0C\u4F8B\u5982 /home/me/project \u6216 D:\\project": "Absolute path, e.g. /home/me/project or D:\\project",
+  "\u6A21\u578B\u63D0\u4F9B\u65B9\uFF08\u53EF\u9009\uFF09": "Model provider (optional)",
+  "\u7559\u7A7A = DSH \u9ED8\u8BA4": "Empty = DSH default",
+  "\u6A21\u578B\uFF08\u53EF\u9009\uFF09": "Model (optional)",
+  "\u8FDB\u5EA6\u6458\u8981\u95F4\u9694\uFF08\u79D2\uFF09": "Progress digest interval (seconds)",
+  "\u5BA1\u6279\u8D85\u65F6\uFF08\u79D2\uFF09": "Approval timeout (seconds)",
+  "\u5355\u6761\u6D88\u606F\u4E0A\u9650\uFF08\u5B57\u7B26\uFF09": "Max message size (characters)",
+  "\u5206\u5757\u53D1\u9001\u95F4\u9694\uFF08\u6BEB\u79D2\uFF09": "Chunk send interval (ms)",
+  "\u4FDD\u5B58\u9AD8\u7EA7\u8BBE\u7F6E": "Save advanced settings",
+  "\u6062\u590D\u63A8\u8350\u8282\u594F\u53C2\u6570": "Restore recommended pacing",
+  "\u{1F4F1} \u624B\u673A ${name} \u626B\u7801\u76F4\u8FBE\u5BF9\u8BDD": "\u{1F4F1} Scan to chat with the bot on ${name}",
+  "\u7528 ${name} \u626B\u63CF\u5DE6\u4FA7\u4E8C\u7EF4\u7801\uFF0C\u7ACB\u5373\u6253\u5F00\u4E0E Bot \u5BF9\u8BDD\uFF1B\u53D1\u9001\u9996\u6761\u6D88\u606F\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002": "Scan the QR code with ${name} to open the chat; sending the first message authorizes you automatically.",
+  "\u5728 ${name} \u5BA2\u6237\u7AEF\u6253\u5F00 \u2197": "Open in ${name} \u2197",
+  "\u5DF2\u626B\u7801\uFF0C\u8BF7\u5728\u624B\u673A\u4E0A\u786E\u8BA4\u2026": "Scanned \u2014 confirm on your phone\u2026",
+  "\u8BF7\u4F7F\u7528\u5FAE\u4FE1\u626B\u7801\u767B\u5F55\uFF08ClawBot\uFF09": "Scan with WeChat to sign in (ClawBot)",
+  "\u8BF7\u7528\u98DE\u4E66\u626B\u7801\u521B\u5EFA\u5E94\u7528\uFF08\u4E8C\u7EF4\u7801 10 \u5206\u949F\u5185\u6709\u6548\uFF09": "Scan with Lark / Feishu to create the app (QR valid for 10 minutes)",
+  "\u8BF7\u626B\u7801\u767B\u5F55": "Scan to sign in",
+  "\u4F5C\u5E9F\u5F53\u524D\u4E8C\u7EF4\u7801\u5E76\u91CD\u65B0\u751F\u6210\uFF08\u65E7\u7801\u7ACB\u5373\u5931\u6548\uFF09": "Invalidate the current QR code and generate a new one (the old one stops working)",
+  "\u751F\u6210\u4E2D\u2026": "Generating\u2026",
+  "\u{1F504} \u91CD\u65B0\u751F\u6210\u4E8C\u7EF4\u7801": "\u{1F504} Regenerate QR code",
+  "\u626B\u4E0D\u51FA\u6765\u6216\u5DF2\u8FC7\u671F\u65F6\u53EF\u70B9\u6B64\u6362\u65B0\u7801": "Tap here for a fresh code if scanning fails or it expired",
+  "\u{1F4F1} \u4E00\u952E\u521B\u5EFA\u98DE\u4E66\u5E94\u7528\uFF08\u63A8\u8350\uFF09": "\u{1F4F1} One-tap Lark / Feishu app creation (recommended)",
+  "\u70B9\u51FB\u540E\u7528\u98DE\u4E66\u626B\u7801\uFF1A\u81EA\u52A8\u521B\u5EFA\u673A\u5668\u4EBA\u5E94\u7528\u5E76\u9884\u7F6E\u6240\u9700\u6743\u9650\u3001\u4E8B\u4EF6\u8BA2\u9605\u4E0E\u5361\u7247\u56DE\u8C03\uFF0C\u65E0\u9700\u8FDB\u5F00\u53D1\u8005\u540E\u53F0\u624B\u5DE5\u914D\u7F6E\u3002": "Click and scan with Lark / Feishu: the bot app is created with the required permissions, event subscriptions and card callbacks preconfigured \u2014 no manual developer-console setup.",
+  "\u4F7F\u7528\u98DE\u4E66\u626B\u7801\u521B\u5EFA\u5E94\u7528\u5E76\u81EA\u52A8\u586B\u5165\u51ED\u8BC1": "Create the app by scanning with Lark / Feishu and fill in the credentials automatically",
+  "\u5904\u7406\u4E2D\u2026": "Working\u2026",
+  "\u626B\u7801\u4E00\u952E\u521B\u5EFA\u5E94\u7528": "Scan to create the app",
+  "\u5DF2\u6709\u5E94\u7528\uFF1F\u5728\u4E0B\u65B9\u624B\u52A8\u586B\u5165 App ID \u4E0E App Secret\uFF0C\u6216 ": "Already have an app? Enter the App ID and App Secret below, or ",
+  "\u524D\u5F80\u98DE\u4E66\u5F00\u653E\u5E73\u53F0": "open the Lark / Feishu Open Platform",
+  " \u521B\u5EFA\u540E\u586B\u5165\u3002": " and paste them here.",
+  "Bot Token \u2014 Telegram @BotFather \u4E0B\u53D1\u7684\u673A\u5668\u4EBA Token": "Bot Token \u2014 the token issued by Telegram @BotFather",
+  "\u8BF7\u8F93\u5165 Telegram Bot Token (\u5982 123456789:ABCdef...)": "Enter the Telegram Bot Token (e.g. 123456789:ABCdef...)",
+  "\u9690\u85CF\u5BC6\u94A5": "Hide secret",
+  "\u663E\u793A\u660E\u6587": "Show secret",
+  "\u{1F648} \u9690\u85CF": "\u{1F648} Hide",
+  "\u{1F441}\uFE0F \u663E\u793A": "\u{1F441}\uFE0F Show",
+  "\u7F51\u7EDC\u4EE3\u7406 (\u53EF\u9009) \u2014 \u652F\u6301\u56FD\u5185 HTTP / HTTPS \u4EE3\u7406": "Network proxy (optional) \u2014 HTTP / HTTPS proxy",
+  "\u53EF\u9009\uFF0C\u4F8B\u5982 http://127.0.0.1:7890\uFF08\u4E3A\u7A7A\u5219\u76F4\u8FDE\u6216\u8BFB\u53D6\u73AF\u5883\u53D8\u91CF\uFF09": "Optional, e.g. http://127.0.0.1:7890 (empty = direct or environment variables)",
+  "AppID \u2014 QQ \u5F00\u653E\u5E73\u53F0\u673A\u5668\u4EBA\u5E94\u7528 ID": "AppID \u2014 QQ Open Platform bot app ID",
+  "App ID \u2014 \u98DE\u4E66\u5F00\u653E\u5E73\u53F0\u81EA\u5EFA\u5E94\u7528 ID (cli_xxx)": "App ID \u2014 Lark / Feishu Open Platform app ID (cli_xxx)",
+  "\u8BF7\u8F93\u5165 AppID": "Enter the AppID",
+  "\u8BF7\u8F93\u5165 App ID (\u5982 cli_a1b2c3d4...)": "Enter the App ID (e.g. cli_a1b2c3d4...)",
+  "ClientSecret \u2014 QQ \u5F00\u653E\u5E73\u53F0\u673A\u5668\u4EBA\u5BC6\u94A5": "ClientSecret \u2014 QQ Open Platform bot secret",
+  "App Secret \u2014 \u98DE\u4E66\u5F00\u653E\u5E73\u53F0\u5E94\u7528\u5BC6\u94A5": "App Secret \u2014 Lark / Feishu Open Platform app secret",
+  "\u8BF7\u8F93\u5165 ClientSecret": "Enter the ClientSecret",
+  "\u8BF7\u8F93\u5165 App Secret": "Enter the App Secret",
+  "\u{1F4D6} \u524D\u5F80 QQ \u5F00\u653E\u5E73\u53F0\u7533\u8BF7\u673A\u5668\u4EBA": "\u{1F4D6} Create a bot on the QQ Open Platform",
+  "\u{1F4D6} \u524D\u5F80\u98DE\u4E66\u5F00\u653E\u5E73\u53F0\u521B\u5EFA\u4F01\u4E1A\u81EA\u5EFA\u5E94\u7528": "\u{1F4D6} Create an app on the Lark / Feishu Open Platform",
+  "\u4FDD\u5B58\u5E76\u8FDE\u63A5": "Save and connect",
+  "\u8FDE\u63A5\u5931\u8D25": "Connection failed",
+  "\u626B\u7801\u767B\u5F55": "Scan to sign in",
+  "\u767B\u5F55\u5931\u8D25": "Sign-in failed",
+  "\u8BF4\u660E: \u626B\u7801\u6210\u529F\u540E\uFF0C\u5411\u8BE5\u5FAE\u4FE1 Bot \u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684\u5FAE\u4FE1\u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002\u4F7F\u7528\u4E13\u7528\u5FAE\u4FE1\u53F7\uFF0C\u907F\u514D\u5F71\u54CD\u4E3B\u53F7\u3002": "Note: after scanning, the first message you send to this WeChat bot authorizes you automatically. Only allowlisted WeChat users can drive the agent; other messages are ignored. Use a dedicated WeChat account to avoid affecting your main one.",
+  "\u8BF4\u660E: \u586B\u5165 QQ \u5F00\u653E\u5E73\u53F0\u673A\u5668\u4EBA\u7684 AppID \u4E0E ClientSecret \u540E\u4FDD\u5B58\u5373\u81EA\u52A8\u8FDE\u63A5\u3002\u7528\u6237\u5411 Bot \u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684 QQ \u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002": "Note: enter the QQ bot AppID and ClientSecret and save to connect automatically. The first message a user sends to the bot authorizes them. Only allowlisted QQ users can drive the agent; other messages are ignored.",
+  "\u8BF4\u660E: \u767B\u5F55\u6210\u529F\u540E\uFF0C\u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684\u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002": "Note: after signing in, the first message you send authorizes you automatically. Only allowlisted users can drive the agent; other messages are ignored.",
+  "${days}\u5929 ${hrs}\u5C0F\u65F6 ${mins}\u5206": "${days}d ${hrs}h ${mins}m",
+  "${hrs}\u5C0F\u65F6 ${mins}\u5206": "${hrs}h ${mins}m",
+  "${mins}\u5206\u949F": ["${mins} minute", "${mins} minutes"],
+  "\u{1F4CA} \u5BBF\u4E3B\u7CFB\u7EDF\u4E0E\u8FD0\u884C\u770B\u677F": "\u{1F4CA} Host system & runtime dashboard",
+  "CPU \u6838\u5FC3\u4E0E\u578B\u53F7": "CPU cores & model",
+  "${cores} \u6838\u5FC3 (${model})": ["${cores} core (${model})", "${cores} cores (${model})"],
+  "DSH \u8FD0\u884C\u65F6\u95F4 (Uptime)": "DSH uptime",
+  "Node \u8FDB\u7A0B\u5806\u5185\u5B58": "Node process heap",
+  "\u7CFB\u7EDF\u5185\u5B58\u5360\u7528: ${used} GB / ${total} GB": "System memory: ${used} GB / ${total} GB",
+  "\u8BCA\u65AD\u8BF7\u6C42\u5F02\u5E38": "Diagnostic request failed",
+  "\u{1F50D} \u7F51\u7EDC\u8FDE\u901A\u6027\u4E00\u952E\u8BCA\u65AD": "\u{1F50D} One-click network diagnostics",
+  "\u4E00\u952E\u68C0\u6D4B\u672C\u5730\u53CD\u5411\u4EE3\u7406\u7AEF\u53E3\u3001\u5C40\u57DF\u7F51 IPv4\u3001Cloudflare Anycast \u5EF6\u8FDF\u4EE5\u53CA\u56FD\u5185 npmmirror \u955C\u50CF\u6E90\u8FDE\u901A\u6027\u3002": "Checks the local reverse-proxy port, LAN IPv4, Cloudflare Anycast latency and npmmirror connectivity.",
+  "\u6B63\u5728\u63A2\u6D4B\u8FDE\u901A\u6027\u2026": "Probing connectivity\u2026",
+  "\u{1F504} \u91CD\u65B0\u8BCA\u65AD\u7F51\u7EDC": "\u{1F504} Run diagnostics again",
+  "\u{1F50D} \u5F00\u59CB\u4E00\u952E\u8BCA\u65AD": "\u{1F50D} Run diagnostics",
+  "\u2713 \u6240\u6709\u7F51\u7EDC\u63A2\u6D4B\u9879\u6B63\u5E38": "\u2713 All network checks passed",
+  "\u25B2 \u68C0\u6D4B\u5230\u90E8\u5206\u5EF6\u8FDF\u8F83\u9AD8\u6216\u5F02\u5E38": "\u25B2 Some checks show high latency or errors",
+  "\u6B63\u5728\u6267\u884C\u7F51\u7EDC\u7AEF\u53E3\u4E0E\u4E91\u7AEF\u8282\u70B9\u8FDE\u901A\u6027\u63A2\u6D4B\u2026": "Probing local ports and cloud endpoints\u2026",
+  "\u2713 \u5907\u4EFD\u6587\u4EF6\u5DF2\u6210\u529F\u5BFC\u51FA\u5E76\u4E0B\u8F7D\u5230\u672C\u5730\uFF01": "\u2713 Backup exported and downloaded!",
+  "\u5BFC\u51FA\u5907\u4EFD\u5931\u8D25": "Export failed",
+  "\u5BFC\u51FA\u5F02\u5E38": "Export error",
+  "\u2713 \u914D\u7F6E\u5DF2\u6210\u529F\u5BFC\u5165\u5E76\u5237\u65B0\u751F\u6548\uFF01": "\u2713 Configuration imported and applied!",
+  "\u5BFC\u5165\u914D\u7F6E\u5931\u8D25": "Import failed",
+  "\u5BFC\u5165\u89E3\u6790\u5931\u8D25: ${reason}": "Failed to parse the import: ${reason}",
+  "\u{1F5C4}\uFE0F \u5168\u5C40\u914D\u7F6E\u5907\u4EFD\u4E0E\u6062\u590D": "\u{1F5C4}\uFE0F Global configuration backup & restore",
+  "\u652F\u6301\u4E00\u952E\u5BFC\u51FA\u6216\u5BFC\u5165\u6062\u590D\u672C\u63D2\u4EF6\u6240\u6709\u914D\u7F6E\uFF08\u5305\u542B\u5404 IM \u5E73\u53F0\u51ED\u8BC1\u3001\u6388\u6743\u767D\u540D\u5355\u3001\u516C\u7F51\u96A7\u9053\u4E0E\u5B89\u5168\u8BA4\u8BC1\u89C4\u5219\uFF09\u3002": "Export or restore the plugin's full configuration in one click (IM credentials, allowlists, public tunnel and access-protection rules).",
+  "\u6B63\u5728\u5BFC\u51FA\u2026": "Exporting\u2026",
+  "\u{1F4E5} \u5BFC\u51FA\u914D\u7F6E\u5907\u4EFD (.json)": "\u{1F4E5} Export backup (.json)",
+  "\u6B63\u5728\u5BFC\u5165\u2026": "Importing\u2026",
+  "\u{1F4E4} \u5BFC\u5165\u914D\u7F6E\u6062\u590D": "\u{1F4E4} Import configuration",
+  "\u2022 \u8FDB\u884C\u4E2D\u7684\u4F1A\u8BDD ${count} \u4E2A\uFF1A": "\u2022 Running sessions: ${count}",
+  "${count} \u6B21\u5DE5\u5177\u8C03\u7528": ["${count} tool call", "${count} tool calls"],
+  "\uFF08\u6700\u8FD1\uFF1A${tool}\uFF09": " (most recent: ${tool})",
+  "\u601D\u8003\u4E2D": "Thinking",
+  "    - ${title}\uFF08\u7B2C ${turn} \u8F6E\uFF0C${detail}\uFF09": "    - ${title} (turn ${turn}, ${detail})",
+  "    \u2026\u7B49\u5171 ${count} \u4E2A": "    \u2026and ${count} more",
+  "\u2022 \u8FDB\u884C\u4E2D\u7684\u5B50\u4EE3\u7406/agent \u4EFB\u52A1 ${count} \u4E2A\uFF1A": "\u2022 Running subagent tasks: ${count}",
+  "\u2022 \u5F85\u5BA1\u6279\u8BF7\u6C42 ${count} \u4E2A\uFF1A": "\u2022 Pending approvals: ${count}",
+  "\u26A0\uFE0F \u68C0\u6D4B\u5230\u6709\u4EFB\u52A1\u6B63\u5728\u8FD0\u884C\uFF0C\u91CD\u542F\u4F1A\u4E2D\u65AD\u5B83\u4EEC\uFF1A\n\n${list}\n\n\u4E2D\u65AD\u540E\u53EF\u80FD\u9700\u8981\u91CD\u65B0\u53D1\u8D77\u3002\u786E\u5B9A\u8981\u7EE7\u7EED\u91CD\u542F\u5417\uFF1F": "\u26A0\uFE0F Tasks are still running; restarting will interrupt them:\n\n${list}\n\nThey may need to be restarted afterwards. Continue?",
+  "\u6B63\u5728\u5411 DSH \u670D\u52A1\u53D1\u9001\u91CD\u542F\u6307\u4EE4\u2026": "Sending the restart command to DSH\u2026",
+  "DSH \u670D\u52A1\u6B63\u5728\u91CD\u542F\u4E2D\uFF0C\u6B63\u5728\u81EA\u52A8\u91CD\u65B0\u8FDE\u63A5\u2026": "DSH is restarting \u2014 reconnecting automatically\u2026",
+  "\u{1F389} \u91CD\u542F\u6210\u529F\uFF01\u5DF2\u91CD\u65B0\u5EFA\u7ACB\u8FDE\u63A5\uFF0C\u6B63\u5728\u5237\u65B0\u9875\u9762\u2026": "\u{1F389} Restart succeeded \u2014 connection restored, refreshing\u2026",
+  "\u91CD\u8FDE\u7B49\u5F85\u8D85\u65F6\uFF0C\u8BF7\u624B\u52A8\u5237\u65B0\u9875\u9762\u3002": "Reconnect timed out; please refresh the page manually.",
+  "\u5F53\u524D\u6709\u4EFB\u52A1\u6B63\u5728\u8FD0\u884C\uFF0C\u91CD\u542F\u4F1A\u4E2D\u65AD\u5B83\u4EEC\u3002\u786E\u5B9A\u7EE7\u7EED\u5417\uFF1F": "Tasks are still running; restarting will interrupt them. Continue?",
+  "\u672A\u77E5\u539F\u56E0": "Unknown cause",
+  "\u{1F504} DSH \u670D\u52A1\u5E73\u6ED1\u91CD\u542F": "\u{1F504} Graceful DSH restart",
+  "\u4F18\u96C5\u9000\u51FA\u5E76\u91CD\u65B0\u62C9\u8D77\u5F53\u524D DSH \u8FDB\u7A0B\u4E0E\u6240\u6709\u63D2\u4EF6\u670D\u52A1\uFF0C\u524D\u7AEF\u5C06\u5728\u51E0\u79D2\u540E\u81EA\u52A8\u63A2\u6D4B\u91CD\u8FDE\u5E76\u5237\u65B0\u9875\u9762\u3002": "Gracefully exits and restarts the DSH process and all plugin services; the front end reconnects automatically within seconds and refreshes the page.",
+  "\u{1F504} \u7ACB\u5373\u91CD\u542F DSH \u670D\u52A1": "\u{1F504} Restart DSH now",
+  "\u6B63\u5728\u8C03\u5EA6\u2026": "Scheduling\u2026",
+  "\u{1F4F1} \u79FB\u52A8\u7AEF\u9875\u9762\u6539\u5199\u5C42": "\u{1F4F1} Mobile page-rewrite layer",
+  "\u63A7\u5236\u624B\u673A\u7AEF\u9876\u680F\u3001\u5168\u5C40\u79FB\u52A8\u6837\u5F0F\u3001\u8F93\u5165\u6846\u6298\u53E0\u7B49\u9875\u9762\u6539\u5199\u3002\u5173\u95ED\u540E\u4EC5\u4FDD\u7559\u8FDC\u7A0B\u8BBF\u95EE/\u96A7\u9053/\u673A\u5668\u4EBA\u529F\u80FD\uFF0C\u5237\u65B0\u9875\u9762\u751F\u6548\u3002": "Controls the mobile top bar, global mobile styling and input collapse. When off, only remote access / tunnel / bot features remain; refresh to apply.",
+  "\u5F53\u524D\u5BBF\u4E3B\u5DF2\u5168\u5C40\u5173\u95ED\u6B64\u5C42\uFF08mobileUi:false\uFF09\uFF0C\u6B64\u5904\u4E0D\u53EF\u5F00\u542F\u3002": "The host has disabled this layer globally (mobileUi:false); it cannot be enabled here.",
+  "\u5173\u95ED\u9875\u9762\u6539\u5199": "Disable page rewrite",
+  "\u5F00\u542F\u9875\u9762\u6539\u5199": "Enable page rewrite",
+  "\u5BBF\u4E3B\u5DF2\u5173\u95ED": "Disabled by host",
+  "\u5F53\u524D\uFF1A${state}": "Current: ${state}",
+  "\u4FDD\u5B58\u5931\u8D25\uFF1A${reason}": "Save failed: ${reason}",
+  "\u{1F5C2}\uFE0F \u8FDC\u7A0B\u5DE5\u4F5C\u533A\u7BA1\u7406 (\u76EE\u5F55\u6D4F\u89C8\u5668)": "\u{1F5C2}\uFE0F Remote workspace management (directory browser)",
+  "\u5728\u79FB\u52A8\u7AEF\u6216\u8FDC\u7A0B\u8BBE\u5907\u4E0A\u53EF\u89C6\u70B9\u9009\u7535\u8111\u4E0A\u7684\u6587\u4EF6\u5939\u6216\u76F4\u63A5\u8F93\u5165\u8DEF\u5F84\u6DFB\u52A0\u81F3 DSH\u3002": "Pick folders on the computer visually from a phone or remote device, or type a path, and add it to DSH.",
+  "+ \u8FDC\u7A0B\u6DFB\u52A0\u5DE5\u4F5C\u533A": "+ Add remote workspace",
+  "\u6B63\u5728\u8BFB\u53D6\u5DE5\u4F5C\u533A\u5217\u8868\u2026": "Reading the workspace list\u2026",
+  "\u6682\u65E0\u5DF2\u6CE8\u518C\u5DE5\u4F5C\u533A\uFF0C\u70B9\u51FB\u53F3\u4E0A\u89D2\u300C+ \u8FDC\u7A0B\u6DFB\u52A0\u5DE5\u4F5C\u533A\u300D\u5373\u53EF\u6D4F\u89C8\u6DFB\u52A0\u3002": "No workspaces registered yet \u2014 use \u201C+ Add remote workspace\u201D above to browse and add one.",
+  "\u6B63\u5728\u8C03\u5EA6 DSH \u670D\u52A1\u91CD\u542F\u2026": "Scheduling the DSH restart\u2026",
+  "\u{1F389} \u91CD\u542F\u6210\u529F\uFF01\u5DF2\u81EA\u52A8\u52A0\u8F7D\u6700\u65B0\u7248\u672C\u3002\u6B63\u5728\u5237\u65B0\u9875\u9762\u2026": "\u{1F389} Restart succeeded \u2014 the latest version is loaded. Refreshing\u2026",
+  "\u5DF2\u6210\u529F\u5347\u7EA7\u5230 v${version}\uFF01": "Upgraded to v${version}!",
+  "\u5347\u7EA7\u5931\u8D25": "Upgrade failed",
+  "\u5347\u7EA7\u8BF7\u6C42\u5931\u8D25": "Upgrade request failed",
+  "DSH \u5DF2\u6210\u529F\u5347\u7EA7\u5230 v${version}\uFF01": "DSH upgraded to v${version}!",
+  "\u66F4\u65B0\u65E5\u5FD7": "Changelog",
+  "\u53CD\u9988 Issue": "Report an issue",
+  "\u7248\u672C\u68C0\u67E5\u4E2D\u2026": "Checking versions\u2026",
+  "\xB7 \u5DF2\u662F\u6700\u65B0": "\xB7 Up to date",
+  "(\u7F51\u7EDC\u8D85\u65F6)": "(network timeout)",
+  "\u53D1\u73B0 DSH \u65B0\u7248\u672C v${version}": "DSH v${version} is available",
+  "\u91CD\u65B0\u68C0\u67E5 npm \u7EBF\u4E0A\u7248\u672C": "Re-check the npm version",
+  "\u68C0\u67E5\u4E2D\u2026": "Checking\u2026",
+  "\u68C0\u67E5\u66F4\u65B0": "Check for updates",
+  "\u53D1\u73B0\u65B0\u7248\u672C v${latest}\uFF08\u5F53\u524D v${current}\uFF09": "v${latest} is available (current v${current})",
+  "\u6B63\u5728\u81EA\u52A8\u5347\u7EA7\u2026": "Upgrading automatically\u2026",
+  "\u2713 \u5347\u7EA7\u5B8C\u6210": "\u2713 Upgrade complete",
+  "\u4E00\u952E\u5347\u7EA7\u5230 v${version}": "Upgrade to v${version}",
+  "\u2728 \u66F4\u65B0\u4EAE\u70B9\uFF1A": "\u2728 Highlights:",
+  "\u5DF2\u6210\u529F\u5347\u7EA7\u5230 v${version}\uFF01\u9700\u8981\u91CD\u542F DSH \u670D\u52A1\u4F7F\u65B0\u7248\u672C\u751F\u6548": "Upgraded to v${version}! Restart the DSH service for it to take effect",
+  "\u7A0D\u540E\u624B\u52A8\u91CD\u542F": "Restart manually later",
+  "\u6B63\u5728\u5904\u7406\u2026": "Working\u2026",
+  "\u25B4 \u6298\u53E0\u624B\u52A8\u547D\u4EE4\u884C": "\u25B4 Hide manual commands",
+  "\u25BE \u67E5\u770B\u624B\u52A8\u5347\u7EA7\u547D\u4EE4 (\u5982\u9700)": "\u25BE Show manual upgrade commands (if needed)",
+  "DSH \u6709\u65B0\u7248\u672C v${latest}\uFF08\u5F53\u524D v${current}\uFF09": "DSH v${latest} is available (current v${current})",
+  "\u6B63\u5728\u5347\u7EA7 DSH\u2026": "Upgrading DSH\u2026",
+  "\u2713 DSH \u5347\u7EA7\u5B8C\u6210": "\u2713 DSH upgrade complete",
+  "\u4E00\u952E\u5347\u7EA7 DSH \u5230 v${version}": "Upgrade DSH to v${version}",
+  "\u67E5\u770B\u5B98\u65B9\u5347\u7EA7\u65B9\u5F0F \u2197": "See the official upgrade instructions \u2197",
+  "\u5347\u7EA7 DSH \u547D\u4EE4\u884C\u5DE5\u5177\u540E\u9700\u91CD\u542F DSH \u670D\u52A1\u751F\u6548\u3002": "Restart the DSH service after upgrading the CLI for it to take effect.",
+  "\u5F53\u524D DSH \u975E npm \u5168\u5C40\u5B89\u88C5\uFF0C\u65E0\u6CD5\u4E00\u952E\u81EA\u52A8\u5347\u7EA7\uFF0C\u8BF7\u6309\u5B98\u65B9\u6E20\u9053\u624B\u52A8\u66F4\u65B0\u3002": "This DSH is not a global npm install, so one-click upgrade is unavailable \u2014 update manually through the official channel.",
+  "\u5C40\u57DF\u7F51": "LAN",
+  "\u516C\u7F51\u96A7\u9053": "Public tunnel",
+  "IM \u673A\u5668\u4EBA": "IM bots",
+  "\u5B89\u5168\u8BA4\u8BC1": "Security",
+  "\u8FD0\u7EF4\u76D1\u63A7": "Operations",
+  "\u8BBF\u95EE\u4F1A\u8BDD\u5DF2\u5931\u6548\uFF0C\u8BF7\u5237\u65B0\u9875\u9762\u91CD\u65B0\u767B\u5F55": "Your access session expired; refresh the page and sign in again",
+  "listPlatforms \u67E5\u8BE2\u5931\u8D25": "Failed to load the platform list",
+  "\u5C40\u57DF\u7F51\u8BBF\u95EE": "LAN access",
+  "\u540C\u4E00 Wi-Fi \u4E0B\u7684\u8BBE\u5907\u53EF\u76F4\u63A5\u626B\u7801\u8BBF\u95EE": "Devices on the same Wi-Fi can scan and connect directly",
+  "\u56FA\u5B9A\u57DF\u540D\u6A21\u5F0F": "Fixed-domain mode",
+  "\u514D\u767B\u5F55\u4E34\u65F6\u57DF\u540D": "Temporary domain (no login)",
+  "\u81EA\u5EFA\u96A7\u9053": "Self-hosted tunnel",
+  "VPS \u81EA\u5EFA \xB7 \u56FA\u5B9A\u5730\u5740": "Self-hosted on a VPS \xB7 fixed address",
+  "Cloudflare \u96A7\u9053": "Cloudflare tunnel",
+  "\u81EA\u884C\u90E8\u7F72\u767B\u8BB0": "Register an existing deployment",
+  "\u53E6\u6709 ${count} \u4E2A\u96A7\u9053\u5165\u53E3\u5728\u8FD0\u884C\uFF0C\u53EF\u5728\u4E0B\u65B9\u300C\u96A7\u9053\u914D\u7F6E\u300D\u4E2D\u67E5\u770B\u4E0E\u7BA1\u7406": ["${count} more tunnel entry is running \u2014 see \u201CTunnel configuration\u201D below", "${count} more tunnel entries are running \u2014 see \u201CTunnel configuration\u201D below"],
+  "\u56FA\u5B9A\u57DF\u540D\u6A21\u5F0F\uFF08Token \u8FD0\u884C \xB7 \u91CD\u542F URL \u4FDD\u6301\u4E0D\u53D8\uFF09": "Fixed-domain mode (Token-based \xB7 URL survives restarts)",
+  "\u4E00\u952E\u83B7\u53D6\u516C\u7F51\u5730\u5740\uFF08\u514D\u767B\u5F55\u4E34\u65F6\u968F\u673A\u57DF\u540D\uFF09": "Get a public URL in one click (random temporary domain, no login)",
+  "\u8FDE\u63A5\u81EA\u5DF1\u90E8\u7F72\u7684\u96A7\u9053\u670D\u52A1\u5668\uFF0C\u83B7\u5F97\u56FA\u5B9A\u57DF\u540D": "Connect to your own tunnel server for a fixed domain",
+  "\u98DE\u4E66": "Lark / Feishu",
+  "\u626B\u7801\u4E00\u952E\u521B\u5EFA \xB7 \u659C\u6760\u6307\u4EE4 \xB7 \u6587\u6863\u8BC4\u8BBA": "One-tap QR setup \xB7 slash commands \xB7 doc comments",
+  "\u5FAE\u4FE1": "WeChat",
+  "ClawBot \u626B\u7801\u76F4\u8FDE \xB7 \u65E0\u9700\u516C\u7F51": "ClawBot QR direct connect \xB7 no public server needed",
+  "\u5B98\u65B9\u673A\u5668\u4EBA \xB7 \u79C1\u804A/\u7FA4\u804A/\u6309\u94AE": "Official bot \xB7 DMs, groups and buttons",
+  "\u5B98\u65B9 Bot API": "Official Bot API",
+  "\u5E73\u53F0\u6E05\u5355\u52A0\u8F7D\u5931\u8D25\uFF1A${reason}": "Failed to load the platform list: ${reason}",
+  "\u91CD\u8BD5": "Retry",
+  "\u6570\u636E\u7F3A\u5931": "Missing data",
+  "\u8BBF\u95EE\u5BC6\u7801": "access password",
+  "\u8BF7\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\u7BA1\u7406\u6743\u9650\u3002": "Enter the admin password to unlock management.",
+  "\u5F53\u524D\u672A\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801\uFF0C\u8F93\u5165\u60A8\u7684\u8BBF\u95EE\u5BC6\u7801\u5373\u53EF\u89E3\u9501\u3002": "No dedicated admin password is set; enter your access password to unlock.",
+  "\u7BA1\u7406\u63A7\u5236\u53F0\u5DF2\u9501\u5B9A\uFF08\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406\uFF09": "Admin console locked (this computer only)",
+  "\u5F53\u524D\u8BBE\u5907\u901A\u8FC7\u8FDC\u7A0B\u5C40\u57DF\u7F51\u6216\u516C\u7F51\u63A5\u5165\u3002\u5DF2\u5F00\u542F\u300C\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406\u300D\u6700\u9AD8\u5B89\u5168\u7B56\u7565\uFF0C\u8FDC\u7A0B\u8BBE\u5907\u7981\u6B62\u67E5\u770B\u4E0E\u4FEE\u6539\u4EFB\u4F55\u7F51\u7EDC\u4E0E\u673A\u5668\u4EBA\u914D\u7F6E\u3002\u5982\u9700\u7BA1\u7406\u8BF7\u5728\u7535\u8111\u672C\u673A\uFF08127.0.0.1\uFF09\u4E0A\u64CD\u4F5C\u3002": "This device is connected over the LAN or the public internet. The strictest policy \u201CThis computer only\u201D is on: remote devices may not view or change any network or bot settings. Manage from the computer itself (127.0.0.1).",
+  "\u2753 \u8FDC\u7A0B\u5982\u4F55\u6551\u6025\u89E3\u9664\u9501\u5B9A\uFF1F": "\u2753 How do I unlock in an emergency?",
+  "\u{1F6DF} \u6551\u6025\u89E3\u9664\u9501\u5B9A\u6307\u5F15\uFF1A": "\u{1F6DF} Emergency unlock guide:",
+  "\u7535\u8111\u672C\u673A\u76F4\u8FDE\u4FEE\u6539": "On the computer itself",
+  "\uFF1A\u76F4\u63A5\u5728\u8FD0\u884C\u672C\u7A0B\u5E8F\u7684\u7535\u8111\u672C\u673A\u6253\u5F00\u672C\u63A7\u5236\u53F0\uFF08127.0.0.1 \u4EAB\u6709\u7269\u7406\u514D\u9501\u7279\u6743\uFF09\uFF0C\u53EF\u968F\u65F6\u4FEE\u6539\u7B56\u7565\u6216\u6E05\u9664\u5BC6\u7801\u3002": ": open this console on the machine running DSH (127.0.0.1 is exempt from locking) to change the policy or clear the password at any time.",
+  "\u670D\u52A1\u5668 / \u65E0\u5934\u73AF\u5883": "Server / headless environment",
+  "\uFF1A\u6551\u6025\u91CD\u7F6E\u6B65\u9AA4\u53C2\u89C1 GitHub README \u7684\u300C\u4E09\u91CD\u5BB9\u707E\u4FDD\u547D\u4F53\u7CFB\u300D\u7AE0\u8282\u3002": ": see the emergency-reset steps in the \u201CTriple Disaster Recovery (Never Locked Out)\u201D section of the English README.",
+  "\u7BA1\u7406\u63A7\u5236\u53F0\u5DF2\u9501\u5B9A": "Admin console locked",
+  "\u{1F511} \u4F7F\u7528\u7BA1\u7406\u5BC6\u7801\u89E3\u9501": "\u{1F511} Unlock with the admin password",
+  "\u{1F510} \u4F7F\u7528\u8BBF\u95EE\u5BC6\u7801\u89E3\u9501": "\u{1F510} Unlock with the access password",
+  "\u5F53\u524D\u8BBE\u5907\u4E3A\u8FDC\u7A0B\u8BBF\u95EE\u3002\u4E3A\u4FDD\u62A4\u60A8\u7684\u7F51\u7EDC\u4E0E\u5E73\u53F0\u914D\u7F6E\u5B89\u5168\uFF0C${hint}": "This is a remote device. To protect your network and platform configuration, ${hint}",
+  "\u8F93\u5165${kind}": "Enter the ${kind}",
+  "\u9A8C\u8BC1\u4E2D\u2026": "Verifying\u2026",
+  "\u89E3\u9501\u7BA1\u7406\u6743\u9650": "Unlock management",
+  "\u2753 \u5FD8\u8BB0${kind}\uFF1F": "\u2753 Forgot the ${kind}?",
+  "\u{1F6DF} \u627E\u56DE\u4E0E\u91CD\u7F6E${kind}\u6307\u5F15\uFF1A": "\u{1F6DF} Recover or reset your ${kind}:",
+  "\uFF1A\u76F4\u63A5\u5728\u8FD0\u884C\u672C\u7A0B\u5E8F\u7684\u7535\u8111\u672C\u673A\u6253\u5F00\u672C\u63A7\u5236\u53F0\uFF08127.0.0.1 \u4EAB\u6709\u7269\u7406\u514D\u9501\u7279\u6743\uFF09\uFF0C\u53EF\u968F\u65F6\u4FEE\u6539\u6216\u6E05\u9664\u5BC6\u7801\u3002": ": open this console on the machine running DSH (127.0.0.1 is exempt from locking) to change or clear the password at any time.",
+  "\u{1F511} \u7ACB\u5373\u8F93\u5165${kind}\u89E3\u9501": "\u{1F511} Enter the ${kind} to unlock",
+  "\u{1F513} \u7BA1\u7406\u5458\u6743\u9650\u5DF2\u89E3\u9501\uFF08\u5F53\u524D\u4E34\u65F6\u4F1A\u8BDD\u6709\u6548\uFF09": "\u{1F513} Admin access unlocked (valid for this temporary session)",
+  "\u{1F512} \u91CD\u65B0\u9501\u5B9A\u540E\u53F0": "\u{1F512} Lock the console again",
+  "\u{1F512} \u540E\u53F0\u7BA1\u7406\u6743\u9650\u672A\u89E3\u9501\uFF08\u4FEE\u6539\u654F\u611F\u914D\u7F6E\u9700\u5148\u89E3\u9501\uFF09": "\u{1F512} Admin access is locked (unlock before changing sensitive settings)",
+  "\u26A0\uFE0F \u5C1A\u672A\u8BBE\u7F6E\u4EFB\u4F55\u8BBF\u95EE\u5BC6\u7801 / \u7BA1\u7406\u5BC6\u7801\uFF0C\u8FDC\u7A0B\u8BBF\u5BA2\u53EF\u514D\u5BC6\u8FDB\u5165\uFF01": "\u26A0\uFE0F No access or admin password is set \u2014 remote visitors can enter without one!",
+  "\u{1F511} \u89E3\u9501\u7BA1\u7406\u6743\u9650": "\u{1F511} Unlock management",
+  "\u{1F510} \u7ACB\u5373\u8BBE\u7F6E\u5BC6\u7801": "\u{1F510} Set a password now",
+  "\u{1F512} \u89E3\u9501\u540E\u53F0\u7BA1\u7406\u6743\u9650": "\u{1F512} Unlock admin access",
+  "\u5F53\u524D\u64CD\u4F5C\u9700\u8981\u540E\u53F0\u7BA1\u7406\u5458\u6743\u9650\u3002\u4E3A\u4FDD\u62A4\u60A8\u7684\u7F51\u7EDC\u914D\u7F6E\u4E0E\u673A\u5668\u4EBA\u5E73\u53F0\u5B89\u5168\uFF0C\u8BF7\u8F93\u5165\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\uFF1A": "This action requires admin access. To protect your network configuration and bot platforms, enter the admin password to unlock:",
+  "\u5F53\u524D\u64CD\u4F5C\u9700\u8981\u540E\u53F0\u7BA1\u7406\u6743\u9650\u3002\u672A\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801\uFF0C\u8F93\u5165\u60A8\u7684\u8BBF\u95EE\u5BC6\u7801\u5373\u53EF\u89E3\u9501\uFF1A": "This action requires admin access. No dedicated admin password is set; enter your access password to unlock:",
+  "\u53D6\u6D88": "Cancel",
+  "\u7ACB\u5373\u89E3\u9501": "Unlock now",
+  "\u{1F4A1} \u63D0\u793A\uFF1A\u82E5\u672A\u5355\u72EC\u914D\u7F6E\u7BA1\u7406\u5BC6\u7801\uFF0C\u8BF7\u8F93\u5165\u521D\u6B21\u8BBE\u7F6E\u7684\u8BBF\u95EE\u5BC6\u7801\uFF1B\u7535\u8111\u672C\u673A\uFF08127.0.0.1\uFF09\u8BBF\u95EE\u4EAB\u6709\u514D\u5BC6\u7BA1\u7406\u7279\u6743\u3002": "\u{1F4A1} Tip: if no dedicated admin password is set, enter the access password you configured first; access from 127.0.0.1 on this computer needs no unlock.",
+  "\u9009\u62E9\u7535\u8111\u5DE5\u4F5C\u533A": "Choose a workspace on your computer",
+  "\u70B9\u51FB\u8FDB\u5165\u6587\u4EF6\u5939\uFF0C\u6216\u70B9\u51FB\u300C+ \u9009\u4E3A\u5DE5\u4F5C\u533A\u300D\u76F4\u63A5\u6DFB\u52A0\u5E76\u5207\u6362": "Open a folder, or tap \u201C+ Use as workspace\u201D to add and switch directly",
+  "\u{1F512} \u6B64\u64CD\u4F5C\u9700\u8981\u7BA1\u7406\u5458\u6743\u9650": "\u{1F512} Admin access required",
+  "\u8FDC\u7A0B\u8BBF\u95EE\u65F6\u6D4F\u89C8/\u6DFB\u52A0\u5DE5\u4F5C\u533A\u9700\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\uFF08\u4E0E\u8BBF\u95EE\u5BC6\u7801\u4E0D\u540C\uFF09\u3002": "Browsing or adding workspaces remotely requires the admin password (different from the access password).",
+  "\u8BF7\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801": "Enter the admin password",
+  "\u89E3\u9501\u4E2D\u2026": "Unlocking\u2026",
+  "\u89E3\u9501": "Unlock",
+  "\u8FD4\u56DE\u4E0A\u4E00\u7EA7": "Go up one level",
+  "\u2B06\uFE0F \u4E0A\u7EA7": "\u2B06\uFE0F Up",
+  "\u5237\u65B0\u76EE\u5F55": "Refresh directory",
+  "\u5F53\u524D\u76EE\u5F55:": "Current directory:",
+  "\u6B63\u5728\u6DFB\u52A0\u5E76\u5207\u6362\u2026": "Adding and switching\u2026",
+  "\u{1F449} \u8BBE\u4E3A\u5F53\u524D\u5DE5\u4F5C\u533A\u5E76\u8FDB\u5165": "\u{1F449} Use as workspace and enter",
+  "\u8FC7\u6EE4\u5B50\u6587\u4EF6\u5939\u2026": "Filter subfolders\u2026",
+  "${count} \u4E2A\u6587\u4EF6\u5939": ["${count} folder", "${count} folders"],
+  "\u6B63\u5728\u8BFB\u53D6\u76EE\u5F55\u5185\u5BB9\u2026": "Reading directory\u2026",
+  "\u672A\u627E\u5230\u5339\u914D\u7684\u5B50\u6587\u4EF6\u5939": "No matching subfolders",
+  "\u5F53\u524D\u6587\u4EF6\u5939\u4E0B\u6CA1\u6709\u66F4\u591A\u5B50\u6587\u4EF6\u5939": "No more subfolders here",
+  "\uFF08\u76F4\u63A5\u70B9\u51FB\u4E0A\u65B9\u84DD\u8272\u6309\u94AE\u5373\u53EF\u8FDB\u5165\u5F53\u524D\u76EE\u5F55\uFF09": "(tap the blue button above to enter the current directory)",
+  "\u76F4\u63A5\u6DFB\u52A0\u6B64\u5B50\u6587\u4EF6\u5939\u4E3A\u5DE5\u4F5C\u533A\u5E76\u8FDB\u5165": "Add this subfolder as a workspace and enter",
+  "+ \u9009\u4E3A\u5DE5\u4F5C\u533A": "+ Use as workspace",
+  "\u25BC \u6536\u8D77\u7EDD\u5BF9\u8DEF\u5F84\u624B\u52A8\u8F93\u5165": "\u25BC Hide manual path input",
+  "\u25B6 \u624B\u52A8\u7C98\u8D34/\u8F93\u5165\u7EDD\u5BF9\u8DEF\u5F84": "\u25B6 Paste / type an absolute path",
+  "\u8F93\u5165\u7535\u8111\u7EDD\u5BF9\u8DEF\u5F84\uFF0C\u4F8B\u5982 C:\\Projects\\my-app": "Enter an absolute path on your computer, e.g. C:\\Projects\\my-app",
+  "\u524D\u5F80": "Go",
+  "\u6DFB\u52A0\u5E76\u8FDB\u5165": "Add and enter",
+  "\u5DF2\u6CE8\u518C\u5DE5\u4F5C\u533A (${count} \u4E2A\uFF0C\u70B9\u51FB\u76F4\u63A5\u5207\u6362)\uFF1A": "Registered workspaces (${count}, tap to switch):",
+  "\u8FDB\u5165 \u2794": "Enter \u2794",
+  "\u{1F4A1} \u70B9\u51FB\u6587\u4EF6\u5939\u53EF\u9010\u7EA7\u8FDB\u5165": "\u{1F4A1} Tap folders to drill down",
+  "\u89E3\u9501\u5931\u8D25": "Unlock failed",
+  "\u6B63\u5728\u5207\u6362\u5DE5\u4F5C\u533A\u2026": "Switching workspace\u2026",
+  "\u2713 \u5DF2\u5207\u6362\u81F3\u5DE5\u4F5C\u533A\uFF01": "\u2713 Switched to the workspace!",
+  "\u8BFB\u53D6\u76EE\u5F55\u5931\u8D25": "Failed to read the directory",
+  "\u5F53\u524D\u7B56\u7565\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406\uFF0C\u8FDC\u7A0B\u65E0\u6CD5\u89E3\u9501": "The current policy is \u201Cthis computer only\u201D; remote unlock is unavailable",
+  "\u8BF7\u8F93\u5165\u6216\u9009\u62E9\u5DE5\u4F5C\u533A\u8DEF\u5F84": "Enter or choose a workspace path",
+  "\u2713 \u5DE5\u4F5C\u533A\u300C${name}\u300D\u5DF2\u9009\u5B9A\uFF0C\u6B63\u5728\u5207\u6362\u2026": "\u2713 Workspace \u201C${name}\u201D selected, switching\u2026",
+  "\u6DFB\u52A0\u5DE5\u4F5C\u533A\u5931\u8D25": "Failed to add the workspace",
+  "\u6DFB\u52A0\u5DE5\u4F5C\u533A\u5F02\u5E38": "Workspace add error",
+  "\u8FDC\u7A0B\u8BBF\u95EE": "Remote access",
+  "\u7BA1\u7406\u5458\u5BC6\u7801\u9519\u8BEF": "Incorrect admin password",
+  "\u89E3\u9501\u8BF7\u6C42\u5931\u8D25": "Unlock request failed",
+  "IPv4\uFF084\uFF09": "IPv4 (4)",
+  "IPv6\uFF086\uFF09": "IPv6 (6)",
+  "${label}\uFF1A${reason}": "${label}: ${reason}",
+  "cloudflared\uFF1A${path}\uFF08${version} \xB7 ${source}\uFF09": "cloudflared: ${path} (${version} \xB7 ${source})",
+  "\u26A1 \u81EA\u52A8\u63A8\u8350 (${ip} \xB7 ${label})": "\u26A1 Auto (recommended: ${ip} \xB7 ${label})"
+};
+var serverEn = {
+  "App ID \u4E0E App Secret \u672A\u914D\u7F6E": "App ID and App Secret are not configured",
+  "\u8BF7\u586B\u5199\u5B8C\u6574\u7684 App ID \u548C App Secret\uFF0C\u6216\u4F7F\u7528\u626B\u7801\u4E00\u952E\u521B\u5EFA\u5E94\u7528": "Enter a complete App ID and App Secret, or use one-tap QR app creation",
+  "Telegram Bot Token \u672A\u914D\u7F6E": "Telegram Bot Token is not configured",
+  "\u8BF7\u586B\u5199\u5B8C\u6574\u7684 Telegram Bot Token": "Enter a complete Telegram Bot Token",
+  "\u8BF7\u5148\u5728\u914D\u7F6E\u9762\u677F\u586B\u5199 QQ \u5F00\u653E\u5E73\u53F0\u7684 AppID \u4E0E ClientSecret": "Enter the QQ Open Platform AppID and ClientSecret in this panel first",
+  "\u4E8C\u7EF4\u7801\u5DF2\u8FC7\u671F\uFF0C\u6B63\u5728\u5237\u65B0\u2026": "QR code expired, refreshing\u2026",
+  "\u64CD\u4F5C\u5DF2\u88AB\u62E6\u622A\uFF1A\u5F53\u524D\u7B56\u7565\u4E3A\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406": "Blocked: the current policy allows this computer only",
+  "\u8BE5\u64CD\u4F5C\u6D89\u53CA\u654F\u611F\u914D\u7F6E\uFF1A\u8BF7\u5148\u5728\u300C\u5B89\u5168\u8BA4\u8BC1\u300D\u4E2D\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\u6216\u7BA1\u7406\u5BC6\u7801\u540E\u518D\u6267\u884C": "This action touches sensitive configuration: set an access or admin password under \u201CSecurity\u201D first",
+  "\u64CD\u4F5C\u5DF2\u88AB\u62E6\u622A\uFF1A\u9700\u8981\u7BA1\u7406\u5458\u6743\u9650\uFF0C\u8BF7\u5148\u5728\u63A7\u5236\u53F0\u8F93\u5165\u7BA1\u7406\u5BC6\u7801\u89E3\u9501": "Blocked: admin access required \u2014 enter the admin password to unlock first",
+  "AuthManager \u672A\u521D\u59CB\u5316": "AuthManager is not initialized",
+  "\u4EC5\u5BC6\u7801\u6A21\u5F0F\u9700\u8981\u5148\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\uFF1A\u8BF7\u5148\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\u300D\u5904\u8BBE\u7F6E\u5BC6\u7801\uFF0C\u518D\u5F00\u542F\u5B89\u5168\u9632\u62A4": "Password-only mode needs an access password: set one under \u201CExternal visitor access password\u201D below, then enable protection",
+  "\u4EC5\u5BC6\u7801\u6A21\u5F0F\u9700\u8981\u5148\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\uFF1A\u8BF7\u5148\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\u300D\u5904\u8BBE\u7F6E\u5BC6\u7801\u540E\u518D\u5207\u6362": "Password-only mode needs an access password: set one under \u201CExternal visitor access password\u201D below, then switch modes",
+  "UI \u914D\u7F6E\u6301\u4E45\u5316\u4E0D\u53EF\u7528": "UI configuration persistence is unavailable",
+  "pageTweaks \u5FC5\u987B\u4E3A\u5E03\u5C14\u503C": "pageTweaks must be a boolean",
+  "\u5F53\u524D\u6709\u4EFB\u52A1\u6B63\u5728\u8FD0\u884C\uFF0C\u91CD\u542F\u4F1A\u6253\u65AD\u5B83\u4EEC": "Tasks are still running; restarting will interrupt them",
+  "\u5907\u4EFD\u5BFC\u51FA\u670D\u52A1\u4E0D\u53EF\u7528": "Backup export service is unavailable",
+  "\u5907\u4EFD\u5BFC\u5165\u670D\u52A1\u4E0D\u53EF\u7528": "Backup import service is unavailable",
+  "PlatformManager \u672A\u521D\u59CB\u5316\uFF0CIM \u5E73\u53F0\u6E05\u5355\u4E0D\u53EF\u7528": "PlatformManager is not initialized; the IM platform list is unavailable",
+  "PlatformManager \u672A\u521D\u59CB\u5316": "PlatformManager is not initialized",
+  "\u7F3A\u5C11 platformId \u53C2\u6570": "Missing platformId parameter",
+  "\u96A7\u9053\u670D\u52A1\u5730\u5740\u5FC5\u987B\u662F ws:// \u6216 wss://\uFF08\u4E5F\u63A5\u53D7 http/https\uFF09": "The tunnel server URL must be ws:// or wss:// (http/https is also accepted)",
+  "\u8BF7\u8F93\u5165\u5408\u6CD5\u7684\u516C\u7F51\u96A7\u9053\u5730\u5740\uFF08https://...\uFF09": "Enter a valid public tunnel URL (https://...)",
+  "\u81EA\u5EFA\u96A7\u9053\u5DF2\u5728\u8FD0\u884C": "The self-hosted tunnel is already running",
+  "\u7F3A\u5C11\u914D\u7F6E\uFF1A\u8BF7\u5728\u63A7\u5236\u53F0\u914D\u7F6E customTunnel.serverUrl \u548C customTunnel.accessToken": "Missing configuration: set customTunnel.serverUrl and customTunnel.accessToken in the console",
+  "Cloudflare \u96A7\u9053\u5DF2\u5728\u8FD0\u884C": "The Cloudflare tunnel is already running",
+  "\u6B63\u5728\u521D\u59CB\u5316...": "Initializing\u2026",
+  "\u6B63\u5728\u81EA\u52A8\u91CD\u8FDE...": "Reconnecting automatically\u2026",
+  "\u6B63\u5728\u8FDE\u63A5 Cloudflare...": "Connecting to Cloudflare\u2026",
+  "\u6B63\u5728\u4E0B\u8F7D cloudflared (~30MB)...": "Downloading cloudflared (~30 MB)\u2026",
+  "\u4E34\u65F6\u96A7\u9053\u5DF2\u5EFA\u7ACB": "Temporary tunnel established",
+  "\u56FA\u5B9A\u96A7\u9053\u5DF2\u5EFA\u7ACB": "Fixed tunnel established",
+  "\u96A7\u9053\u5DF2\u6CE8\u518C\uFF0C\u7B49\u5F85\u5C31\u7EEA...": "Tunnel registered, waiting to become ready\u2026",
+  "\u96A7\u9053\u5DF2\u5EFA\u7ACB": "Tunnel established",
+  "\u96A7\u9053\u672A\u8FD0\u884C\u6216\u5C1A\u672A\u5C31\u7EEA": "The tunnel is not running or not ready yet",
+  "\u5DF2\u53D6\u6D88": "Cancelled",
+  "\u5BA2\u6237\u7AEF\u5728\u7EBF\u8FD0\u884C\u4E2D (WebSocket \u901A\u9053\u5DF2\u5EFA\u7ACB)": "Client online (WebSocket channel established)",
+  "\u5BA2\u6237\u7AEF\u5728\u7EBF\u8FD0\u884C\u4E2D": "Client online",
+  "\u5F85\u8FDE\u63A5/\u5C31\u7EEA": "Waiting to connect / ready",
+  "\u672A\u914D\u7F6E\u81EA\u5EFA\u670D\u52A1\u5668\uFF08\u82E5\u5DF2\u90E8\u7F72\u81EA\u5EFA\u96A7\u9053\u53EF\u5728\u300C\u516C\u7F51\u96A7\u9053\u300D\u4E2D\u914D\u7F6E\uFF09": "No self-hosted server configured (configure it under \u201CPublic tunnel\u201D if it is already deployed)",
+  "\u65E0\u6548\u7684\u5907\u4EFD\u6570\u636E\u7ED3\u6784\uFF1A\u7F3A\u5C11 config \u8282\u70B9": "Invalid backup data: the config node is missing",
+  "\u4E0B\u8F7D\u8D85\u65F6\uFF085\u5206\u949F\uFF09": "Download timed out (5 minutes)",
+  "\u91CD\u5B9A\u5411\u6B21\u6570\u8FC7\u591A": "Too many redirects",
+  "\u672A\u77E5\u9519\u8BEF": "Unknown error",
+  "\u672A\u77E5": "Unknown",
+  "\u505C\u6B62 cloudflared...": "Stopping cloudflared\u2026",
+  "\u5C40\u57DF\u7F51 IP \u5206\u914D\u4E0E\u53EF\u7528\u6027": "LAN IP allocation & availability",
+  "Cloudflare Anycast \u8FB9\u7F18\u7F51\u7EDC": "Cloudflare Anycast edge network",
+  "\u56FD\u5185 npm \u9AD8\u901F\u955C\u50CF\u6E90 (npmmirror)": "npmmirror (fast npm mirror)",
+  "\u81EA\u5EFA\u96A7\u9053\u90E8\u7F72\u670D\u52A1\u5668": "Self-hosted tunnel server",
+  "\u4EE3\u7406\u672A\u542F\u52A8": "Proxy is not running",
+  "\u672A\u68C0\u6D4B\u5230\u6D3B\u8DC3\u5C40\u57DF\u7F51 IPv4 \u5730\u5740 (\u53EF\u80FD\u672A\u8FDE\u63A5 Wi-Fi/\u4EE5\u592A\u7F51)": "No active LAN IPv4 address detected (Wi-Fi/Ethernet may be disconnected)",
+  "\u5B89\u5168\u62E6\u622A\uFF1A\u7981\u6B62\u8BBF\u95EE UNC \u7F51\u7EDC\u5171\u4EAB\u8DEF\u5F84": "Blocked: UNC network share paths are not allowed",
+  "\u626B\u7801\u521B\u5EFA\u5E94\u7528\u672A\u8FD4\u56DE\u5B8C\u6574\u51ED\u636E": "Scan-to-create did not return complete credentials",
+  "\u98DE\u4E66\u901A\u9053\u672A\u542F\u52A8\uFF1A\u8BF7\u5148\u914D\u7F6E\u5E94\u7528\u51ED\u8BC1\u5E76\u8FDE\u63A5": "Lark / Feishu channel is not running: configure the app credentials and connect first",
+  "\u7F3A\u5C11\u6587\u4EF6\u8DEF\u5F84": "Missing file path",
+  "\u8BC4\u8BBA\u4F1A\u8BDD\u4E0D\u652F\u6301\u53D1\u9001\u6587\u4EF6": "Sending files is not supported in comment sessions",
+  "\u5F53\u524D\u8FD0\u884C\u5728 DSH \u684C\u9762\u7248\u5185\uFF0C\u5BBF\u4E3B\u7531\u5E94\u7528\u7EDF\u4E00\u7BA1\u7406\uFF0C\u63D2\u4EF6\u4E0D\u80FD\u81EA\u884C\u91CD\u542F\u3002\u8BF7\u7528\u684C\u9762\u5E94\u7528\u83DC\u5355\u7684\u91CD\u542F/\u9000\u51FA\u91CD\u8FDB\uFF08\u6709\u5173\u95ED\u786E\u8BA4\u4FDD\u62A4\u6B63\u5728\u8DD1\u7684\u4EFB\u52A1\uFF09\uFF0C\u4E0D\u8981\u7528\u9762\u677F\u91CD\u542F\u3002": "DSH Desktop manages the host itself, so the plugin cannot restart it. Use the desktop app menu to restart or quit and reopen (it asks for confirmation when tasks are running) instead of the panel restart.",
+  '\u684C\u9762\u7248 DSH \u7531\u5E94\u7528\u5185\u66F4\u65B0\u7EDF\u4E00\u7BA1\u7406\uFF08\u4E00\u952E\u5347\u7EA7\u4EC5\u652F\u6301 npm \u5168\u5C40\u5B89\u88C5\u7684 CLI \u7248\uFF09\uFF1B\u8BF7\u7528\u684C\u9762\u5E94\u7528\u83DC\u5355\u7684"\u68C0\u67E5\u66F4\u65B0"\u5347\u7EA7\uFF0C\u52FF\u7528 npm \u6539\u52A8\u5E94\u7528\u5305\u5185\u6587\u4EF6': "DSH Desktop updates itself from within the app (one-click upgrade only supports the globally npm-installed CLI); use \u201CCheck for updates\u201D in the desktop app menu and do not modify files inside the app package with npm",
+  "dsh \u975E\u6807\u51C6 npm \u5168\u5C40\u5B89\u88C5\uFF08Electron/\u6253\u5305/\u6E90\u7801/pnpm \u7B49\uFF09\uFF0C\u65E0\u6CD5\u81EA\u52A8\u5347\u7EA7\uFF1B\u8BF7\u6309\u5B98\u65B9\u6E20\u9053\u624B\u52A8\u66F4\u65B0": "dsh is not a standard global npm install (Electron/packaged/source/pnpm, etc.), so automatic upgrade is unavailable \u2014 update manually via the official channel",
+  "\u7F3A\u5C11\u5DE5\u4F5C\u533A\u76EE\u5F55\u8DEF\u5F84": "Missing workspace directory path",
+  "\u8DEF\u5F84\u5B89\u5168\u6821\u9A8C\u672A\u901A\u8FC7": "Path failed the security check",
+  "\u767B\u5F55\u542F\u52A8\u5931\u8D25": "Failed to start sign-in",
+  "\u5347\u7EA7\u547D\u4EE4\u6267\u884C\u5931\u8D25": "Upgrade command failed",
+  "\u672A\u627E\u5230 dsh \u547D\u4EE4\uFF08\u53EF\u80FD\u901A\u8FC7\u6E90\u7801/\u6253\u5305\u65B9\u5F0F\u8FD0\u884C\uFF0C\u975E npm \u5168\u5C40\u5B89\u88C5\uFF09": "dsh command not found (it may be installed from source or packaged rather than as a global npm package)",
+  "\u5F53\u524D DSH \u4E3A\u975E npm \u5168\u5C40\u5B89\u88C5\uFF0C\u65E0\u6CD5\u81EA\u52A8\u5347\u7EA7\uFF1B\u8BF7\u6309\u5B98\u65B9\u6E20\u9053\u624B\u52A8\u66F4\u65B0": "This DSH is not a global npm install, so automatic upgrade is unavailable \u2014 update manually via the official channel",
+  "\u96A7\u9053\u672A\u8FD0\u884C": "Tunnel is not running",
+  "\u672A\u547D\u540D\u4F1A\u8BDD": "Untitled session",
+  "\u5F85\u5BA1\u6279\u8BF7\u6C42": "Pending approval",
+  "\u{1F3E0} \u7528\u6237\u4E3B\u76EE\u5F55": "\u{1F3E0} Home",
+  "\u{1F4BB} \u684C\u9762": "\u{1F4BB} Desktop",
+  "\u{1F4C1} \u6587\u6863": "\u{1F4C1} Documents",
+  "\u{1F4E5} \u4E0B\u8F7D": "\u{1F4E5} Downloads",
+  "\u6839\u76EE\u5F55 /": "Root /",
+  "C: \u76D8": "C: drive",
+  "\u5C1D\u8BD5\u6B21\u6570\u8FC7\u591A\uFF0C\u8BF7 60 \u79D2\u540E\u518D\u8BD5": "Too many attempts, please try again in 60 seconds",
+  "\u5C1D\u8BD5\u6B21\u6570\u8FC7\u591A\uFF0C\u8BF7\u7A0D\u540E\u518D\u8BD5": "Too many attempts, please try again later",
+  "\u5F53\u524D\u5DF2\u914D\u7F6E\u4E3A\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406\u8BBE\u7F6E": "Management is currently restricted to this computer",
+  "\u8BF7\u68C0\u67E5 Token \u4E0E\u53C2\u6570": "check the Token and parameters",
+  "\u5DF2\u914D\u7F6E Token": "Token configured",
+  "\u767B\u5F55\u5931\u8D25\u6216\u8D85\u65F6": "Sign-in failed or timed out",
+  "\u63A2\u6D4B dsh \u5B89\u88C5\u5F62\u6001\u5931\u8D25\uFF0C\u8BF7\u6309\u5B98\u65B9\u6E20\u9053\u624B\u52A8\u66F4\u65B0": "Failed to detect how dsh is installed; update manually via the official channel",
+  "systemctl \u6267\u884C\u8D85\u65F6\uFF085s\uFF09": "systemctl timed out (5s)",
+  "\u4F60\u5DF2\u62D2\u7EDD\u6388\u6743\uFF0C\u53EF\u91CD\u65B0\u53D1\u8D77\u626B\u7801\u521B\u5EFA": "You declined the authorization; you can start the QR sign-in again",
+  "\u4E8C\u7EF4\u7801\u5DF2\u8FC7\u671F\uFF0C\u8BF7\u91CD\u65B0\u53D1\u8D77\u626B\u7801\u521B\u5EFA": "The QR code expired; start the QR sign-in again"
+};
+var serverPatterns = [
+  [/^(.+)（(access_denied|expired_token)）$/, "$1t ($2)"],
+  [/^systemctl 退出码 (.*)$/, "systemctl exit code $1"],
+  [/^cloudflared 进程意外退出 \(code=(.*?)(, .*)?\)$/, "cloudflared exited unexpectedly (code=$1$2)"],
+  [/^cloudflared 退出，code=(.*) signal=(.*)$/, "cloudflared exited (code=$1, signal=$2)"],
+  [/^配置错误（(.*)）$/, "Configuration error ($1t)"],
+  [/^(.*)（已自动重试 (\d+) 次仍失败，请检查网络\/Token，或点击「关闭」停止）$/, "$1t (retried $2 times without success \u2014 check your network/Token, or click \u201CClose\u201D to stop)"],
+  [/^(.*)，(.*) 后自动重连（第 (\d+)\/(\d+) 次）$/, "$1t, reconnecting automatically after $2 (attempt $3/$4)"],
+  [/^(.*)，(.*) 后继续自动重连（已重试 (\d+) 次；隧道长时间无法建立，请检查网络与 Token）$/, "$1t, continuing to reconnect automatically after $2 (retried $3 times; the tunnel has been down for a while \u2014 check your network and Token)"],
+  [/^(.*)；⚠️ 运行时健康探活未启用（未识别到 cloudflared metrics 地址），连接器若静默假死将无法自动发现$/, "$1t; \u26A0\uFE0F runtime health probing is disabled (no cloudflared metrics address found) \u2014 a silently hung connector will not be detected automatically"],
+  [/^健康探活连续 (\d+) 次失败：连接器已无健康边缘连接，正在观察能否自行恢复（(\d+)\/(\d+)）$/, "Health probe failed $1 times in a row: the connector has no healthy edge connection \u2014 watching whether it recovers ($2/$3)"],
+  [/^健康探活连续 (\d+) 次失败：连接器已无健康边缘连接，正在自动重连…$/, "Health probe failed $1 times in a row: the connector has no healthy edge connection \u2014 reconnecting\u2026"],
+  [/^固定隧道已建立 \((.*)\)$/, "Fixed tunnel established ($1)"],
+  [/^临时隧道已建立 \((.*)\)$/, "Temporary tunnel established ($1)"],
+  [/^服务器连通良好 \(延迟 (\d+)ms · 状态: (.*)\)$/, "Server reachable (latency $1 ms \xB7 status: $2t)"],
+  [/^连接畅通 \(延迟 (\d+)ms\)$/, "Connection OK (latency $1 ms)"],
+  [/^连接异常: (.*) \(临时公网隧道可能受阻\)$/, "Connection error: $1t (the temporary public tunnel may be blocked)"],
+  [/^连接超时或异常: (.*)$/, "Connection timed out or failed: $1t"],
+  [/^连接超时 \((\d+(?:\.\d+)?)s\)$/, "Connection timed out ($1s)"],
+  [/^无法连通自建服务器: (.*)$/, "Cannot reach the self-hosted server: $1t"],
+  [/^本地反向代理端口 \((\d+)\)$/, "Local reverse-proxy port ($1)"],
+  [/^正常运行中 \(代理目标端口: (\d+)\)$/, "Running (proxy target port: $1)"],
+  [/^检测到有效局域网 IPv4: (.*)$/, "Valid LAN IPv4 detected: $1"],
+  [/^自建隧道部署服务器 \((.*)\)$/, "Self-hosted tunnel server ($1)"],
+  [/^指定路径不是文件夹: (.*)$/, "Not a folder: $1"],
+  [/^无法访问指定路径 \((.*)\)$/, "Cannot access the path ($1t)"],
+  [/^读取文件夹失败: (.*)$/, "Failed to read the folder: $1t"],
+  [/^安全拦截：禁止访问系统敏感目录 \((.*)\)$/, "Blocked: access to a sensitive system directory is not allowed ($1)"],
+  [/^安全拦截：禁止访问系统关键目录 \((.*)\)$/, "Blocked: access to a critical system directory is not allowed ($1)"],
+  [/^安全拦截：禁止访问敏感配置目录「(.*)」$/, "Blocked: access to a sensitive configuration directory \u201C$1\u201D is not allowed"],
+  [/^安全拦截：符号链接指向系统敏感目录 \((.*)\)$/, "Blocked: symlink points to a sensitive system directory ($1)"],
+  [/^安全拦截：符号链接指向系统关键目录 \((.*)\)$/, "Blocked: symlink points to a critical system directory ($1)"],
+  [/^安全拦截：符号链接指向敏感配置目录「(.*)」$/, "Blocked: symlink points to a sensitive configuration directory \u201C$1\u201D"],
+  [/^非法的版本号格式: (.*)$/, "Invalid version format: $1"],
+  [/^重启失败：(.*)$/, "Restart failed: $1t"],
+  [/^systemctl (.*) 失败：(.*)。DSH 仍在运行；请手动执行「(.*)」或检查单元。$/, "systemctl $1 failed: $2t. DSH is still running; run \u201C$3\u201D manually or check the unit."],
+  [/^npm 安装成功但 dsh 命令实际版本仍为 (.*)（预期 (.*)）。可能安装到了错误位置，请手动执行 `(.*)` 并重启 DSH。$/, "npm install succeeded but the dsh command still reports $1 (expected $2). It may have installed to the wrong location \u2014 run `$3` manually and restart DSH."],
+  [/^请求过于频繁，请等待 (\d+) 秒后再试$/, "Too many requests; retry in $1 s"],
+  [/^添加工作区请求过于频繁，请等待 (\d+) 秒后再试$/, "Too many workspace requests; retry in $1 s"],
+  [/^平台未注册: (.*)$/, "Platform not registered: $1"],
+  [/^不支持的平台: (.*)$/, "Unsupported platform: $1"],
+  [/^下载 cloudflared: (.*)$/, "Downloading cloudflared: $1"],
+  [/^数据面探测超时 (.*)$/, "Data plane probe timed out $1"],
+  [/^公网地址格式非法: (.*)$/, "Invalid public URL: $1"],
+  [/^([A-Za-z]): 盘$/, "$1: drive"],
+  [/^(.*) \(Wi-Fi 无线网卡\)$/, "$1t (Wi-Fi adapter)"],
+  [/^(.*) \(有线网卡\)$/, "$1t (wired adapter)"],
+  [/^(.*) \(虚拟网卡 \/ WSL \/ 虚拟机\)$/, "$1t (virtual adapter / WSL / VM)"],
+  [/^cloudflared 启动失败: (.*)$/, "cloudflared failed to start: $1t"],
+  [/^cloudflared 自动重连失败: (.*)$/, "cloudflared automatic reconnect failed: $1t"]
+];
+
+// client/locales.mjs
+var LOCALE_NAMESPACE = "@wenbin_wb/dsh-bridge";
+var zh = {
+  // 移动端顶栏
+  "menu.open": "\u6253\u5F00\u83DC\u5355",
+  "menu.newSession": "\u65B0\u5EFA\u4F1A\u8BDD",
+  "title.fallback": "\u65B0\u4F1A\u8BDD",
+  // 移动端输入区
+  "composer.placeholder": "\u270D\uFE0F \u70B9\u51FB\u8F93\u5165\u6D88\u606F\u2026",
+  "composer.expand": "\u5C55\u5F00\u8F93\u5165\u6846",
+  "composer.collapse": "\u6536\u8D77\u8F93\u5165\u6846\uFF0C\u6700\u5927\u5316\u5BF9\u8BDD\u9605\u8BFB\u533A",
+  "panel.backToChat": "\u8FD4\u56DE\u5BF9\u8BDD",
+  // 宿主浮层（智能体团队 / 子智能体下拉）在移动端由本插件统一补收起按钮：动作文案，兼作 aria-label
+  "popover.collapse": "\u6536\u8D77",
+  // 移动端设置面板 / 抽屉（dsh-bridge 自绘部分）
+  "workspace.choose": "\u9009\u62E9\u7535\u8111\u5DE5\u4F5C\u533A",
+  "workspace.reading": "\u6B63\u5728\u8BFB\u53D6\u76EE\u5F55\u5185\u5BB9\u2026",
+  "workspace.currentDir": "\u5F53\u524D\u76EE\u5F55:",
+  "workspace.registeredHint": "\u5DF2\u6CE8\u518C\u5DE5\u4F5C\u533A (${count} \u4E2A\uFF0C\u70B9\u51FB\u76F4\u63A5\u5207\u6362)\uFF1A",
+  "workspace.enterHint": "\u70B9\u51FB\u8FDB\u5165\u6587\u4EF6\u5939\uFF0C\u6216\u70B9\u51FB\u300C+ \u9009\u4E3A\u5DE5\u4F5C\u533A\u300D\u76F4\u63A5\u6DFB\u52A0\u5E76\u5207\u6362",
+  "workspace.unlockHint": "\u8FDC\u7A0B\u8BBF\u95EE\u65F6\u6D4F\u89C8/\u6DFB\u52A0\u5DE5\u4F5C\u533A\u9700\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\uFF08\u4E0E\u8BBF\u95EE\u5BC6\u7801\u4E0D\u540C\uFF09\u3002",
+  "workspace.chooseFolder": "\u9009\u62E9\u5DE5\u4F5C\u533A",
+  "workspace.addFolder": "\u6DFB\u52A0",
+  "workspace.refresh": "\u5237\u65B0\u76EE\u5F55",
+  "workspace.back": "\u8FD4\u56DE\u4E0A\u4E00\u7EA7",
+  "workspace.filter": "\u8FC7\u6EE4\u5B50\u6587\u4EF6\u5939\u2026",
+  "workspace.more": "\u8FD8\u6709\u66F4\u591A",
+  "workspace.addSubfolder": "\u76F4\u63A5\u6DFB\u52A0\u6B64\u5B50\u6587\u4EF6\u5939\u4E3A\u5DE5\u4F5C\u533A\u5E76\u8FDB\u5165",
+  "workspace.onlyAdmin": "\u4EC5\u9650\u672C\u673A\u7BA1\u7406",
+  "workspace.isCurrent": "\u5F53\u524D\u4E3B\u5165\u53E3",
+  "workspace.isFallback": "\u4E3B\u5165\u53E3",
+  // 远程访问面板
+  "access.copyLink": "\u590D\u5236\u94FE\u63A5",
+  "access.copied": "\u2713 \u5DF2\u590D\u5236",
+  "access.hideQr": "\u9690\u85CF\u4E8C\u7EF4\u7801",
+  "access.showQr": "\u663E\u793A\u4E8C\u7EF4\u7801",
+  "access.privateEnv": "\u8BF7\u5728\u79C1\u5BC6\u73AF\u5883\u4E0B\u4F7F\u7528",
+  "access.switching": "\u5207\u6362\u4E2D\u2026",
+  "access.publicEntry": "\u516C\u7F51\u8BBF\u95EE\u5165\u53E3",
+  "access.copy": "\u590D\u5236",
+  "access.stopReconnect": "\u505C\u6B62\u91CD\u8FDE",
+  "access.close": "\u5173\u95ED",
+  "access.connecting": "\u8FDE\u63A5\u4E2D\u2026",
+  "access.downloading": "\u4E0B\u8F7D\u4E2D\u2026",
+  "access.enable": "\u5F00\u542F\u516C\u7F51\u96A7\u9053",
+  "access.scanHint": "\u8BF7\u5728\u79C1\u5BC6\u73AF\u5883\u4E0B\u626B\u7801\u4F7F\u7528",
+  "access.autoStart": "\u968F DSH \u542F\u52A8\u81EA\u52A8\u5F00\u542F",
+  "access.tunnelConfig": "\u96A7\u9053\u914D\u7F6E",
+  "access.expand": "\u5C55\u5F00 \u25BE",
+  "access.collapse": "\u6536\u8D77 \u25B4",
+  "access.saveError": "\u4FDD\u5B58\u914D\u7F6E\u5931\u8D25",
+  "access.serverConfig": "\u96A7\u9053\u670D\u52A1\u5668\u914D\u7F6E",
+  "access.saving": "\u4FDD\u5B58\u4E2D\u2026",
+  "access.saved": "\u2713 \u5DF2\u4FDD\u5B58",
+  "access.saveConfig": "\u4FDD\u5B58\u914D\u7F6E",
+  "access.clear": "\u6E05\u9664",
+  "access.externalTunnel": "\u5916\u90E8\u5DF2\u90E8\u7F72\u96A7\u9053",
+  "access.saveFixed": "\u4FDD\u5B58\u56FA\u5B9A\u57DF\u540D\u914D\u7F6E",
+  "access.updateFailed": "\u66F4\u65B0\u5931\u8D25",
+  "access.securityHint": "\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801",
+  "access.goSetup": "\u53BB\u5F00\u542F \u2794",
+  "access.gotoSettings": "\u8BBE\u7F6E \u2794",
+  "access.tutorial": "\u67E5\u770B\u81EA\u5EFA\u96A7\u9053\u670D\u52A1\u5668\u642D\u5EFA\u6559\u7A0B"
+};
+var en = {
+  "menu.open": "Open menu",
+  "menu.newSession": "New session",
+  "title.fallback": "New Session",
+  "composer.placeholder": "\u270D\uFE0F Tap to type a message\u2026",
+  "composer.expand": "Expand input",
+  "composer.collapse": "Collapse input to maximize chat view",
+  "panel.backToChat": "Back to chat",
+  // Host popovers (Agent Team / subagent dropdown) get a collapse control from this plugin on mobile
+  "popover.collapse": "Collapse",
+  "workspace.choose": "Choose a workspace",
+  "workspace.reading": "Reading directory\u2026",
+  "workspace.currentDir": "Current directory:",
+  "workspace.registeredHint": "Registered workspaces (${count}, click to switch):",
+  "workspace.enterHint": "Enter a folder, or tap \u201C+ Select as workspace\u201D to add & switch",
+  "workspace.unlockHint": "Browsing/adding workspaces remotely requires the admin password to unlock (different from the access password).",
+  "workspace.chooseFolder": "Choose workspace",
+  "workspace.addFolder": "Add",
+  "workspace.refresh": "Refresh",
+  "workspace.back": "Back",
+  "workspace.filter": "Filter subfolders\u2026",
+  "workspace.more": "More",
+  "workspace.addSubfolder": "Add this subfolder as a workspace and enter",
+  "workspace.onlyAdmin": "Local admin only",
+  "workspace.isCurrent": "Current entry",
+  "workspace.isFallback": "Main entry",
+  "access.copyLink": "Copy link",
+  "access.copied": "\u2713 Copied",
+  "access.hideQr": "Hide QR",
+  "access.showQr": "Show QR",
+  "access.privateEnv": "Use in a private environment",
+  "access.switching": "Switching\u2026",
+  "access.publicEntry": "Public access entry",
+  "access.copy": "Copy",
+  "access.stopReconnect": "Stop reconnecting",
+  "access.close": "Close",
+  "access.connecting": "Connecting\u2026",
+  "access.downloading": "Downloading\u2026",
+  "access.enable": "Enable public tunnel",
+  "access.scanHint": "Scan in a private environment",
+  "access.autoStart": "Start automatically with DSH",
+  "access.tunnelConfig": "Tunnel configuration",
+  "access.expand": "Expand \u25BE",
+  "access.collapse": "Collapse \u25B4",
+  "access.saveError": "Failed to save configuration",
+  "access.serverConfig": "Tunnel server configuration",
+  "access.saving": "Saving\u2026",
+  "access.saved": "\u2713 Saved",
+  "access.saveConfig": "Save configuration",
+  "access.clear": "Clear",
+  "access.externalTunnel": "External tunnel",
+  "access.saveFixed": "Save fixed-domain configuration",
+  "access.updateFailed": "Update failed",
+  "access.securityHint": "Set an external visitor access password",
+  "access.goSetup": "Set up \u2794",
+  "access.gotoSettings": "Settings \u2794",
+  "access.tutorial": "View the self-hosted tunnel server tutorial"
+};
+function createTranslator(ctx) {
+  const readLang = () => {
+    try {
+      const root = typeof document !== "undefined" ? document.documentElement : null;
+      return (root && typeof root.getAttribute === "function" ? root.getAttribute("lang") : "") || "";
+    } catch {
+      return "";
+    }
+  };
+  const active = () => readLang().toLowerCase().startsWith("zh") ? "zh" : "en";
+  const own = (dict, key) => typeof key === "string" && Object.hasOwn(dict, key) ? dict[key] : void 0;
+  const lookup = (key, lang, vars, depth = 0) => {
+    if (typeof key !== "string") return void 0;
+    if (depth > 8) return void 0;
+    const semantic = lang === "zh" ? own(zh, key) : own(en, key) ?? own(zh, key);
+    if (semantic !== void 0) return semantic;
+    if (lang === "zh") return void 0;
+    const panel = own(panelEn, key);
+    if (panel !== void 0) {
+      if (Array.isArray(panel)) return vars && vars.count === 1 ? panel[0] : panel[1];
+      return panel;
+    }
+    const server = own(serverEn, key);
+    if (server !== void 0) return server;
+    for (const [pattern, english] of serverPatterns) {
+      const matched = pattern.exec(key);
+      if (!matched) continue;
+      return english.replace(/\$(\d)(t?)/g, (_, group, translate) => {
+        const captured = matched[Number(group)] ?? "";
+        return translate ? lookup(captured, "en", void 0, depth + 1) ?? captured : captured;
+      });
+    }
+    return void 0;
+  };
+  const t2 = (key, vars) => {
+    let text = lookup(key, active(), vars);
+    if (text === void 0) text = key;
+    if (vars && text) {
+      for (const [k, v] of Object.entries(vars)) text = text.replaceAll(`\${${k}}`, String(v));
+    }
+    return text;
+  };
+  try {
+    const locale = ctx && (typeof ctx.get === "function" ? ctx.get("locale") : ctx.locale);
+    if (locale && typeof locale.register === "function") {
+      locale.register(LOCALE_NAMESPACE, { zh, en });
+    }
+  } catch {
+  }
+  return { t: t2, active };
+}
+var globalTranslator = createTranslator(null);
+var t = (key, vars) => globalTranslator.t(key, vars);
+
 // client/unlock-manager.js
 var SESSION_KEY = "dsh_admin_token";
 var _token = "";
@@ -1664,10 +2483,10 @@ function _readStorage() {
     return "";
   }
 }
-function _writeStorage(t) {
+function _writeStorage(t2) {
   try {
     if (typeof window === "undefined") return;
-    if (t) window.sessionStorage.setItem(SESSION_KEY, t);
+    if (t2) window.sessionStorage.setItem(SESSION_KEY, t2);
     else window.sessionStorage.removeItem(SESSION_KEY);
   } catch {
   }
@@ -1681,8 +2500,8 @@ function getAdminToken() {
   }
   return "";
 }
-function setAdminToken(t) {
-  _token = t || "";
+function setAdminToken(t2) {
+  _token = t2 || "";
   _writeStorage(_token);
 }
 function clearAdminToken() {
@@ -1755,7 +2574,7 @@ async function unlockAdmin(rpcCall, password) {
       await replayPending();
       return { ok: true };
     }
-    return { ok: false, error: res?.error?.message || "\u7BA1\u7406\u5458\u5BC6\u7801\u9519\u8BEF" };
+    return { ok: false, error: res?.error?.message || t("\u7BA1\u7406\u5458\u5BC6\u7801\u9519\u8BEF") };
   } catch (err) {
     const msg = String(err?.message || err || "");
     if (msg.includes("401") || msg.includes("transport failure") || msg.includes("unauthorized")) {
@@ -1767,7 +2586,7 @@ async function unlockAdmin(rpcCall, password) {
         window.location.reload();
       }
     }
-    return { ok: false, error: err?.message || "\u89E3\u9501\u8BF7\u6C42\u5931\u8D25" };
+    return { ok: false, error: err?.message || t("\u89E3\u9501\u8BF7\u6C42\u5931\u8D25") };
   }
 }
 
@@ -1916,7 +2735,7 @@ function getNavIconCss(customSvg = REMOTE_NAV_SVG) {
 }
 `;
 }
-function registerSettingsNavIcon(resolveLabel = () => "\u8FDC\u7A0B\u8BBF\u95EE", resolveFamilies = null) {
+function registerSettingsNavIcon(resolveLabel = () => t("\u8FDC\u7A0B\u8BBF\u95EE"), resolveFamilies = null) {
   if (typeof document === "undefined") return () => {
   };
   const styleId = "dsh-bridge-settings-nav-icon-style";
@@ -1931,7 +2750,7 @@ function registerSettingsNavIcon(resolveLabel = () => "\u8FDC\u7A0B\u8BBF\u95EE"
   let disposed = false;
   const sync = () => {
     if (disposed) return;
-    const currentLabel = typeof resolveLabel === "function" ? resolveLabel().trim() : "\u8FDC\u7A0B\u8BBF\u95EE";
+    const currentLabel = typeof resolveLabel === "function" ? resolveLabel().trim() : t("\u8FDC\u7A0B\u8BBF\u95EE");
     const families = typeof resolveFamilies === "function" ? resolveFamilies() || {} : {};
     const settingsFamily = families.SETTINGS;
     const selector = settingsFamily && settingsFamily !== ABSENT_FAMILY ? `[role="dialog"] nav button, div[class*="${settingsFamily}_nav"] button` : '[role="dialog"] nav button';
@@ -1958,152 +2777,6 @@ function registerSettingsNavIcon(resolveLabel = () => "\u8FDC\u7A0B\u8BBF\u95EE"
     const styleEl = document.getElementById(styleId);
     if (styleEl) styleEl.remove();
   };
-}
-
-// client/locales.mjs
-var LOCALE_NAMESPACE = "@wenbin_wb/dsh-bridge";
-var zh = {
-  // 移动端顶栏
-  "menu.open": "\u6253\u5F00\u83DC\u5355",
-  "menu.newSession": "\u65B0\u5EFA\u4F1A\u8BDD",
-  "title.fallback": "\u65B0\u4F1A\u8BDD",
-  // 移动端输入区
-  "composer.placeholder": "\u270D\uFE0F \u70B9\u51FB\u8F93\u5165\u6D88\u606F\u2026",
-  "composer.expand": "\u5C55\u5F00\u8F93\u5165\u6846",
-  "composer.collapse": "\u6536\u8D77\u8F93\u5165\u6846\uFF0C\u6700\u5927\u5316\u5BF9\u8BDD\u9605\u8BFB\u533A",
-  "panel.backToChat": "\u8FD4\u56DE\u5BF9\u8BDD",
-  // 宿主浮层（智能体团队 / 子智能体下拉）在移动端由本插件统一补收起按钮：动作文案，兼作 aria-label
-  "popover.collapse": "\u6536\u8D77",
-  // 移动端设置面板 / 抽屉（dsh-bridge 自绘部分）
-  "workspace.choose": "\u9009\u62E9\u7535\u8111\u5DE5\u4F5C\u533A",
-  "workspace.reading": "\u6B63\u5728\u8BFB\u53D6\u76EE\u5F55\u5185\u5BB9\u2026",
-  "workspace.currentDir": "\u5F53\u524D\u76EE\u5F55:",
-  "workspace.registeredHint": "\u5DF2\u6CE8\u518C\u5DE5\u4F5C\u533A (${count} \u4E2A\uFF0C\u70B9\u51FB\u76F4\u63A5\u5207\u6362)\uFF1A",
-  "workspace.enterHint": "\u70B9\u51FB\u8FDB\u5165\u6587\u4EF6\u5939\uFF0C\u6216\u70B9\u51FB\u300C+ \u9009\u4E3A\u5DE5\u4F5C\u533A\u300D\u76F4\u63A5\u6DFB\u52A0\u5E76\u5207\u6362",
-  "workspace.unlockHint": "\u8FDC\u7A0B\u8BBF\u95EE\u65F6\u6D4F\u89C8/\u6DFB\u52A0\u5DE5\u4F5C\u533A\u9700\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\uFF08\u4E0E\u8BBF\u95EE\u5BC6\u7801\u4E0D\u540C\uFF09\u3002",
-  "workspace.chooseFolder": "\u9009\u62E9\u5DE5\u4F5C\u533A",
-  "workspace.addFolder": "\u6DFB\u52A0",
-  "workspace.refresh": "\u5237\u65B0\u76EE\u5F55",
-  "workspace.back": "\u8FD4\u56DE\u4E0A\u4E00\u7EA7",
-  "workspace.filter": "\u8FC7\u6EE4\u5B50\u6587\u4EF6\u5939\u2026",
-  "workspace.more": "\u8FD8\u6709\u66F4\u591A",
-  "workspace.addSubfolder": "\u76F4\u63A5\u6DFB\u52A0\u6B64\u5B50\u6587\u4EF6\u5939\u4E3A\u5DE5\u4F5C\u533A\u5E76\u8FDB\u5165",
-  "workspace.onlyAdmin": "\u4EC5\u9650\u672C\u673A\u7BA1\u7406",
-  "workspace.isCurrent": "\u5F53\u524D\u4E3B\u5165\u53E3",
-  "workspace.isFallback": "\u4E3B\u5165\u53E3",
-  // 远程访问面板
-  "access.copyLink": "\u590D\u5236\u94FE\u63A5",
-  "access.copied": "\u2713 \u5DF2\u590D\u5236",
-  "access.hideQr": "\u9690\u85CF\u4E8C\u7EF4\u7801",
-  "access.showQr": "\u663E\u793A\u4E8C\u7EF4\u7801",
-  "access.privateEnv": "\u8BF7\u5728\u79C1\u5BC6\u73AF\u5883\u4E0B\u4F7F\u7528",
-  "access.switching": "\u5207\u6362\u4E2D\u2026",
-  "access.publicEntry": "\u516C\u7F51\u8BBF\u95EE\u5165\u53E3",
-  "access.copy": "\u590D\u5236",
-  "access.stopReconnect": "\u505C\u6B62\u91CD\u8FDE",
-  "access.close": "\u5173\u95ED",
-  "access.connecting": "\u8FDE\u63A5\u4E2D\u2026",
-  "access.downloading": "\u4E0B\u8F7D\u4E2D\u2026",
-  "access.enable": "\u5F00\u542F\u516C\u7F51\u96A7\u9053",
-  "access.scanHint": "\u8BF7\u5728\u79C1\u5BC6\u73AF\u5883\u4E0B\u626B\u7801\u4F7F\u7528",
-  "access.autoStart": "\u968F DSH \u542F\u52A8\u81EA\u52A8\u5F00\u542F",
-  "access.tunnelConfig": "\u96A7\u9053\u914D\u7F6E",
-  "access.expand": "\u5C55\u5F00 \u25BE",
-  "access.collapse": "\u6536\u8D77 \u25B4",
-  "access.saveError": "\u4FDD\u5B58\u914D\u7F6E\u5931\u8D25",
-  "access.serverConfig": "\u96A7\u9053\u670D\u52A1\u5668\u914D\u7F6E",
-  "access.saving": "\u4FDD\u5B58\u4E2D\u2026",
-  "access.saved": "\u2713 \u5DF2\u4FDD\u5B58",
-  "access.saveConfig": "\u4FDD\u5B58\u914D\u7F6E",
-  "access.clear": "\u6E05\u9664",
-  "access.externalTunnel": "\u5916\u90E8\u5DF2\u90E8\u7F72\u96A7\u9053",
-  "access.saveFixed": "\u4FDD\u5B58\u56FA\u5B9A\u57DF\u540D\u914D\u7F6E",
-  "access.updateFailed": "\u66F4\u65B0\u5931\u8D25",
-  "access.securityHint": "\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801",
-  "access.goSetup": "\u53BB\u5F00\u542F \u2794",
-  "access.gotoSettings": "\u8BBE\u7F6E \u2794",
-  "access.tutorial": "\u67E5\u770B\u81EA\u5EFA\u96A7\u9053\u670D\u52A1\u5668\u642D\u5EFA\u6559\u7A0B"
-};
-var en = {
-  "menu.open": "Open menu",
-  "menu.newSession": "New session",
-  "title.fallback": "New Session",
-  "composer.placeholder": "\u270D\uFE0F Tap to type a message\u2026",
-  "composer.expand": "Expand input",
-  "composer.collapse": "Collapse input to maximize chat view",
-  "panel.backToChat": "Back to chat",
-  // Host popovers (Agent Team / subagent dropdown) get a collapse control from this plugin on mobile
-  "popover.collapse": "Collapse",
-  "workspace.choose": "Choose a workspace",
-  "workspace.reading": "Reading directory\u2026",
-  "workspace.currentDir": "Current directory:",
-  "workspace.registeredHint": "Registered workspaces (${count}, click to switch):",
-  "workspace.enterHint": "Enter a folder, or tap \u201C+ Select as workspace\u201D to add & switch",
-  "workspace.unlockHint": "Browsing/adding workspaces remotely requires the admin password to unlock (different from the access password).",
-  "workspace.chooseFolder": "Choose workspace",
-  "workspace.addFolder": "Add",
-  "workspace.refresh": "Refresh",
-  "workspace.back": "Back",
-  "workspace.filter": "Filter subfolders\u2026",
-  "workspace.more": "More",
-  "workspace.addSubfolder": "Add this subfolder as a workspace and enter",
-  "workspace.onlyAdmin": "Local admin only",
-  "workspace.isCurrent": "Current entry",
-  "workspace.isFallback": "Main entry",
-  "access.copyLink": "Copy link",
-  "access.copied": "\u2713 Copied",
-  "access.hideQr": "Hide QR",
-  "access.showQr": "Show QR",
-  "access.privateEnv": "Use in a private environment",
-  "access.switching": "Switching\u2026",
-  "access.publicEntry": "Public access entry",
-  "access.copy": "Copy",
-  "access.stopReconnect": "Stop reconnecting",
-  "access.close": "Close",
-  "access.connecting": "Connecting\u2026",
-  "access.downloading": "Downloading\u2026",
-  "access.enable": "Enable public tunnel",
-  "access.scanHint": "Scan in a private environment",
-  "access.autoStart": "Start automatically with DSH",
-  "access.tunnelConfig": "Tunnel configuration",
-  "access.expand": "Expand \u25BE",
-  "access.collapse": "Collapse \u25B4",
-  "access.saveError": "Failed to save configuration",
-  "access.serverConfig": "Tunnel server configuration",
-  "access.saving": "Saving\u2026",
-  "access.saved": "\u2713 Saved",
-  "access.saveConfig": "Save configuration",
-  "access.clear": "Clear",
-  "access.externalTunnel": "External tunnel",
-  "access.saveFixed": "Save fixed-domain configuration",
-  "access.updateFailed": "Update failed",
-  "access.securityHint": "Set an external visitor access password",
-  "access.goSetup": "Set up \u2794",
-  "access.gotoSettings": "Settings \u2794",
-  "access.tutorial": "View the self-hosted tunnel server tutorial"
-};
-function createTranslator(ctx) {
-  const active = () => {
-    const lang = (typeof document !== "undefined" ? document.documentElement.getAttribute("lang") : "") || "";
-    return lang.toLowerCase().startsWith("zh") ? "zh" : "en";
-  };
-  const entryOf = (key) => ({ zh: zh[key], en: en[key] });
-  const t = (key, vars) => {
-    const e = entryOf(key);
-    let text = e[active()] ?? e.en ?? e.zh ?? "";
-    if (vars && text) {
-      for (const [k, v] of Object.entries(vars)) text = text.replaceAll(`\${${k}}`, String(v));
-    }
-    return text;
-  };
-  try {
-    const locale = ctx && (typeof ctx.get === "function" ? ctx.get("locale") : ctx.locale);
-    if (locale && typeof locale.register === "function") {
-      locale.register(LOCALE_NAMESPACE, { zh, en });
-    }
-  } catch {
-  }
-  return { t, active };
 }
 
 // lib/bridge-rpc-constants.js
@@ -2304,6 +2977,26 @@ var ISSUES_URL = "https://github.com/wenbin-wb/dsh-bridge/issues/new";
 var TUNNEL_DOCS_URL = "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/custom-tunnel.md";
 var CLOUDFLARE_TUTORIAL_URL = "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/cloudflare-fixed-domain.md";
 var localeT = (key) => key;
+var TRANSLATABLE_PROPS = ["title", "placeholder", "aria-label", "alt"];
+function translateChild(child) {
+  if (typeof child === "string") return child ? localeT(child) : child;
+  if (Array.isArray(child)) return child.map(translateChild);
+  return child;
+}
+function translateProps(props) {
+  if (!props || typeof props !== "object") return props;
+  let next = props;
+  for (const key of TRANSLATABLE_PROPS) {
+    const value = props[key];
+    if (typeof value !== "string" || !value) continue;
+    if (next === props) next = { ...props };
+    next[key] = localeT(value);
+  }
+  return next;
+}
+function h(type, props, ...children) {
+  return React.createElement(type, translateProps(props), ...children.map(translateChild));
+}
 function upgradeCommands(latest) {
   const spec = `@wenbin_wb/dsh-bridge@${latest}`;
   return [
@@ -2348,67 +3041,67 @@ var s = {
   tip: { background: "var(--dsw-alias-bg-layer-2,#f9fafb)", borderRadius: 8, padding: "10px 14px", fontSize: 12, color: "var(--dsw-alias-label-secondary,#6b7280)", lineHeight: 1.6 }
 };
 var Icons = {
-  wechat: (props) => React.createElement(
+  wechat: (props) => h(
     "svg",
     { viewBox: "0 0 24 24", width: 18, height: 18, fill: "currentColor", ...props },
-    React.createElement("path", { d: "M8.5 2C4.36 2 1 4.91 1 8.5c0 2.01 1.05 3.81 2.69 4.97l-.69 2.06 2.45-1.22c.94.43 1.98.69 3.05.69.21 0 .42-.01.62-.03-.23-.62-.37-1.28-.37-1.97 0-3.59 3.36-6.5 7.5-6.5.21 0 .41.01.62.03C15.87 4.54 12.44 2 8.5 2zM6 6.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zm5 0a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zm7.5 3.5c-3.59 0-6.5 2.46-6.5 5.5 0 1.66.86 3.14 2.21 4.1l-.56 1.69 2.01-1c.78.36 1.64.57 2.54.57 3.59 0 6.5-2.46 6.5-5.5s-2.91-5.5-6.5-5.5zm-2 4a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm4 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" })
+    h("path", { d: "M8.5 2C4.36 2 1 4.91 1 8.5c0 2.01 1.05 3.81 2.69 4.97l-.69 2.06 2.45-1.22c.94.43 1.98.69 3.05.69.21 0 .42-.01.62-.03-.23-.62-.37-1.28-.37-1.97 0-3.59 3.36-6.5 7.5-6.5.21 0 .41.01.62.03C15.87 4.54 12.44 2 8.5 2zM6 6.5a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zm5 0a1.25 1.25 0 1 1 0 2.5 1.25 1.25 0 0 1 0-2.5zm7.5 3.5c-3.59 0-6.5 2.46-6.5 5.5 0 1.66.86 3.14 2.21 4.1l-.56 1.69 2.01-1c.78.36 1.64.57 2.54.57 3.59 0 6.5-2.46 6.5-5.5s-2.91-5.5-6.5-5.5zm-2 4a1 1 0 1 1 0 2 1 1 0 0 1 0-2zm4 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2z" })
   ),
-  qq: (props) => React.createElement(
+  qq: (props) => h(
     "svg",
     { viewBox: "0 0 24 24", width: 18, height: 18, fill: "currentColor", ...props },
-    React.createElement("path", { d: "M12 2C7.58 2 4 5.37 4 9.53c0 1.95.78 3.73 2.07 5.07-.37 1.15-.99 2.19-1.8 3.08-.18.2-.04.52.23.52 2.22 0 3.99-1.07 4.9-1.86.8.25 1.66.39 2.6.39 4.42 0 8-3.37 8-7.53S16.42 2 12 2zm-3 8a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm6 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z" })
+    h("path", { d: "M12 2C7.58 2 4 5.37 4 9.53c0 1.95.78 3.73 2.07 5.07-.37 1.15-.99 2.19-1.8 3.08-.18.2-.04.52.23.52 2.22 0 3.99-1.07 4.9-1.86.8.25 1.66.39 2.6.39 4.42 0 8-3.37 8-7.53S16.42 2 12 2zm-3 8a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5zm6 0a1.25 1.25 0 1 1 0-2.5 1.25 1.25 0 0 1 0 2.5z" })
   ),
-  feishu: (props) => React.createElement(
+  feishu: (props) => h(
     "svg",
     { viewBox: "0 0 24 24", width: 18, height: 18, fill: "currentColor", ...props },
-    React.createElement("path", { d: "M12 2.5L3.5 11.2l6.8 1.8 2.2 6.5 1.8-4.7 5.2-1.4L12 2.5zm-.8 11.1l-4.1-1.1 6.5-6.6-4.2 8.3 1.8-.6z" })
+    h("path", { d: "M12 2.5L3.5 11.2l6.8 1.8 2.2 6.5 1.8-4.7 5.2-1.4L12 2.5zm-.8 11.1l-4.1-1.1 6.5-6.6-4.2 8.3 1.8-.6z" })
   ),
-  telegram: (props) => React.createElement(
+  telegram: (props) => h(
     "svg",
     { viewBox: "0 0 24 24", width: 18, height: 18, fill: "currentColor", ...props },
-    React.createElement("path", { d: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" })
+    h("path", { d: "M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z" })
   ),
-  lan: (props) => React.createElement(
+  lan: (props) => h(
     "svg",
     { viewBox: "0 0 24 24", width: 16, height: 16, fill: "currentColor", ...props },
-    React.createElement("path", { d: "M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.29 19.3a1 1 0 0 0 1.41 1.41l1.7-1.7C9.02 19.64 10.46 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" })
+    h("path", { d: "M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.29 19.3a1 1 0 0 0 1.41 1.41l1.7-1.7C9.02 19.64 10.46 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6zm0-9a3 3 0 1 0 0 6 3 3 0 0 0 0-6z" })
   ),
-  tunnel: (props) => React.createElement(
+  tunnel: (props) => h(
     "svg",
     { viewBox: "0 0 24 24", width: 16, height: 16, fill: "currentColor", ...props },
-    React.createElement("path", { d: "M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z" })
+    h("path", { d: "M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM19 18H6c-2.21 0-4-1.79-4-4 0-2.05 1.53-3.76 3.56-3.97l1.07-.11.5-.95C8.08 7.14 9.94 6 12 6c2.62 0 4.88 1.86 5.39 4.43l.3 1.5 1.53.11c1.56.1 2.78 1.41 2.78 2.96 0 1.65-1.35 3-3 3z" })
   ),
-  security: (props) => React.createElement(
+  security: (props) => h(
     "svg",
     { viewBox: "0 0 24 24", width: 16, height: 16, fill: "currentColor", ...props },
-    React.createElement("path", { d: "M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" })
+    h("path", { d: "M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z" })
   ),
-  bot: (props) => React.createElement(
+  bot: (props) => h(
     "svg",
     { viewBox: "0 0 24 24", width: 16, height: 16, fill: "currentColor", ...props },
-    React.createElement("path", { d: "M20 9V7c0-1.1-.9-2-2-2h-3c0-1.66-1.34-3-3-3S9 3.34 9 5H6c-1.1 0-2 .9-2 2v2c-1.66 0-3 1.34-3 3s1.34 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.66 0 3-1.34 3-3s-1.34-3-3-3zm-2 10H6V7h12v12zm-9-6c-.83 0-1.5-.67-1.5-1.5S8.17 10 9 10s1.5.67 1.5 1.5S9.83 13 9 13zm6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" })
+    h("path", { d: "M20 9V7c0-1.1-.9-2-2-2h-3c0-1.66-1.34-3-3-3S9 3.34 9 5H6c-1.1 0-2 .9-2 2v2c-1.66 0-3 1.34-3 3s1.34 3 3 3v4c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4c1.66 0 3-1.34 3-3s-1.34-3-3-3zm-2 10H6V7h12v12zm-9-6c-.83 0-1.5-.67-1.5-1.5S8.17 10 9 10s1.5.67 1.5 1.5S9.83 13 9 13zm6 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z" })
   ),
-  github: (props) => React.createElement(
+  github: (props) => h(
     "svg",
     { viewBox: "0 0 24 24", width: 13, height: 13, fill: "currentColor", ...props },
-    React.createElement("path", { d: "M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" })
+    h("path", { d: "M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z" })
   ),
-  refresh: (props) => React.createElement(
+  refresh: (props) => h(
     "svg",
     { viewBox: "0 0 24 24", width: 12, height: 12, fill: "none", stroke: "currentColor", strokeWidth: 2.2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
-    React.createElement("path", { d: "M23 4v6h-6M1 20v-6h6" }),
-    React.createElement("path", { d: "M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" })
+    h("path", { d: "M23 4v6h-6M1 20v-6h6" }),
+    h("path", { d: "M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15" })
   ),
-  check: (props) => React.createElement(
+  check: (props) => h(
     "svg",
     { viewBox: "0 0 24 24", width: 12, height: 12, fill: "none", stroke: "currentColor", strokeWidth: 2.5, strokeLinecap: "round", strokeLinejoin: "round", ...props },
-    React.createElement("polyline", { points: "20 6 9 17 4 12" })
+    h("polyline", { points: "20 6 9 17 4 12" })
   ),
-  ops: (props) => React.createElement(
+  ops: (props) => h(
     "svg",
     { viewBox: "0 0 24 24", width: 16, height: 16, fill: "none", stroke: "currentColor", strokeWidth: 2, strokeLinecap: "round", strokeLinejoin: "round", ...props },
-    React.createElement("circle", { cx: 12, cy: 12, r: 3 }),
-    React.createElement("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" })
+    h("circle", { cx: 12, cy: 12, r: 3 }),
+    h("path", { d: "M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z" })
   )
 };
 function useCopy() {
@@ -2466,7 +3159,7 @@ function StatusTag({ running, status }) {
     color = "var(--dsw-alias-label-primary, #0f1115)";
     text = "\u8FD0\u884C\u4E2D";
   }
-  return React.createElement("span", {
+  return h("span", {
     style: { ...s.tag, background: bg, color }
   }, text);
 }
@@ -2498,10 +3191,10 @@ function QrBlock({ url, qr, onReset, auth, onNavigateSecurity }) {
     }
   }, [url]);
   const toggleQr = React.useCallback(() => setShowQr((v) => !v), []);
-  return React.createElement(
+  return h(
     "div",
     { style: { marginTop: 10 } },
-    auth?.enabled ? React.createElement(
+    auth?.enabled ? h(
       "div",
       {
         style: {
@@ -2523,54 +3216,54 @@ function QrBlock({ url, qr, onReset, auth, onNavigateSecurity }) {
         onClick: onNavigateSecurity,
         title: onNavigateSecurity ? "\u70B9\u51FB\u524D\u5F80\u300C\u5B89\u5168\u8BA4\u8BC1\u300D\u914D\u7F6E" : void 0
       },
-      React.createElement("span", { style: { display: "inline-flex", alignItems: "center", gap: 4 } }, "\u{1F6E1}\uFE0F \u8BBF\u95EE\u5B89\u5168\u8BA4\u8BC1\u5DF2\u751F\u6548 \xB7 \u626B\u7801\u8BBE\u5907\u514D\u5BC6"),
-      onNavigateSecurity && React.createElement("span", { style: { textDecoration: "underline", fontSize: 11, fontWeight: 600 } }, "\u8BBE\u7F6E \u2794")
-    ) : React.createElement(
+      h("span", { style: { display: "inline-flex", alignItems: "center", gap: 4 } }, "\u{1F6E1}\uFE0F \u8BBF\u95EE\u5B89\u5168\u8BA4\u8BC1\u5DF2\u751F\u6548 \xB7 \u626B\u7801\u8BBE\u5907\u514D\u5BC6"),
+      onNavigateSecurity && h("span", { style: { textDecoration: "underline", fontSize: 11, fontWeight: 600 } }, "\u8BBE\u7F6E \u2794")
+    ) : h(
       "div",
       {
         style: { ...s.warn, cursor: onNavigateSecurity ? "pointer" : "default", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 6 },
         onClick: onNavigateSecurity,
         title: onNavigateSecurity ? "\u70B9\u51FB\u524D\u5F80\u300C\u5B89\u5168\u8BA4\u8BC1\u300D\u5F00\u542F\u8BBF\u95EE\u4FDD\u62A4" : void 0
       },
-      React.createElement("span", null, "\u26A0\uFE0F \u5F53\u524D\u672A\u5F00\u542F\u8BBF\u95EE\u8BA4\u8BC1\uFF0C\u5EFA\u8BAE\u5728\u300C\u5B89\u5168\u8BA4\u8BC1\u300D\u5F00\u542F\u5BC6\u7801\u6216\u626B\u7801\u4FDD\u62A4\u3002"),
-      onNavigateSecurity && React.createElement("span", { style: { fontWeight: 600, textDecoration: "underline", fontSize: 12, color: "var(--dsw-alias-brand-primary,#4f6ef7)" } }, "\u53BB\u5F00\u542F \u2794")
+      h("span", null, "\u26A0\uFE0F \u5F53\u524D\u672A\u5F00\u542F\u8BBF\u95EE\u8BA4\u8BC1\uFF0C\u5EFA\u8BAE\u5728\u300C\u5B89\u5168\u8BA4\u8BC1\u300D\u5F00\u542F\u5BC6\u7801\u6216\u626B\u7801\u4FDD\u62A4\u3002"),
+      onNavigateSecurity && h("span", { style: { fontWeight: 600, textDecoration: "underline", fontSize: 12, color: "var(--dsw-alias-brand-primary,#4f6ef7)" } }, "\u53BB\u5F00\u542F \u2794")
     ),
-    React.createElement(
+    h(
       "div",
       { style: { display: "flex", flexDirection: "column", gap: 8, marginTop: 8 } },
-      React.createElement(
+      h(
         "div",
         { style: { padding: "6px 10px", background: "var(--dsw-alias-bg-layer-1,#ffffff)", border: "1px solid var(--dsw-alias-border-l2,#e5e7eb)", borderRadius: 8 } },
-        React.createElement("code", { style: { ...s.code, display: "block", wordBreak: "break-all", fontSize: 12, lineHeight: 1.5 } }, url)
+        h("code", { style: { ...s.code, display: "block", wordBreak: "break-all", fontSize: 12, lineHeight: 1.5 } }, url)
       ),
-      React.createElement(
+      h(
         "div",
         { style: { display: "flex", gap: 8, alignItems: "center" } },
-        React.createElement("button", {
+        h("button", {
           style: { ...s.btnGhost, height: 28, padding: "0 12px", fontSize: 12, flex: "1 1 auto", justifyContent: "center" },
           onClick: copy
         }, copied ? "\u2713 \u5DF2\u590D\u5236" : "\u590D\u5236\u94FE\u63A5"),
-        React.createElement("button", {
+        h("button", {
           style: { ...s.btnGhost, height: 28, padding: "0 12px", fontSize: 12, flex: "1 1 auto", justifyContent: "center" },
           onClick: toggleQr
         }, showQr ? "\u9690\u85CF\u4E8C\u7EF4\u7801" : "\u663E\u793A\u4E8C\u7EF4\u7801")
       )
     ),
-    showQr && qr && React.createElement(
+    showQr && qr && h(
       "div",
       { style: { marginTop: 10 } },
-      React.createElement("img", { src: qr, alt: "QR", style: s.qr }),
-      React.createElement("div", { style: { ...s.muted, marginTop: 4 } }, "\u8BF7\u5728\u79C1\u5BC6\u73AF\u5883\u4E0B\u4F7F\u7528"),
-      React.createElement(
+      h("img", { src: qr, alt: "QR", style: s.qr }),
+      h("div", { style: { ...s.muted, marginTop: 4 } }, "\u8BF7\u5728\u79C1\u5BC6\u73AF\u5883\u4E0B\u4F7F\u7528"),
+      h(
         "div",
         { style: { ...s.muted, marginTop: 4, fontSize: 11, color: "var(--dsw-alias-brand-primary, #4f6ef7)" } },
         "\u{1F4F1} \u63D0\u793A\uFF1A\u624B\u673A\u6D4F\u89C8\u5668\u626B\u7801\u6253\u5F00\u540E\uFF0C\u5728\u83DC\u5355\u70B9\u51FB\u300C\u6DFB\u52A0\u5230\u4E3B\u5C4F\u5E55\u300D\u5373\u53EF\u4F5C\u4E3A\u72EC\u7ACB\u5168\u5C4F App \u8FD0\u884C\u3002"
       )
     ),
-    onReset && React.createElement(
+    onReset && h(
       "div",
       { style: { marginTop: 8 } },
-      React.createElement("button", {
+      h("button", {
         style: { ...s.btnGhost, fontSize: 12, height: 28 },
         onClick: onReset,
         title: "\u5173\u95ED\u96A7\u9053\u5E76\u91CD\u65B0\u5F00\u542F\uFF0C\u53EF\u83B7\u5F97\u65B0\u7684 URL"
@@ -2593,7 +3286,7 @@ var LanNetworkSelector = React.memo(function LanNetworkSelector2({ lan, onSelect
       setSwitching(false);
     }
   };
-  return React.createElement(
+  return h(
     "div",
     {
       style: {
@@ -2606,7 +3299,7 @@ var LanNetworkSelector = React.memo(function LanNetworkSelector2({ lan, onSelect
         marginBottom: 6
       }
     },
-    React.createElement(
+    h(
       "div",
       {
         style: {
@@ -2619,21 +3312,21 @@ var LanNetworkSelector = React.memo(function LanNetworkSelector2({ lan, onSelect
           color: "var(--dsw-alias-label-primary, currentColor)"
         }
       },
-      React.createElement(
+      h(
         "span",
         { style: { display: "inline-flex", alignItems: "center", gap: 5 } },
         "\u{1F6DC} \u5C40\u57DF\u7F51\u7F51\u5361 / IP \u9009\u62E9"
       ),
-      switching && React.createElement("span", {
+      switching && h("span", {
         style: { fontSize: 11, color: "var(--dsw-alias-brand-primary, #4f6ef7)" }
       }, "\u5207\u6362\u4E2D\u2026")
     ),
-    React.createElement(
+    h(
       "div",
       { style: { ...s.muted, fontSize: 11, marginBottom: 6 } },
       "\u68C0\u6D4B\u5230\u4E3B\u673A\u5B58\u5728\u591A\u5F20\u7F51\u5361\uFF08\u5982\u7269\u7406 Wi-Fi\u3001\u4EE5\u592A\u7F51\u3001WSL \u6216\u865A\u62DF\u673A\uFF09\u3002\u82E5\u9ED8\u8BA4 IP \u65E0\u6CD5\u88AB\u79FB\u52A8\u7AEF\u8BBF\u95EE\uFF0C\u53EF\u624B\u52A8\u5207\u6362\uFF1A"
     ),
-    React.createElement(
+    h(
       "select",
       {
         style: {
@@ -2648,19 +3341,22 @@ var LanNetworkSelector = React.memo(function LanNetworkSelector2({ lan, onSelect
         onChange: handleChange,
         disabled: switching
       },
-      React.createElement("option", { value: "" }, `\u26A1 \u81EA\u52A8\u63A8\u8350 (${interfaces[0]?.address || currentIp} \xB7 ${interfaces[0]?.label || interfaces[0]?.name || ""})`),
-      interfaces.map((iface) => React.createElement("option", {
+      h("option", { value: "" }, localeT("\u26A1 \u81EA\u52A8\u63A8\u8350 (${ip} \xB7 ${label})", {
+        ip: interfaces[0]?.address || currentIp,
+        label: interfaces[0]?.label || interfaces[0]?.name || ""
+      })),
+      interfaces.map((iface) => h("option", {
         key: `${iface.name}-${iface.address}`,
         value: iface.address
-      }, `${iface.address} \xB7 ${iface.label || iface.name}${iface.isVirtual ? " [\u865A\u62DF/WSL]" : ""}`))
+      }, iface.isVirtual ? localeT("${address} \xB7 ${name} [\u865A\u62DF/WSL]", { address: iface.address, name: localeT(iface.label || iface.name) }) : localeT("${address} \xB7 ${name}", { address: iface.address, name: localeT(iface.label || iface.name) })))
     )
   );
 });
 var CustomTunnelGuide = React.memo(function CustomTunnelGuide2() {
-  return React.createElement(
+  return h(
     "div",
     { style: s.block },
-    React.createElement("a", {
+    h("a", {
       href: TUNNEL_DOCS_URL,
       target: "_blank",
       rel: "noreferrer",
@@ -2681,7 +3377,7 @@ var TunnelEntryCard = React.memo(function TunnelEntryCard2({
   const [showQr, setShowQr] = React.useState(false);
   const hasUrl = Boolean(entry && entry.url);
   const active = Boolean(entry && entry.running);
-  return React.createElement(
+  return h(
     "div",
     {
       style: {
@@ -2690,34 +3386,34 @@ var TunnelEntryCard = React.memo(function TunnelEntryCard2({
         background: active ? "linear-gradient(180deg, var(--dsw-alias-bg-layer-2,#f9fafb), var(--dsw-alias-bg-layer-1,#ffffff))" : void 0
       }
     },
-    React.createElement(
+    h(
       "div",
       { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 } },
-      React.createElement(
+      h(
         "div",
         { style: { flex: "1 1 auto", minWidth: 0 } },
-        React.createElement(
+        h(
           "div",
           { style: { display: "flex", alignItems: "center", gap: 8 } },
-          React.createElement("span", { style: { fontSize: 16 } }, "\u{1F310}"),
-          React.createElement("div", { style: s.label }, "\u516C\u7F51\u8BBF\u95EE\u5165\u53E3")
+          h("span", { style: { fontSize: 16 } }, "\u{1F310}"),
+          h("div", { style: s.label }, "\u516C\u7F51\u8BBF\u95EE\u5165\u53E3")
         ),
-        React.createElement(
+        h(
           "div",
           { style: { ...s.muted, marginTop: 4 } },
-          entry ? entry.title + " \xB7 " + entry.desc : "\u5C1A\u672A\u914D\u7F6E\u4EFB\u4F55\u516C\u7F51\u96A7\u9053\uFF0C\u53EF\u5728\u4E0B\u65B9\u5F00\u542F Cloudflare \u96A7\u9053\u6216\u914D\u7F6E\u81EA\u5EFA\u96A7\u9053"
+          entry ? `${localeT(entry.title)} \xB7 ${localeT(entry.desc)}` : "\u5C1A\u672A\u914D\u7F6E\u4EFB\u4F55\u516C\u7F51\u96A7\u9053\uFF0C\u53EF\u5728\u4E0B\u65B9\u5F00\u542F Cloudflare \u96A7\u9053\u6216\u914D\u7F6E\u81EA\u5EFA\u96A7\u9053"
         )
       ),
-      React.createElement(StatusTag, {
+      h(StatusTag, {
         running: active,
         status: entry && entry.phase && entry.phase !== "ready" ? entry.phase : void 0
       })
     ),
-    React.createElement(
+    h(
       "div",
       { style: { ...s.block, display: "flex", flexDirection: "column", gap: 10 } },
       // 有地址：大号 URL + 复制
-      hasUrl && React.createElement(
+      hasUrl && h(
         "div",
         {
           style: {
@@ -2730,16 +3426,16 @@ var TunnelEntryCard = React.memo(function TunnelEntryCard2({
             gap: 10
           }
         },
-        React.createElement("code", {
+        h("code", {
           style: { ...s.code, flex: "1 1 auto", fontSize: 13.5, wordBreak: "break-all", lineHeight: 1.5 }
         }, entry.url),
-        React.createElement("button", {
+        h("button", {
           style: { ...s.btnGhost, flexShrink: 0, height: 28, padding: "0 12px", fontSize: 12 },
           onClick: () => onCopy && onCopy(entry.url)
         }, copied ? "\u2713 \u5DF2\u590D\u5236" : "\u590D\u5236")
       ),
       // 状态细节（重连/错误/连接中）——无 URL 时格外重要，让用户知道隧道在自愈而非消失
-      entry && entry.stateDetail && React.createElement("div", {
+      entry && entry.stateDetail && h("div", {
         style: {
           fontSize: 12,
           lineHeight: 1.5,
@@ -2747,31 +3443,31 @@ var TunnelEntryCard = React.memo(function TunnelEntryCard2({
         }
       }, entry.stateDetail),
       // 操作行：running → 关闭/停止重连（+ 重置）；!running → 开启
-      active && onStop && React.createElement(
+      active && onStop && h(
         "div",
         { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
-        React.createElement("button", {
+        h("button", {
           style: s.btnGhost,
           onClick: onStop
         }, entry && entry.phase === "reconnecting" ? "\u505C\u6B62\u91CD\u8FDE" : "\u5173\u95ED"),
-        onReset && React.createElement("button", {
+        onReset && h("button", {
           style: { ...s.btnGhost, height: 28, padding: "0 12px", fontSize: 12 },
           onClick: onReset,
           title: "\u5173\u95ED\u5E76\u91CD\u65B0\u5F00\u542F\uFF0C\u66F4\u6362\u4E34\u65F6\u5730\u5740"
         }, "\u{1F504} \u91CD\u7F6E\u94FE\u63A5")
       ),
       // running 但无 onStop 的入口（如外部登记）：只给重置/二维码辅助，无开关
-      active && !onStop && onReset && React.createElement(
+      active && !onStop && onReset && h(
         "div",
         { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
-        React.createElement("button", {
+        h("button", {
           style: { ...s.btnGhost, height: 28, padding: "0 12px", fontSize: 12 },
           onClick: onReset,
           title: "\u5173\u95ED\u5E76\u91CD\u65B0\u5F00\u542F\uFF0C\u66F4\u6362\u4E34\u65F6\u5730\u5740"
         }, "\u{1F504} \u91CD\u7F6E\u94FE\u63A5")
       ),
       // 未运行：引导开启（连接中/下载中禁用）
-      !active && onStart && React.createElement("button", {
+      !active && onStart && h("button", {
         style: {
           ...s.btnPri,
           alignSelf: "flex-start",
@@ -2784,22 +3480,22 @@ var TunnelEntryCard = React.memo(function TunnelEntryCard2({
         title: entry && entry.configured === false ? "\u8BF7\u5148\u5728\u300C\u96A7\u9053\u914D\u7F6E\u300D\u4E2D\u4FDD\u5B58\u670D\u52A1\u5668\u914D\u7F6E" : ""
       }, entry && entry.phase === "connecting" ? "\u8FDE\u63A5\u4E2D\u2026" : entry && entry.phase === "downloading" ? "\u4E0B\u8F7D\u4E2D\u2026" : "\u5F00\u542F\u516C\u7F51\u96A7\u9053"),
       // 二维码辅助按钮：有地址未运行时也可查看（外部登记等）
-      hasUrl && entry.qr && React.createElement(
+      hasUrl && entry.qr && h(
         "div",
         { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
-        React.createElement("button", {
+        h("button", {
           style: { ...s.btnGhost, height: 28, padding: "0 12px", fontSize: 12 },
           onClick: () => setShowQr((v) => !v)
         }, showQr ? "\u9690\u85CF\u4E8C\u7EF4\u7801" : "\u663E\u793A\u4E8C\u7EF4\u7801")
       ),
-      showQr && hasUrl && entry.qr && React.createElement(
+      showQr && hasUrl && entry.qr && h(
         "div",
         { style: { display: "flex", flexDirection: "column", alignItems: "flex-start", gap: 6 } },
-        React.createElement("img", { src: entry.qr, alt: "QR", style: { ...s.qr, margin: 0 } }),
-        React.createElement("div", { style: { ...s.muted, fontSize: 11 } }, "\u8BF7\u5728\u79C1\u5BC6\u73AF\u5883\u4E0B\u626B\u7801\u4F7F\u7528")
+        h("img", { src: entry.qr, alt: "QR", style: { ...s.qr, margin: 0 } }),
+        h("div", { style: { ...s.muted, fontSize: 11 } }, "\u8BF7\u5728\u79C1\u5BC6\u73AF\u5883\u4E0B\u626B\u7801\u4F7F\u7528")
       )
     ),
-    onToggleAutoStart && React.createElement(
+    onToggleAutoStart && h(
       "label",
       {
         style: {
@@ -2816,36 +3512,36 @@ var TunnelEntryCard = React.memo(function TunnelEntryCard2({
         },
         title: "DSH \u542F\u52A8\u65F6\u81EA\u52A8\u6062\u590D\u8BE5\u96A7\u9053\u7684\u8FD0\u884C\u72B6\u6001"
       },
-      React.createElement("input", {
+      h("input", {
         type: "checkbox",
         checked: Boolean(autoStart),
         onChange: (e) => onToggleAutoStart(e.target.checked)
       }),
-      React.createElement("span", null, "\u968F DSH \u542F\u52A8\u81EA\u52A8\u5F00\u542F")
+      h("span", null, "\u968F DSH \u542F\u52A8\u81EA\u52A8\u5F00\u542F")
     )
   );
 });
 var TunnelConfigGroup = React.memo(function TunnelConfigGroup2({ children }) {
   const [open, setOpen] = React.useState(false);
-  return React.createElement(
+  return h(
     "div",
     { style: s.card },
-    React.createElement(
+    h(
       "div",
       {
         style: { display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", userSelect: "none", gap: 8 },
         onClick: () => setOpen((v) => !v)
       },
-      React.createElement(
+      h(
         "div",
         { style: { display: "flex", alignItems: "center", gap: 8 } },
-        React.createElement("span", { style: { fontSize: 14 } }, "\u2699\uFE0F"),
-        React.createElement("div", { style: s.label }, "\u96A7\u9053\u914D\u7F6E"),
-        React.createElement("span", { style: { ...s.muted, fontSize: 11 } }, "Token \xB7 \u56FA\u5B9A\u57DF\u540D \xB7 \u81EA\u5EFA\u670D\u52A1\u5668 \xB7 \u5916\u90E8\u767B\u8BB0")
+        h("span", { style: { fontSize: 14 } }, "\u2699\uFE0F"),
+        h("div", { style: s.label }, "\u96A7\u9053\u914D\u7F6E"),
+        h("span", { style: { ...s.muted, fontSize: 11 } }, "Token \xB7 \u56FA\u5B9A\u57DF\u540D \xB7 \u81EA\u5EFA\u670D\u52A1\u5668 \xB7 \u5916\u90E8\u767B\u8BB0")
       ),
-      React.createElement("span", { style: { fontSize: 12, color: "var(--dsw-alias-label-tertiary,#9ca3af)", flexShrink: 0 } }, open ? "\u6536\u8D77 \u25B4" : "\u5C55\u5F00 \u25BE")
+      h("span", { style: { fontSize: 12, color: "var(--dsw-alias-label-tertiary,#9ca3af)", flexShrink: 0 } }, open ? "\u6536\u8D77 \u25B4" : "\u5C55\u5F00 \u25BE")
     ),
-    open && React.createElement("div", { style: { marginTop: 4 } }, children)
+    open && h("div", { style: { marginTop: 4 } }, children)
   );
 });
 var CustomTunnelConfigForm = React.memo(function CustomTunnelConfigForm2({ serverUrl: initUrl, accessToken: initToken, onSave }) {
@@ -2887,14 +3583,14 @@ var CustomTunnelConfigForm = React.memo(function CustomTunnelConfigForm2({ serve
     setSaveSuccess(false);
     setSaveErr(null);
   }, []);
-  return React.createElement(
+  return h(
     "div",
     { style: s.block },
-    React.createElement("div", { style: { ...s.muted, marginBottom: 8 } }, "\u96A7\u9053\u670D\u52A1\u5668\u914D\u7F6E"),
-    React.createElement(
+    h("div", { style: { ...s.muted, marginBottom: 8 } }, "\u96A7\u9053\u670D\u52A1\u5668\u914D\u7F6E"),
+    h(
       "div",
       { style: { display: "flex", flexDirection: "column", gap: 8 } },
-      React.createElement("input", {
+      h("input", {
         style: s.input,
         placeholder: "WebSocket \u5730\u5740\uFF0C\u4F8B\u5982 wss://tunnel.example.com/connect",
         value: serverUrl,
@@ -2904,7 +3600,7 @@ var CustomTunnelConfigForm = React.memo(function CustomTunnelConfigForm2({ serve
         },
         disabled: saving
       }),
-      React.createElement("input", {
+      h("input", {
         style: s.input,
         type: "password",
         placeholder: "\u96A7\u9053\u670D\u52A1\u7AEF\u8FDE\u63A5\u4EE4\u724C\uFF08Tunnel Access Token\uFF09",
@@ -2915,13 +3611,13 @@ var CustomTunnelConfigForm = React.memo(function CustomTunnelConfigForm2({ serve
         },
         disabled: saving
       }),
-      saveErr && React.createElement("div", { style: s.err }, `\u274C ${saveErr}`),
-      React.createElement(
+      saveErr && h("div", { style: s.err }, `\u274C ${localeT(saveErr)}`),
+      h(
         "div",
         { style: { ...s.muted, fontSize: 11 } },
         "\u{1F4A1} \u7528\u4E8E\u4E0E\u60A8\u7684 VPS \u96A7\u9053\u670D\u52A1\u7AEF\u5EFA\u7ACB\u53CD\u5411\u901A\u9053\uFF08\u4E0E Web \u7F51\u9875\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\u4E92\u76F8\u72EC\u7ACB\uFF09\u3002"
       ),
-      React.createElement("button", {
+      h("button", {
         style: {
           ...s.btnPri,
           alignSelf: "flex-start",
@@ -2952,23 +3648,23 @@ var TunnelCard = React.memo(function TunnelCard2({
 }) {
   const { running, configured, url, qr, state } = data ?? {};
   const phase = state?.phase ?? "idle";
-  return React.createElement(
+  return h(
     "div",
     { style: s.card },
-    React.createElement(
+    h(
       "div",
       { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 } },
-      React.createElement(
+      h(
         "div",
         { style: { flex: "1 1 auto", minWidth: 0 } },
-        React.createElement("div", { style: s.label }, title),
-        React.createElement("div", { style: { ...s.muted, marginTop: 2 } }, desc)
+        h("div", { style: s.label }, title),
+        h("div", { style: { ...s.muted, marginTop: 2 } }, desc)
       ),
-      React.createElement(
+      h(
         "div",
         { style: { display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 6 } },
-        React.createElement(StatusTag, { running, status: phase === "ready" ? void 0 : phase }),
-        onToggleAutoStart && React.createElement(
+        h(StatusTag, { running, status: phase === "ready" ? void 0 : phase }),
+        onToggleAutoStart && h(
           "label",
           {
             style: {
@@ -2982,7 +3678,7 @@ var TunnelCard = React.memo(function TunnelCard2({
             },
             title: "DSH \u542F\u52A8\u65F6\u81EA\u52A8\u6062\u590D\u8BE5\u96A7\u9053\u7684\u8FD0\u884C\u72B6\u6001"
           },
-          React.createElement("input", {
+          h("input", {
             type: "checkbox",
             checked: Boolean(autoStart),
             onChange: (e) => onToggleAutoStart(e.target.checked)
@@ -2992,26 +3688,26 @@ var TunnelCard = React.memo(function TunnelCard2({
       )
     ),
     children,
-    phase !== "idle" && phase !== "ready" && React.createElement("div", {
+    phase !== "idle" && phase !== "ready" && h("div", {
       style: {
         ...s.block,
         fontSize: 12,
         color: phase === "error" || phase === "reconnecting" ? "var(--dsw-alias-label-primary, #0f1115)" : "var(--dsw-alias-label-secondary,#6b7280)"
       }
     }, state?.detail ?? phase),
-    url && React.createElement(QrBlock, { url, qr, onReset, auth, onNavigateSecurity }),
-    (onStart || onStop) && React.createElement(
+    url && h(QrBlock, { url, qr, onReset, auth, onNavigateSecurity }),
+    (onStart || onStop) && h(
       "div",
       {
         style: { ...s.block, display: "flex", gap: 8, flexWrap: "wrap" }
       },
-      !running && onStart && React.createElement("button", {
+      !running && onStart && h("button", {
         style: { ...s.btnPri, opacity: configured === false ? 0.4 : 1 },
         onClick: onStart,
         disabled: configured === false || phase === "connecting" || phase === "downloading",
         title: configured === false ? "\u8BF7\u5148\u4FDD\u5B58\u670D\u52A1\u5668\u914D\u7F6E" : ""
       }, phase === "connecting" ? "\u8FDE\u63A5\u4E2D\u2026" : phase === "downloading" ? "\u4E0B\u8F7D\u4E2D\u2026" : "\u5F00\u542F"),
-      running && onStop && React.createElement("button", {
+      running && onStop && h("button", {
         style: s.btnGhost,
         onClick: onStop
       }, phase === "reconnecting" ? "\u505C\u6B62\u91CD\u8FDE" : "\u5173\u95ED")
@@ -3023,30 +3719,39 @@ var CloudflareDiagnostics = React.memo(function CloudflareDiagnostics2({ dataPla
   if (dataPlane) {
     const n = dataPlane.consecutiveFailures || 0;
     if (dataPlane.state === "ok") {
-      lines.push("\u2705 \u6570\u636E\u9762\u6B63\u5E38\uFF08\u6BCF 60s \u63A2\u6D4B\u516C\u7F51\u5165\u53E3" + (dataPlane.resolvedIp ? " \xB7 " + dataPlane.resolvedIp : "") + "\uFF09");
+      lines.push(localeT("\u2705 \u6570\u636E\u9762\u6B63\u5E38\uFF08\u6BCF 60s \u63A2\u6D4B\u516C\u7F51\u5165\u53E3${ip}\uFF09", {
+        ip: dataPlane.resolvedIp ? localeT(" \xB7 ${ip}", { ip: dataPlane.resolvedIp }) : ""
+      }));
     } else if (dataPlane.state === "unstable") {
-      lines.push("\u26A0\uFE0F \u6570\u636E\u9762\u95F4\u6B47\u5931\u8D25\uFF08\u8FDE\u7EED " + n + " \u6B21\uFF09\uFF1A" + (dataPlane.lastError || "\u539F\u56E0\u672A\u77E5"));
+      lines.push(localeT("\u26A0\uFE0F \u6570\u636E\u9762\u95F4\u6B47\u5931\u8D25\uFF08\u8FDE\u7EED ${count} \u6B21\uFF09\uFF1A${reason}", { count: n, reason: localeT(dataPlane.lastError) || localeT("\u539F\u56E0\u672A\u77E5") }));
     } else if (dataPlane.state === "degraded") {
-      lines.push("\u274C \u6570\u636E\u9762\u4E0D\u53EF\u8FBE\uFF08\u8FDE\u7EED " + n + " \u6B21\uFF09\uFF1A" + (dataPlane.lastError || "\u539F\u56E0\u672A\u77E5"));
+      lines.push(localeT("\u274C \u6570\u636E\u9762\u4E0D\u53EF\u8FBE\uFF08\u8FDE\u7EED ${count} \u6B21\uFF09\uFF1A${reason}", { count: n, reason: localeT(dataPlane.lastError) || localeT("\u539F\u56E0\u672A\u77E5") }));
     } else if (dataPlane.lastError) {
-      lines.push("\u6570\u636E\u9762\u63A2\u6D4B\uFF1A" + dataPlane.lastError);
+      lines.push(localeT("\u6570\u636E\u9762\u63A2\u6D4B\uFF1A${reason}", { reason: localeT(dataPlane.lastError) }));
     }
   }
   if (foreignRunner && foreignRunner.pid) {
-    lines.push("\u26A0\uFE0F \u68C0\u6D4B\u5230\u53E6\u4E00\u4E2A cloudflared\uFF08PID " + foreignRunner.pid + "\uFF0C\u51ED\u636E\u6765\u6E90 --" + foreignRunner.via + "\uFF09\u6B63\u5728\u4F7F\u7528\u76F8\u540C\u7684 tunnel token\uFF1A\u96A7\u9053\u72B6\u6001\u53EF\u80FD\u53EA\u53CD\u6620\u4E00\u534A\uFF0C\u8BF7\u505C\u7528\u5176\u4E2D\u4E00\u4FA7");
+    lines.push(localeT("\u26A0\uFE0F \u68C0\u6D4B\u5230\u53E6\u4E00\u4E2A cloudflared\uFF08PID ${pid}\uFF0C\u51ED\u636E\u6765\u6E90 --${via}\uFF09\u6B63\u5728\u4F7F\u7528\u76F8\u540C\u7684 tunnel token\uFF1A\u96A7\u9053\u72B6\u6001\u53EF\u80FD\u53EA\u53CD\u6620\u4E00\u534A\uFF0C\u8BF7\u505C\u7528\u5176\u4E2D\u4E00\u4FA7", {
+      pid: foreignRunner.pid,
+      via: foreignRunner.via
+    }));
   }
   if (binary && binary.path) {
     const src = binary.source === "system" ? "\u7CFB\u7EDF\u5B89\u88C5\uFF08\u4E0D\u53C2\u4E0E\u7248\u672C\u9489\u6B7B\uFF09" : binary.source === "managed" ? "\u63D2\u4EF6\u5185\u7F6E" : "\u5916\u90E8\u6307\u5B9A";
-    lines.push("cloudflared\uFF1A" + binary.path + "\uFF08" + (binary.version || "\u7248\u672C\u672A\u77E5") + " \xB7 " + src + "\uFF09");
+    lines.push(localeT("cloudflared\uFF1A${path}\uFF08${version} \xB7 ${source}\uFF09", {
+      path: binary.path,
+      version: localeT(binary.version || "\u7248\u672C\u672A\u77E5"),
+      source: localeT(src)
+    }));
   }
   if (!lines.length) return null;
-  return React.createElement(
+  return h(
     "div",
     { style: { display: "flex", flexDirection: "column", gap: 4, margin: "6px 0 10px" } },
-    lines.map((t, i) => React.createElement("div", {
+    lines.map((t2, i) => h("div", {
       key: i,
       style: { ...s.muted, fontSize: 11, wordBreak: "break-all" }
-    }, t))
+    }, t2))
   );
 });
 var CLOUDFLARE_NETWORK_SELECTS = [
@@ -3093,7 +3798,7 @@ var CloudflareConfigForm = React.memo(function CloudflareConfigForm2({ token, ho
       setSaving(false);
     }
   };
-  return React.createElement(
+  return h(
     "div",
     {
       style: {
@@ -3103,38 +3808,38 @@ var CloudflareConfigForm = React.memo(function CloudflareConfigForm2({ token, ho
         marginTop: 10
       }
     },
-    React.createElement(
+    h(
       "div",
       {
         style: { display: "flex", alignItems: "center", justifyContent: "space-between", cursor: "pointer", userSelect: "none" },
         onClick: () => setOpen((v) => !v)
       },
-      React.createElement(
+      h(
         "div",
         { style: { fontSize: 12, fontWeight: 500, color: "var(--dsw-alias-brand-primary, #3b82f6)" } },
         "\u2699\uFE0F \u9AD8\u7EA7\u914D\u7F6E\uFF1A\u56FA\u5B9A\u57DF\u540D (Cloudflare Token) ",
-        (token || hostname) && React.createElement("span", { style: { fontSize: 11, color: "var(--dsw-alias-label-primary, #0f1115)", fontWeight: 400 } }, "\u25CF \u5DF2\u914D\u7F6E\u56FA\u5B9A\u57DF\u540D")
+        (token || hostname) && h("span", { style: { fontSize: 11, color: "var(--dsw-alias-label-primary, #0f1115)", fontWeight: 400 } }, "\u25CF \u5DF2\u914D\u7F6E\u56FA\u5B9A\u57DF\u540D")
       ),
-      React.createElement("span", { style: { fontSize: 11, color: "var(--dsw-alias-label-secondary, #9ca3af)" } }, open ? "\u25B4 \u6298\u53E0" : "\u25BE \u5C55\u5F00")
+      h("span", { style: { fontSize: 11, color: "var(--dsw-alias-label-secondary, #9ca3af)" } }, open ? "\u25B4 \u6298\u53E0" : "\u25BE \u5C55\u5F00")
     ),
-    open && React.createElement(
+    open && h(
       "form",
       { onSubmit: handleSave, style: { marginTop: 10 } },
-      React.createElement(
+      h(
         "div",
         { style: { fontSize: 12, color: "var(--dsw-alias-label-secondary, #6b7280)", marginBottom: 8, lineHeight: 1.5 } },
         "\u5728 Cloudflare Zero Trust \u63A7\u5236\u53F0\u521B\u5EFA Tunnel \u5373\u53EF\u83B7\u53D6\u4E13\u5C5E Token \u5E76\u7ED1\u5B9A\u81EA\u5DF1\u7684\u57DF\u540D\uFF08\u5982 dsh.yourname.com\uFF09\uFF0C\u6BCF\u6B21\u91CD\u542F URL \u6C38\u4E0D\u53D8\u66F4\u3002\u4E0D\u586B\u5219\u4F7F\u7528\u9ED8\u8BA4\u514D\u767B\u5F55\u4E34\u65F6\u968F\u673A\u57DF\u540D\u3002"
       ),
-      React.createElement("a", {
+      h("a", {
         href: CLOUDFLARE_TUTORIAL_URL,
         target: "_blank",
         rel: "noreferrer",
         style: { ...s.btnLink, marginBottom: 10 }
       }, "\u{1F4D6} \u67E5\u770B\u300CCloudflare \u56FA\u5B9A\u57DF\u540D\u300D\u7533\u8BF7\u4E0E\u914D\u7F6E\u6559\u7A0B"),
-      React.createElement(
+      h(
         "div",
         { style: { marginBottom: 8 } },
-        React.createElement("input", {
+        h("input", {
           style: s.input,
           type: "text",
           placeholder: "\u81EA\u5B9A\u4E49\u56FA\u5B9A\u57DF\u540D (\u4F8B\u5982: dsh.yourdomain.com)",
@@ -3142,10 +3847,10 @@ var CloudflareConfigForm = React.memo(function CloudflareConfigForm2({ token, ho
           onChange: (e) => setHostnameVal(e.target.value)
         })
       ),
-      React.createElement(
+      h(
         "div",
         { style: { marginBottom: 8 } },
-        React.createElement("input", {
+        h("input", {
           style: s.input,
           type: "password",
           placeholder: "Tunnel Token (\u4F8B\u5982: eyJhIjoi...)",
@@ -3153,19 +3858,19 @@ var CloudflareConfigForm = React.memo(function CloudflareConfigForm2({ token, ho
           onChange: (e) => setTokenVal(e.target.value)
         })
       ),
-      React.createElement(
+      h(
         "div",
         {
           style: { display: "grid", gridTemplateColumns: "repeat(3, minmax(0, 1fr))", gap: 6, marginBottom: 8 }
         },
-        CLOUDFLARE_NETWORK_SELECTS.map(({ key, label, opts }) => React.createElement(
+        CLOUDFLARE_NETWORK_SELECTS.map(({ key, label, opts }) => h(
           "label",
           {
             key,
             style: { display: "flex", flexDirection: "column", gap: 3, fontSize: 11, color: "var(--dsw-alias-label-secondary, #6b7280)" }
           },
           label,
-          React.createElement(
+          h(
             "select",
             {
               style: {
@@ -3179,24 +3884,24 @@ var CloudflareConfigForm = React.memo(function CloudflareConfigForm2({ token, ho
               value: netVals[key] || "",
               onChange: (e) => setNetVals((v) => ({ ...v, [key]: e.target.value }))
             },
-            opts.map(([val, text]) => React.createElement("option", { key: val, value: val }, text))
+            opts.map(([val, text]) => h("option", { key: val, value: val }, text))
           )
         ))
       ),
-      React.createElement(
+      h(
         "div",
         { style: { ...s.muted, fontSize: 11, marginBottom: 8, lineHeight: 1.5 } },
         "\u7F51\u7EDC\u53C2\u6570\u53D6\u503C\u6765\u81EA Cloudflare \u5B98\u65B9\u767D\u540D\u5355\uFF1B\u6539\u52A8\u9700\u91CD\u65B0\u5F00\u542F\u96A7\u9053\uFF08\u5173\u95ED\u2192\u5F00\u542F\uFF09\u540E\u751F\u6548\uFF0C\u5F53\u524D\u4E8C\u8FDB\u5236\u4E0D\u652F\u6301\u7684\u53C2\u6570\u4F1A\u81EA\u52A8\u8DF3\u8FC7\u5E76\u5728\u65E5\u5FD7\u544A\u8B66\u3002"
       ),
-      React.createElement(
+      h(
         "div",
         { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } },
-        React.createElement("button", {
+        h("button", {
           type: "submit",
           style: { ...s.btnPri, height: 28, fontSize: 12, padding: "0 12px" },
           disabled: saving
         }, saving ? "\u4FDD\u5B58\u4E2D\u2026" : "\u4FDD\u5B58\u56FA\u5B9A\u57DF\u540D\u914D\u7F6E"),
-        (tokenVal || hostnameVal) && React.createElement("button", {
+        (tokenVal || hostnameVal) && h("button", {
           type: "button",
           style: { ...s.btnGhost, height: 28, fontSize: 12, padding: "0 10px" },
           onClick: () => {
@@ -3205,7 +3910,7 @@ var CloudflareConfigForm = React.memo(function CloudflareConfigForm2({ token, ho
             onSave({ token: "", hostname: "" });
           }
         }, "\u6E05\u9664"),
-        msg && React.createElement("span", {
+        msg && h("span", {
           style: { fontSize: 12, color: "var(--dsw-alias-label-primary, #0f1115)" }
         }, msg.text)
       )
@@ -3232,41 +3937,41 @@ var ExternalTunnelCard = React.memo(function ExternalTunnelCard2({ ext, onSave }
       setSaving(false);
     }
   };
-  return React.createElement(
+  return h(
     "div",
     { style: s.card },
-    React.createElement(
+    h(
       "div",
       { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 } },
-      React.createElement(
+      h(
         "div",
         { style: { flex: "1 1 auto", minWidth: 0 } },
-        React.createElement("div", { style: s.label }, "\u5916\u90E8\u5DF2\u90E8\u7F72\u96A7\u9053"),
-        React.createElement(
+        h("div", { style: s.label }, "\u5916\u90E8\u5DF2\u90E8\u7F72\u96A7\u9053"),
+        h(
           "div",
           { style: { ...s.muted, marginTop: 2 } },
           "\u5DF2\u5728 Docker / \u670D\u52A1\u5668\u4E0A\u81EA\u884C\u90E8\u7F72\u96A7\u9053\uFF08\u5982 cloudflared\uFF09\u65F6\uFF0C\u767B\u8BB0\u516C\u7F51\u5730\u5740\u5373\u53EF\u5728\u9762\u677F\u5C55\u793A\u5165\u53E3\u4E0E\u4E8C\u7EF4\u7801\uFF1B\u63D2\u4EF6\u4E0D\u4F1A\u91CD\u590D\u4E0B\u8F7D\u6216\u7BA1\u7406\u8BE5\u96A7\u9053\u3002"
         )
       ),
-      React.createElement(StatusTag, { running: Boolean(ext?.configured) })
+      h(StatusTag, { running: Boolean(ext?.configured) })
     ),
-    ext?.configured && React.createElement(QrBlock, { url: ext?.url, qr: ext?.qr }),
-    React.createElement(
+    ext?.configured && h(QrBlock, { url: ext?.url, qr: ext?.qr }),
+    h(
       "form",
       { onSubmit: handleSave, style: { marginTop: 10, display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } },
-      React.createElement("input", {
+      h("input", {
         style: { ...s.input, flex: "1 1 220px", minWidth: 0 },
         type: "text",
         placeholder: "https://tunnel.yourdomain.com \u6216 trycloudflare \u5730\u5740",
         value: urlVal,
         onChange: (e) => setUrlVal(e.target.value)
       }),
-      React.createElement("button", {
+      h("button", {
         type: "submit",
         style: { ...s.btnPri, height: 28, fontSize: 12, padding: "0 12px" },
         disabled: saving
       }, saving ? "\u4FDD\u5B58\u4E2D\u2026" : "\u4FDD\u5B58"),
-      ext?.configured && React.createElement("button", {
+      ext?.configured && h("button", {
         type: "button",
         style: { ...s.btnGhost, height: 28, fontSize: 12, padding: "0 10px" },
         onClick: () => {
@@ -3274,7 +3979,7 @@ var ExternalTunnelCard = React.memo(function ExternalTunnelCard2({ ext, onSave }
           onSave("");
         }
       }, "\u6E05\u9664"),
-      msg && React.createElement("span", {
+      msg && h("span", {
         style: { fontSize: 12, color: "var(--dsw-alias-label-primary, #0f1115)" }
       }, msg.text)
     )
@@ -3320,12 +4025,12 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
     const noPasswordYet = !auth?.hasPassword && !auth?.hasAdminPassword;
     if (next && noPasswordYet && mode !== "token_only") {
       if (mode === "password_only") {
-        window.alert("\u300C\u4EC5\u5BC6\u7801 / PIN \u7801\u767B\u5F55\u300D\u6A21\u5F0F\u5FC5\u987B\u5148\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\u624D\u80FD\u5F00\u542F\u5B89\u5168\u9632\u62A4\u3002\n\n\u8BF7\u5148\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801 / PIN \u7801\u300D\u8F93\u5165\u5BC6\u7801\u5E76\u70B9\u51FB\u300C\u4FDD\u5B58\u8BBF\u95EE\u5BC6\u7801\u300D\uFF0C\u7136\u540E\u518D\u5F00\u542F\u3002");
+        window.alert(localeT("\u300C\u4EC5\u5BC6\u7801 / PIN \u7801\u767B\u5F55\u300D\u6A21\u5F0F\u5FC5\u987B\u5148\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\u624D\u80FD\u5F00\u542F\u5B89\u5168\u9632\u62A4\u3002\n\n\u8BF7\u5148\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801 / PIN \u7801\u300D\u8F93\u5165\u5BC6\u7801\u5E76\u70B9\u51FB\u300C\u4FDD\u5B58\u8BBF\u95EE\u5BC6\u7801\u300D\uFF0C\u7136\u540E\u518D\u5F00\u542F\u3002"));
         setTopMsg({ ok: false, text: "\u8BF7\u5148\u8BBE\u7F6E\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\uFF0C\u518D\u5F00\u542F\u5B89\u5168\u9632\u62A4" });
         return;
       }
       const go = window.confirm(
-        '\u26A0\uFE0F \u60A8\u5C1A\u672A\u8BBE\u7F6E\u4EFB\u4F55\u8BBF\u95EE\u5BC6\u7801\u6216\u7BA1\u7406\u5BC6\u7801\u3002\n\n\u5F00\u542F\u5B89\u5168\u9632\u62A4\u540E\uFF0C\u4EFB\u4F55\u77E5\u9053\u5C40\u57DF\u7F51 IP / \u96A7\u9053\u5730\u5740\u7684\u8BBF\u5BA2\u4ECD\u53EF\u76F4\u63A5\u8FDB\u5165\uFF08\u5F53\u524D\u76F8\u5F53\u4E8E"\u514D\u5BC6\u5F00\u653E"\u72B6\u6001\uFF09\u3002\n\n\u662F\u5426\u4ECD\u8981\u5F00\u542F\uFF1F\u5EFA\u8BAE\u5148\u5173\u95ED\uFF0C\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\u300D\u5904\u8BBE\u7F6E\u5BC6\u7801\u540E\u518D\u5F00\u542F\u3002'
+        localeT('\u26A0\uFE0F \u60A8\u5C1A\u672A\u8BBE\u7F6E\u4EFB\u4F55\u8BBF\u95EE\u5BC6\u7801\u6216\u7BA1\u7406\u5BC6\u7801\u3002\n\n\u5F00\u542F\u5B89\u5168\u9632\u62A4\u540E\uFF0C\u4EFB\u4F55\u77E5\u9053\u5C40\u57DF\u7F51 IP / \u96A7\u9053\u5730\u5740\u7684\u8BBF\u5BA2\u4ECD\u53EF\u76F4\u63A5\u8FDB\u5165\uFF08\u5F53\u524D\u76F8\u5F53\u4E8E"\u514D\u5BC6\u5F00\u653E"\u72B6\u6001\uFF09\u3002\n\n\u662F\u5426\u4ECD\u8981\u5F00\u542F\uFF1F\u5EFA\u8BAE\u5148\u5173\u95ED\uFF0C\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\u300D\u5904\u8BBE\u7F6E\u5BC6\u7801\u540E\u518D\u5F00\u542F\u3002')
       );
       if (!go) return;
     }
@@ -3356,7 +4061,7 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
   };
   const handleChangeMode = async (m) => {
     if (m === "password_only" && !auth?.hasPassword && !auth?.hasAdminPassword) {
-      window.alert("\u300C\u4EC5\u5BC6\u7801 / PIN \u7801\u767B\u5F55\u300D\u9700\u8981\u5148\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\u3002\n\n\u8BF7\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801 / PIN \u7801\u300D\u5904\u8F93\u5165\u5BC6\u7801\u5E76\u70B9\u51FB\u300C\u4FDD\u5B58\u8BBF\u95EE\u5BC6\u7801\u300D\uFF0C\u7136\u540E\u518D\u5207\u6362\u5230\u6B64\u6A21\u5F0F\u6216\u5F00\u542F\u5B89\u5168\u9632\u62A4\u3002");
+      window.alert(localeT("\u300C\u4EC5\u5BC6\u7801 / PIN \u7801\u767B\u5F55\u300D\u9700\u8981\u5148\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\u3002\n\n\u8BF7\u5728\u4E0B\u65B9\u300C\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801 / PIN \u7801\u300D\u5904\u8F93\u5165\u5BC6\u7801\u5E76\u70B9\u51FB\u300C\u4FDD\u5B58\u8BBF\u95EE\u5BC6\u7801\u300D\uFF0C\u7136\u540E\u518D\u5207\u6362\u5230\u6B64\u6A21\u5F0F\u6216\u5F00\u542F\u5B89\u5168\u9632\u62A4\u3002"));
       setTopMsg({ ok: false, text: "\u8BF7\u5148\u5728\u4E0B\u65B9\u8BBE\u7F6E\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801\uFF0C\u518D\u5207\u6362\u4E3A\u300C\u4EC5\u5BC6\u7801\u767B\u5F55\u300D\u6A21\u5F0F" });
       return;
     }
@@ -3439,7 +4144,7 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
     }
   };
   const handleRegenerateToken = async () => {
-    if (!confirm("\u91CD\u7F6E\u540E\uFF0C\u4E4B\u524D\u5305\u542B\u65E7 Token \u7684\u4E8C\u7EF4\u7801\u548C\u5206\u4EAB\u94FE\u63A5\u5C06\u7ACB\u5373\u5931\u6548\u3002\u662F\u5426\u786E\u8BA4\u91CD\u7F6E\uFF1F")) return;
+    if (!confirm(localeT("\u91CD\u7F6E\u540E\uFF0C\u4E4B\u524D\u5305\u542B\u65E7 Token \u7684\u4E8C\u7EF4\u7801\u548C\u5206\u4EAB\u94FE\u63A5\u5C06\u7ACB\u5373\u5931\u6548\u3002\u662F\u5426\u786E\u8BA4\u91CD\u7F6E\uFF1F"))) return;
     try {
       const res = await rpcCall(BRIDGE_ENDPOINTS.authRegenerateToken, {});
       if (!res?.ok) throw new Error(res?.error?.message || "\u91CD\u7F6E\u5931\u8D25");
@@ -3452,38 +4157,38 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
   const scopeLabel = scope === "all" ? "\u5168\u90E8\u901A\u9053 (\u5C40\u57DF\u7F51+\u516C\u7F51)" : scope === "public_only" ? "\u4EC5\u516C\u7F51\u96A7\u9053" : "\u4EC5\u5C40\u57DF\u7F51";
   const modeLabel = mode === "token_and_password" ? "\u626B\u7801\u514D\u5BC6 + \u5BC6\u7801" : mode === "password_only" ? "\u4EC5\u5BC6\u7801\u767B\u5F55" : "\u4EC5\u5B89\u5168 Token";
   const adminLabel = adminPolicy === "password_unlock" ? "\u9700\u5BC6\u7801\u89E3\u9501" : adminPolicy === "local_only" ? "\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406" : "\u5BBD\u677E\u6A21\u5F0F";
-  return React.createElement(
+  return h(
     "div",
     { style: { display: "flex", flexDirection: "column", gap: 14 } },
     // ---- 顶部总控与状态概览卡片 ----
-    React.createElement(
+    h(
       "div",
       { style: s.card },
-      React.createElement(
+      h(
         "div",
         {
           style: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }
         },
-        React.createElement(
+        h(
           "div",
           { style: { flex: "1 1 260px" } },
-          React.createElement(
+          h(
             "div",
             { style: { ...s.label, fontSize: 15, display: "flex", alignItems: "center", gap: 8 } },
             "\u{1F510} \u5168\u5C40\u8BBF\u95EE\u5B89\u5168\u9632\u62A4\u4F53\u7CFB"
           ),
-          React.createElement(
+          h(
             "div",
             { style: { ...s.muted, marginTop: 4 } },
             "\u96C6\u6210\u5916\u90E8\u8BBF\u95EE\u95E8\u7981\u62E6\u622A\u4E0E\u7BA1\u7406\u540E\u53F0\u9632\u7BE1\u6539\u63A7\u5236\uFF0C\u53CC\u91CD\u5B88\u62A4\u8FDC\u7A0B\u4F1A\u8BDD\u4E0E\u7F51\u7EDC\u914D\u7F6E\u5B89\u5168"
           )
         ),
-        React.createElement("button", {
+        h("button", {
           style: { ...enabled ? s.btnPri : s.btnGhost, whiteSpace: "nowrap", flexShrink: 0 },
           onClick: handleToggleEnabled
         }, enabled ? "\u2713 \u5DF2\u542F\u7528\u5B89\u5168\u9632\u62A4" : "\u672A\u5F00\u542F\u5B89\u5168\u9632\u62A4")
       ),
-      enabled && React.createElement(
+      enabled && h(
         "div",
         {
           style: {
@@ -3495,7 +4200,7 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
             borderTop: "1px solid var(--dsw-alias-border-l2,#e5e7eb)"
           }
         },
-        React.createElement("div", {
+        h("div", {
           style: {
             display: "inline-flex",
             alignItems: "center",
@@ -3506,8 +4211,8 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
             background: "var(--dsw-alias-bg-layer-2,#f3f4f6)",
             color: "var(--dsw-alias-label-secondary,#4b5563)"
           }
-        }, "\u{1F310} \u4FDD\u62A4\u8303\u56F4: ", React.createElement("strong", { style: { color: "var(--dsw-alias-brand-primary,#4f6ef7)" } }, scopeLabel)),
-        React.createElement("div", {
+        }, "\u{1F310} \u4FDD\u62A4\u8303\u56F4: ", h("strong", { style: { color: "var(--dsw-alias-brand-primary,#4f6ef7)" } }, scopeLabel)),
+        h("div", {
           style: {
             display: "inline-flex",
             alignItems: "center",
@@ -3518,8 +4223,8 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
             background: "var(--dsw-alias-bg-layer-2,#f3f4f6)",
             color: "var(--dsw-alias-label-secondary,#4b5563)"
           }
-        }, "\u{1F511} \u5916\u90E8\u9A8C\u8BC1: ", React.createElement("strong", { style: { color: "var(--dsw-alias-brand-primary,#4f6ef7)" } }, modeLabel)),
-        React.createElement("div", {
+        }, "\u{1F511} \u5916\u90E8\u9A8C\u8BC1: ", h("strong", { style: { color: "var(--dsw-alias-brand-primary,#4f6ef7)" } }, modeLabel)),
+        h("div", {
           style: {
             display: "inline-flex",
             alignItems: "center",
@@ -3530,9 +4235,9 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
             background: "var(--dsw-alias-bg-layer-2,#f3f4f6)",
             color: "var(--dsw-alias-label-secondary,#4b5563)"
           }
-        }, "\u{1F512} \u540E\u53F0\u9632\u7BE1\u6539: ", React.createElement("strong", { style: { color: "var(--dsw-alias-label-primary, #0f1115)" } }, adminLabel))
+        }, "\u{1F512} \u540E\u53F0\u9632\u7BE1\u6539: ", h("strong", { style: { color: "var(--dsw-alias-label-primary, #0f1115)" } }, adminLabel))
       ),
-      topMsg && React.createElement("div", {
+      topMsg && h("div", {
         style: {
           marginTop: 12,
           padding: "8px 12px",
@@ -3543,7 +4248,7 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
         }
       }, topMsg.text),
       // 访问认证已开启但尚未设置任何密码/Token 保护：局域网/公网访客可免密进入，高危提示
-      enabled && !auth?.hasPassword && !auth?.hasAdminPassword && React.createElement(
+      enabled && !auth?.hasPassword && !auth?.hasAdminPassword && h(
         "div",
         {
           style: {
@@ -3558,16 +4263,16 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
           }
         },
         "\u26A0\uFE0F ",
-        React.createElement("strong", null, "\u5C1A\u672A\u8BBE\u7F6E\u4EFB\u4F55\u8BBF\u95EE\u5BC6\u7801\u6216\u7BA1\u7406\u5BC6\u7801"),
+        h("strong", null, "\u5C1A\u672A\u8BBE\u7F6E\u4EFB\u4F55\u8BBF\u95EE\u5BC6\u7801\u6216\u7BA1\u7406\u5BC6\u7801"),
         " \u2014\u2014 \u6B64\u65F6\u201C\u8BBF\u95EE\u8BA4\u8BC1\u5DF2\u5F00\u542F\u201D\u4F46\u4EFB\u4F55\u77E5\u9053\u5C40\u57DF\u7F51 IP / \u96A7\u9053\u5730\u5740\u7684\u4EBA\u90FD\u80FD\u76F4\u63A5\u8FDB\u5165\uFF08\u96A7\u9053\u5165\u53E3\u81EA\u8EAB\u4E0D\u8BBE\u9632\uFF0C\u8BE6\u89C1\u4E0B\u65B9\u5B89\u5168\u987B\u77E5\uFF09\u3002",
         "\u5EFA\u8BAE\u7ACB\u5373\u5728\u4E0B\u65B9\u8BBE\u7F6E",
-        React.createElement("strong", null, "\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801"),
+        h("strong", null, "\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801"),
         "\u6216",
-        React.createElement("strong", null, "\u7BA1\u7406\u5BC6\u7801"),
+        h("strong", null, "\u7BA1\u7406\u5BC6\u7801"),
         "\u540E\u518D\u5BF9\u5916\u5F00\u653E\u3002"
       )
     ),
-    React.createElement(
+    h(
       React.Fragment,
       null,
       // =========================================================================
@@ -3576,29 +4281,29 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
       // 第一道防线卡片：已开启防护，或【尚未设置任何密码】时始终显示——
       // 未设密码时必须给出密码输入框，否则用户开启防护（尤其 password_only）后
       // 会因无密码被锁在登录墙外且找不到设密码入口（自我锁死，v2.10.5 修复）。
-      (enabled || !auth?.hasPassword) && React.createElement(
+      (enabled || !auth?.hasPassword) && h(
         "div",
         { style: s.card },
-        React.createElement(
+        h(
           "div",
           { style: { marginBottom: 14 } },
-          React.createElement(
+          h(
             "div",
             { style: { ...s.label, fontSize: 14, display: "flex", alignItems: "center", gap: 6 } },
             "\u{1F6E1}\uFE0F \u7B2C\u4E00\u9053\u9632\u7EBF\uFF1A\u5916\u90E8\u8BBF\u95EE\u95E8\u7981\uFF08\u63A7\u5236\u8C01\u80FD\u4F7F\u7528 AI\uFF09"
           ),
-          React.createElement(
+          h(
             "div",
             { style: { ...s.muted, marginTop: 3 } },
             "\u63A7\u5236\u5916\u90E8\u8BBE\u5907\u901A\u8FC7\u5C40\u57DF\u7F51 IP \u6216\u516C\u7F51\u96A7\u9053\uFF08Cloudflare/\u81EA\u5EFA\u96A7\u9053\uFF09\u8FDB\u5165 DSH \u804A\u5929\u754C\u9762\u65F6\u7684\u8EAB\u4EFD\u9A8C\u8BC1\u65B9\u5F0F"
           )
         ),
         // 验证模式选择
-        React.createElement(
+        h(
           "div",
           { style: { marginBottom: 16 } },
-          React.createElement("label", { style: { ...s.label, display: "block", marginBottom: 8, fontSize: 12 } }, "\u9A8C\u8BC1\u6A21\u5F0F\u9009\u62E9"),
-          React.createElement(
+          h("label", { style: { ...s.label, display: "block", marginBottom: 8, fontSize: 12 } }, "\u9A8C\u8BC1\u6A21\u5F0F\u9009\u62E9"),
+          h(
             "div",
             { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
             [
@@ -3607,7 +4312,7 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
               { id: "token_only", title: "\u{1F3AB} \u4EC5\u5B89\u5168 Token \u514D\u5BC6", desc: "\u4EC5\u6301\u6709\u5E26\u5B89\u5168 Token \u7684\u4E8C\u7EF4\u7801\u6216\u4E13\u5C5E\u5206\u4EAB\u94FE\u63A5\u65B9\u53EF\u8FDB\u5165" }
             ].map((opt) => {
               const isSel = mode === opt.id;
-              return React.createElement(
+              return h(
                 "div",
                 {
                   key: opt.id,
@@ -3622,18 +4327,18 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
                     transition: "all 0.15s ease"
                   }
                 },
-                React.createElement("div", { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? "var(--dsw-alias-brand-primary,#4f6ef7)" : "var(--dsw-alias-label-primary,currentColor)" } }, opt.title),
-                React.createElement("div", { style: { ...s.muted, fontSize: 11, marginTop: 4 } }, opt.desc)
+                h("div", { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? "var(--dsw-alias-brand-primary,#4f6ef7)" : "var(--dsw-alias-label-primary,currentColor)" } }, opt.title),
+                h("div", { style: { ...s.muted, fontSize: 11, marginTop: 4 } }, opt.desc)
               );
             })
           )
         ),
         // 防护生效范围
-        React.createElement(
+        h(
           "div",
           { style: { marginBottom: 16 } },
-          React.createElement("label", { style: { ...s.label, display: "block", marginBottom: 8, fontSize: 12 } }, "\u9632\u62A4\u751F\u6548\u901A\u9053"),
-          React.createElement(
+          h("label", { style: { ...s.label, display: "block", marginBottom: 8, fontSize: 12 } }, "\u9632\u62A4\u751F\u6548\u901A\u9053"),
+          h(
             "div",
             { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
             [
@@ -3642,7 +4347,7 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
               { id: "lan_only", title: "\u4EC5\u5C40\u57DF\u7F51\u5F00\u542F\u9632\u62A4", desc: "\u4EC5\u5C40\u57DF\u7F51\u76F4\u8FDE\u9700\u9A8C\u8BC1\uFF0C\u516C\u7F51\u96A7\u9053\u4E0D\u5F00\u542F" }
             ].map((opt) => {
               const isSel = scope === opt.id;
-              return React.createElement(
+              return h(
                 "div",
                 {
                   key: opt.id,
@@ -3657,36 +4362,38 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
                     transition: "all 0.15s ease"
                   }
                 },
-                React.createElement("div", { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? "var(--dsw-alias-brand-primary,#4f6ef7)" : "var(--dsw-alias-label-primary,currentColor)" } }, opt.title),
-                React.createElement("div", { style: { ...s.muted, fontSize: 11, marginTop: 3 } }, opt.desc)
+                h("div", { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? "var(--dsw-alias-brand-primary,#4f6ef7)" : "var(--dsw-alias-label-primary,currentColor)" } }, opt.title),
+                h("div", { style: { ...s.muted, fontSize: 11, marginTop: 3 } }, opt.desc)
               );
             })
           )
         ),
         // 访客访问密码输入框 (当非 token_only 时展示)
-        mode !== "token_only" && React.createElement(
+        mode !== "token_only" && h(
           "div",
           { style: { marginBottom: 16 } },
-          React.createElement(
+          h(
             "label",
             { style: { ...s.label, display: "block", marginBottom: 6, fontSize: 12 } },
-            `\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801 ${auth?.hasPassword ? "(\u2713 \u5DF2\u8BBE\u7F6E\u8BBF\u5BA2\u5BC6\u7801)" : "(\u26A0\uFE0F \u5C1A\u672A\u8BBE\u7F6E\u5BC6\u7801\uFF0C\u76F4\u63A5\u8F93\u5165 IP \u5C06\u514D\u5BC6)"}`
+            localeT("\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801 ${status}", {
+              status: auth?.hasPassword ? localeT("(\u2713 \u5DF2\u8BBE\u7F6E\u8BBF\u5BA2\u5BC6\u7801)") : localeT("(\u26A0\uFE0F \u5C1A\u672A\u8BBE\u7F6E\u5BC6\u7801\uFF0C\u76F4\u63A5\u8F93\u5165 IP \u5C06\u514D\u5BC6)")
+            })
           ),
-          React.createElement(
+          h(
             "div",
             { style: { display: "flex", gap: 8, alignItems: "center" } },
-            React.createElement("input", {
+            h("input", {
               type: showAccessPassword ? "text" : "password",
               style: { ...s.input, flex: 1 },
               placeholder: auth?.hasPassword ? "\u8F93\u5165\u65B0\u5BC6\u7801\u4EE5\u4FEE\u6539\uFF08\u7559\u7A7A\u4FDD\u5B58\u53EF\u6E05\u9664\u8BBF\u5BA2\u5BC6\u7801\uFF09" : "\u8BBE\u7F6E\u5916\u90E8\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801 / PIN \u7801",
               value: accessPassword,
               onChange: (e) => setAccessPassword(e.target.value)
             }),
-            React.createElement("button", {
+            h("button", {
               style: { ...s.btnGhost, height: 32, fontSize: 12, whiteSpace: "nowrap", flexShrink: 0 },
               onClick: () => setShowAccessPassword((v) => !v)
             }, showAccessPassword ? "\u9690\u85CF" : "\u663E\u793A"),
-            React.createElement("button", {
+            h("button", {
               style: {
                 ...s.btnPri,
                 height: 32,
@@ -3705,12 +4412,12 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
               disabled: savingAccess
             }, savingAccess ? "\u4FDD\u5B58\u4E2D\u2026" : saveAccessSuccess ? "\u2713 \u5DF2\u6210\u529F\u4FDD\u5B58\uFF01" : "\u4FDD\u5B58\u8BBF\u95EE\u5BC6\u7801")
           ),
-          React.createElement(
+          h(
             "div",
             { style: { ...s.muted, fontSize: 11, marginTop: 4 } },
             "\u{1F4A1} \u5F53\u5916\u90E8\u670B\u53CB\u6216\u540C\u4E8B\u672A\u901A\u8FC7\u4E8C\u7EF4\u7801\u626B\u7801\uFF0C\u800C\u662F\u76F4\u63A5\u8F93\u5165 IP \u6216\u516C\u7F51\u57DF\u540D\u8BBF\u95EE\u65F6\uFF0C\u9700\u8F93\u5165\u6B64\u5BC6\u7801\u767B\u5F55\u3002"
           ),
-          msgAccess && React.createElement("div", {
+          msgAccess && h("div", {
             style: {
               marginTop: 8,
               padding: "6px 12px",
@@ -3722,25 +4429,25 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
           }, msgAccess.text)
         ),
         // 免密 Token 管理
-        mode !== "password_only" && React.createElement(
+        mode !== "password_only" && h(
           "div",
           { style: s.block },
-          React.createElement("label", { style: { ...s.label, display: "block", marginBottom: 6, fontSize: 12 } }, "\u514D\u5BC6\u626B\u7801 Token (\u4E13\u5C5E\u8BBF\u95EE\u51ED\u636E)"),
-          React.createElement(
+          h("label", { style: { ...s.label, display: "block", marginBottom: 6, fontSize: 12 } }, "\u514D\u5BC6\u626B\u7801 Token (\u4E13\u5C5E\u8BBF\u95EE\u51ED\u636E)"),
+          h(
             "div",
             { style: { display: "flex", gap: 8, alignItems: "center" } },
-            React.createElement(
+            h(
               "code",
               { style: { ...s.code, flex: 1, padding: "6px 10px", background: "var(--dsw-alias-bg-layer-1,#fff)", borderRadius: 6, border: "1px solid var(--dsw-alias-border-l2,#e5e7eb)" } },
               auth?.secretToken ? `${auth.secretToken.slice(0, 10)}****************` : "\u672A\u751F\u6210"
             ),
-            React.createElement("button", {
+            h("button", {
               style: { ...s.btnGhost, height: 32, fontSize: 12, whiteSpace: "nowrap", flexShrink: 0 },
               onClick: handleRegenerateToken,
               title: "\u91CD\u65B0\u751F\u6210 Token\uFF0C\u4F7F\u4E4B\u524D\u5206\u4EAB\u7684\u65E7\u4E8C\u7EF4\u7801\u548C\u94FE\u63A5\u7ACB\u5373\u5931\u6548"
             }, "\u{1F504} \u91CD\u7F6E\u5B89\u5168 Token")
           ),
-          React.createElement(
+          h(
             "div",
             { style: { ...s.muted, fontSize: 11, marginTop: 4 } },
             "\u{1F4A1} \u63A7\u5236\u53F0\u751F\u6210\u7684\u5C40\u57DF\u7F51\u4E0E\u516C\u7F51\u4E8C\u7EF4\u7801\u5DF2\u81EA\u52A8\u5D4C\u5165\u6B64 Token\uFF0C\u624B\u673A\u626B\u7801\u5373\u53EF\u514D\u5BC6\u8FDB\u5165\u804A\u5929\u754C\u9762\uFF08\u4F46\u4E0D\u8D4B\u4E88\u540E\u53F0\u7BA1\u7406\u8BBE\u7F6E\u6743\u9650\uFF09\u3002"
@@ -3750,33 +4457,33 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
       // =========================================================================
       // ---- 第二道防线：后台管理防篡改（控制谁能修改本插件所有设置） ----
       // =========================================================================
-      React.createElement(
+      h(
         "div",
         { style: s.card },
-        React.createElement(
+        h(
           "div",
           { style: { marginBottom: 14 } },
-          React.createElement(
+          h(
             "div",
             { style: { ...s.label, fontSize: 14, display: "flex", alignItems: "center", gap: 6 } },
             "\u{1F512} \u7B2C\u4E8C\u9053\u9632\u7EBF\uFF1A\u7BA1\u7406\u540E\u53F0\u9632\u7BE1\u6539\uFF08\u63A7\u5236\u8C01\u80FD\u4FEE\u6539\u672C\u63D2\u4EF6\u6240\u6709\u8BBE\u7F6E\uFF09"
           ),
-          React.createElement(
+          h(
             "div",
             { style: { ...s.muted, marginTop: 3 } },
             "\u9501\u5B9A\u6574\u4E2A\u63D2\u4EF6\u8BBE\u7F6E\u540E\u53F0\uFF08\u5305\u542B\u5C40\u57DF\u7F51\u3001\u516C\u7F51\u96A7\u9053\u3001IM \u673A\u5668\u4EBA\u5BC6\u94A5\u4E0E\u5B89\u5168\u8BBE\u7F6E\uFF09\uFF0C\u9632\u6B62\u4ED6\u4EBA\u968F\u610F\u7BE1\u6539\u914D\u7F6E"
           ),
-          React.createElement(
+          h(
             "div",
             {
               style: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginTop: 10, paddingTop: 10, borderTop: "1px solid var(--dsw-alias-border-l2,#e5e7eb)" }
             },
-            React.createElement(
+            h(
               "div",
               { style: { fontSize: 12, fontWeight: 600, color: "var(--dsw-alias-label-primary,currentColor)" } },
               adminProtection ? "\u{1F6E1}\uFE0F \u7BA1\u7406\u4FDD\u62A4\u5DF2\u5F00\u542F\uFF08\u4FEE\u6539\u914D\u7F6E\u9700\u7BA1\u7406\u5BC6\u7801\uFF09" : "\u26A0\uFE0F \u7BA1\u7406\u4FDD\u62A4\u5DF2\u5173\u95ED\uFF08\u4FEE\u6539\u914D\u7F6E\u514D\u5BC6\uFF09"
             ),
-            React.createElement("button", {
+            h("button", {
               type: "button",
               style: { ...adminProtection ? s.btnGhost : s.btnPri, height: 28, fontSize: 12, padding: "0 12px" },
               onClick: handleToggleAdminProtection
@@ -3784,29 +4491,31 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
           )
         ),
         // 管理员密码设置
-        React.createElement(
+        h(
           "div",
           { style: { marginBottom: 16 } },
-          React.createElement(
+          h(
             "label",
             { style: { ...s.label, display: "block", marginBottom: 6, fontSize: 12 } },
-            `\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5458\u5BC6\u7801 ${auth?.hasAdminPassword ? "(\u2713 \u5DF2\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801)" : "(\u672A\u5355\u72EC\u8BBE\u7F6E\uFF0C\u9ED8\u8BA4\u4F7F\u7528\u4E0A\u8FF0\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801)"}`
+            localeT("\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5458\u5BC6\u7801 ${status}", {
+              status: auth?.hasAdminPassword ? localeT("(\u2713 \u5DF2\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801)") : localeT("(\u672A\u5355\u72EC\u8BBE\u7F6E\uFF0C\u9ED8\u8BA4\u4F7F\u7528\u4E0A\u8FF0\u8BBF\u5BA2\u8BBF\u95EE\u5BC6\u7801)")
+            })
           ),
-          React.createElement(
+          h(
             "div",
             { style: { display: "flex", gap: 8, alignItems: "center" } },
-            React.createElement("input", {
+            h("input", {
               type: showAdminPassword ? "text" : "password",
               style: { ...s.input, flex: 1 },
               placeholder: auth?.hasAdminPassword ? "\u8F93\u5165\u65B0\u5BC6\u7801\u4EE5\u4FEE\u6539\uFF08\u7559\u7A7A\u4FDD\u5B58\u53EF\u6E05\u9664\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801\uFF09" : "\u8BBE\u7F6E\u540E\u53F0\u7BA1\u7406\u89E3\u9501\u5BC6\u7801\uFF08\u5EFA\u8BAE\u4E0E\u8BBF\u5BA2\u5BC6\u7801\u4E0D\u540C\uFF09",
               value: adminPassword,
               onChange: (e) => setAdminPassword(e.target.value)
             }),
-            React.createElement("button", {
+            h("button", {
               style: { ...s.btnGhost, height: 32, fontSize: 12, whiteSpace: "nowrap", flexShrink: 0 },
               onClick: () => setShowAdminPassword((v) => !v)
             }, showAdminPassword ? "\u9690\u85CF" : "\u663E\u793A"),
-            React.createElement("button", {
+            h("button", {
               style: {
                 ...s.btnPri,
                 height: 32,
@@ -3823,12 +4532,12 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
               disabled: savingAdmin
             }, savingAdmin ? "\u4FDD\u5B58\u4E2D\u2026" : saveAdminSuccess ? "\u2713 \u5DF2\u6210\u529F\u4FDD\u5B58\uFF01" : "\u4FDD\u5B58\u7BA1\u7406\u5BC6\u7801")
           ),
-          React.createElement(
+          h(
             "div",
             { style: { ...s.muted, fontSize: 11, marginTop: 4, color: "var(--dsw-alias-brand-primary,#4f6ef7)" } },
             "\u{1F511} \u6838\u5FC3\u4F5C\u7528\uFF1A\u7528\u4E8E\u8FDC\u7A0B\u8BBE\u5907\u8FDB\u5165\u8BBE\u7F6E\u540E\u53F0\u65F6\u7684\u89E3\u9501\u9A8C\u8BC1\u3002\u8BBE\u7F6E\u540E\uFF0C\u5373\u4FBF\u628A\u8BBF\u95EE\u5BC6\u7801\u544A\u77E5\u4ED6\u4EBA\uFF0C\u4ED6\u4EBA\u4E5F\u65E0\u6CD5\u8FDB\u5165\u8BBE\u7F6E\u540E\u53F0\u6539\u914D\u7F6E\u3002"
           ),
-          msgAdmin && React.createElement("div", {
+          msgAdmin && h("div", {
             style: {
               marginTop: 8,
               padding: "6px 12px",
@@ -3840,11 +4549,11 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
           }, msgAdmin.text)
         ),
         // 远程管理权限控制策略
-        React.createElement(
+        h(
           "div",
           { style: s.block },
-          React.createElement("label", { style: { ...s.label, display: "block", marginBottom: 8, fontSize: 12 } }, "\u8FDC\u7A0B\u8BBE\u5907\u7BA1\u7406\u6743\u9650\u7B56\u7565"),
-          React.createElement(
+          h("label", { style: { ...s.label, display: "block", marginBottom: 8, fontSize: 12 } }, "\u8FDC\u7A0B\u8BBE\u5907\u7BA1\u7406\u6743\u9650\u7B56\u7565"),
+          h(
             "div",
             { style: { display: "flex", gap: 8, flexWrap: "wrap" } },
             [
@@ -3853,7 +4562,7 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
               { id: "open", title: "\u{1F513} \u5BBD\u677E\u6A21\u5F0F", desc: "\u4EFB\u4F55\u5DF2\u901A\u8FC7\u7B2C\u4E00\u9053\u9632\u7EBF\u767B\u5F55\u7684\u8BBE\u5907\u5747\u53EF\u76F4\u63A5\u4FEE\u6539\u6240\u6709\u914D\u7F6E" }
             ].map((opt) => {
               const isSel = adminPolicy === opt.id;
-              return React.createElement(
+              return h(
                 "div",
                 {
                   key: opt.id,
@@ -3868,8 +4577,8 @@ var AccessAuthCard = React.memo(function AccessAuthCard2({ auth, rpcCall, onUpda
                     transition: "all 0.15s ease"
                   }
                 },
-                React.createElement("div", { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? "var(--dsw-alias-brand-primary,#4f6ef7)" : "var(--dsw-alias-label-primary,currentColor)" } }, opt.title),
-                React.createElement("div", { style: { ...s.muted, fontSize: 11, marginTop: 4 } }, opt.desc)
+                h("div", { style: { fontSize: 13, fontWeight: isSel ? 600 : 500, color: isSel ? "var(--dsw-alias-brand-primary,#4f6ef7)" : "var(--dsw-alias-label-primary,currentColor)" } }, opt.title),
+                h("div", { style: { ...s.muted, fontSize: 11, marginTop: 4 } }, opt.desc)
               );
             })
           )
@@ -3945,8 +4654,8 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
     load();
     const activeLogin = platform?.login && (platform.login.phase === "qr" || platform.login.phase === "scaned");
     const interval = activeLogin ? 1500 : 3e3;
-    const t = setInterval(() => load(true), interval);
-    return () => clearInterval(t);
+    const t2 = setInterval(() => load(true), interval);
+    return () => clearInterval(t2);
   }, [load, platform?.login?.phase]);
   const act = React.useCallback(async (endpoint, payload) => {
     setBusy(true);
@@ -4036,35 +4745,35 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
   }, [act, cfgDraft, platformId]);
   const cfgDirty = cfgDraft && platform?.config && (Number(cfgDraft.digestIntervalSec) !== platform.config.digestIntervalSec || Number(cfgDraft.approvalTimeoutSec) !== platform.config.approvalTimeoutSec || Number(cfgDraft.maxMessageChars) !== platform.config.maxMessageChars || Number(cfgDraft.sendChunkDelayMs) !== platform.config.sendChunkDelayMs || (cfgDraft.agentPreset ?? "") !== (platform.config.agentPreset ?? "") || (cfgDraft.cwd ?? "") !== (platform.config.cwd ?? "") || (cfgDraft.agentProvider ?? "") !== (platform.config.agentProvider ?? "") || (cfgDraft.agentModel ?? "") !== (platform.config.agentModel ?? "") || platformId === "qq" && (cfgDraft.appId !== (platform.config.appId ?? "") || cfgDraft.clientSecret !== (platform.config.clientSecret ?? "")) || platformId === "feishu" && (cfgDraft.appId !== (platform.config.appId ?? "") || cfgDraft.appSecret !== (platform.config.appSecret ?? "")) || platformId === "telegram" && (cfgDraft.botToken !== "" || cfgDraft.proxy !== (platform.config.proxy ?? "")));
   if (!platform && !err) {
-    return React.createElement(
+    return h(
       "div",
       { style: s.card },
-      React.createElement("div", { style: s.label }, platformName),
-      React.createElement("div", { style: { ...s.muted, marginTop: 6 } }, "\u52A0\u8F7D\u4E2D\u2026")
+      h("div", { style: s.label }, platformName),
+      h("div", { style: { ...s.muted, marginTop: 6 } }, "\u52A0\u8F7D\u4E2D\u2026")
     );
   }
   const connected = platform?.status === "connected" || platform?.status === "starting" || platform?.status === "reconnecting";
   const login = platform?.login ?? {};
   const showQr = login.phase === "qr" || login.phase === "scaned";
   const statusLabel = platform?.status === "connected" ? "\u5DF2\u8FDE\u63A5" : platform?.status === "starting" ? "\u8FDE\u63A5\u4E2D\u2026" : platform?.status === "reconnecting" ? "\u91CD\u8FDE\u4E2D\u2026" : platform?.status === "paused" ? "\u6682\u505C\uFF08\u4F1A\u8BDD\u8FC7\u671F\uFF09" : platform?.status === "error" ? "\u9519\u8BEF" : "\u672A\u8FDE\u63A5";
-  return React.createElement(
+  return h(
     "div",
     { style: s.card },
-    React.createElement(
+    h(
       "div",
       { style: { display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 10 } },
-      React.createElement(
+      h(
         "div",
         { style: { flex: "1 1 auto", minWidth: 0 } },
-        React.createElement(
+        h(
           "div",
           { style: { ...s.label, display: "flex", alignItems: "center", gap: 7 } },
-          platformId === "wechat" && React.createElement(Icons.wechat, { style: { color: "#07C160", width: 20, height: 20 } }),
-          platformId === "qq" && React.createElement(Icons.qq, { style: { color: "#12B7F5", width: 20, height: 20 } }),
-          platformId === "feishu" && React.createElement(Icons.feishu, { style: { color: "#00D6B9", width: 20, height: 20 } }),
-          platformId === "telegram" && React.createElement(Icons.telegram, { style: { color: "#24A1DE", width: 20, height: 20 } }),
+          platformId === "wechat" && h(Icons.wechat, { style: { color: "#07C160", width: 20, height: 20 } }),
+          platformId === "qq" && h(Icons.qq, { style: { color: "#12B7F5", width: 20, height: 20 } }),
+          platformId === "feishu" && h(Icons.feishu, { style: { color: "#00D6B9", width: 20, height: 20 } }),
+          platformId === "telegram" && h(Icons.telegram, { style: { color: "#24A1DE", width: 20, height: 20 } }),
           platformName,
-          platformRecommended && React.createElement("span", {
+          platformRecommended && h("span", {
             style: {
               fontSize: 10,
               lineHeight: "16px",
@@ -4078,83 +4787,83 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
             }
           }, "\u63A8\u8350")
         ),
-        React.createElement("div", { style: { ...s.muted, marginTop: 2 } }, platformDesc)
+        h("div", { style: { ...s.muted, marginTop: 2 } }, platformDesc)
       ),
-      React.createElement(StatusTag, { status: platform?.status, running: connected })
+      h(StatusTag, { status: platform?.status, running: connected })
     ),
     // 快捷入口：使用说明 / 开放平台 / 命令速查
-    React.createElement(
+    h(
       "div",
       { style: { display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap", alignItems: "center" } },
-      platformId === "wechat" && React.createElement("a", {
+      platformId === "wechat" && h("a", {
         href: "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/wechat-usage.md",
         target: "_blank",
         rel: "noopener noreferrer",
         style: s.btnGhost
       }, "\u{1F4D6} \u5FAE\u4FE1\u4F7F\u7528\u8BF4\u660E"),
-      platformId === "qq" && React.createElement("a", {
+      platformId === "qq" && h("a", {
         href: "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/qq-usage.md",
         target: "_blank",
         rel: "noopener noreferrer",
         style: s.btnGhost
       }, "\u{1F4D6} QQ \u4F7F\u7528\u8BF4\u660E"),
-      platformId === "qq" && React.createElement("a", {
+      platformId === "qq" && h("a", {
         href: "https://bot.q.qq.com/wiki/develop/api-v2/",
         target: "_blank",
         rel: "noopener noreferrer",
         style: s.btnGhost
       }, "\u{1F310} QQ \u5F00\u653E\u5E73\u53F0"),
-      platformId === "feishu" && React.createElement("a", {
+      platformId === "feishu" && h("a", {
         href: "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/feishu-usage.md",
         target: "_blank",
         rel: "noopener noreferrer",
         style: s.btnGhost
       }, "\u{1F4D6} \u98DE\u4E66\u4F7F\u7528\u8BF4\u660E"),
-      platformId === "feishu" && React.createElement("a", {
+      platformId === "feishu" && h("a", {
         href: "https://open.feishu.cn/app",
         target: "_blank",
         rel: "noopener noreferrer",
         style: s.btnGhost
       }, "\u{1F310} \u98DE\u4E66\u5F00\u653E\u5E73\u53F0"),
-      platformId === "telegram" && React.createElement("a", {
+      platformId === "telegram" && h("a", {
         href: "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/telegram-usage.md",
         target: "_blank",
         rel: "noopener noreferrer",
         style: s.btnGhost
       }, "\u{1F4D6} Telegram \u4F7F\u7528\u8BF4\u660E"),
-      platformId === "telegram" && React.createElement("a", {
+      platformId === "telegram" && h("a", {
         href: "https://t.me/BotFather",
         target: "_blank",
         rel: "noopener noreferrer",
         style: s.btnGhost
       }, "\u{1F310} @BotFather \u7533\u8BF7 Bot"),
-      React.createElement("button", {
+      h("button", {
         style: s.btnGhost,
         onClick: () => setShowHelp((v) => !v)
       }, showHelp ? "\u6536\u8D77\u547D\u4EE4" : "\u547D\u4EE4\u5217\u8868")
     ),
     // 命令速查
-    showHelp && React.createElement(
+    showHelp && h(
       "div",
       { style: { ...s.block, fontSize: 12, lineHeight: 1.8, fontFamily: "monospace" } },
-      React.createElement("div", null, "/new <\u63D0\u793A\u8BCD> \u2014 \u65B0\u5EFA\u4F1A\u8BDD\u5E76\u5F00\u59CB\uFF08\u5F53\u524D\u5DE5\u4F5C\u533A\uFF09"),
-      React.createElement("div", null, "/new <\u63D0\u793A\u8BCD> @N \u2014 \u5728\u6307\u5B9A\u5DE5\u4F5C\u533A\u65B0\u5EFA\u4F1A\u8BDD"),
-      React.createElement("div", null, "/sessions\uFF08\u6216 /list\uFF09\u2014 \u5217\u51FA\u4F1A\u8BDD\uFF08\u6309\u5DE5\u4F5C\u533A\u5206\u7EC4\uFF0C\u5E26\u6807\u9898\uFF09"),
-      React.createElement("div", null, "/use N\uFF08\u6216 /resume N\uFF09\u2014 \u5207\u6362\u5230\u4F1A\u8BDD N"),
-      React.createElement("div", null, "/workspaces \u2014 \u5217\u51FA\u6240\u6709\u53EF\u7528\u5DE5\u4F5C\u533A"),
-      React.createElement("div", null, "/end \u2014 \u7ED3\u675F\u5F53\u524D\u4F1A\u8BDD\uFF08\u56DE\u5230\u65E0\u6D3B\u52A8\u4F1A\u8BDD\u72B6\u6001\uFF09"),
-      React.createElement("div", null, "/stop \u2014 \u505C\u6B62\u5F53\u524D\u4EFB\u52A1"),
-      React.createElement("div", null, "/status \u2014 \u67E5\u770B Agent \u72B6\u6001\u4E0E\u4F1A\u8BDD\u6458\u8981"),
-      React.createElement("div", null, "/yes \u6216 /no\uFF08\u6216 1/2\uFF09\u2014 \u56DE\u5E94\u6743\u9650\u5BA1\u6279\u8BF7\u6C42"),
-      React.createElement("div", null, "/help \u2014 \u663E\u793A\u5B8C\u6574\u547D\u4EE4\u5E2E\u52A9")
+      h("div", null, "/new <\u63D0\u793A\u8BCD> \u2014 \u65B0\u5EFA\u4F1A\u8BDD\u5E76\u5F00\u59CB\uFF08\u5F53\u524D\u5DE5\u4F5C\u533A\uFF09"),
+      h("div", null, "/new <\u63D0\u793A\u8BCD> @N \u2014 \u5728\u6307\u5B9A\u5DE5\u4F5C\u533A\u65B0\u5EFA\u4F1A\u8BDD"),
+      h("div", null, "/sessions\uFF08\u6216 /list\uFF09\u2014 \u5217\u51FA\u4F1A\u8BDD\uFF08\u6309\u5DE5\u4F5C\u533A\u5206\u7EC4\uFF0C\u5E26\u6807\u9898\uFF09"),
+      h("div", null, "/use N\uFF08\u6216 /resume N\uFF09\u2014 \u5207\u6362\u5230\u4F1A\u8BDD N"),
+      h("div", null, "/workspaces \u2014 \u5217\u51FA\u6240\u6709\u53EF\u7528\u5DE5\u4F5C\u533A"),
+      h("div", null, "/end \u2014 \u7ED3\u675F\u5F53\u524D\u4F1A\u8BDD\uFF08\u56DE\u5230\u65E0\u6D3B\u52A8\u4F1A\u8BDD\u72B6\u6001\uFF09"),
+      h("div", null, "/stop \u2014 \u505C\u6B62\u5F53\u524D\u4EFB\u52A1"),
+      h("div", null, "/status \u2014 \u67E5\u770B Agent \u72B6\u6001\u4E0E\u4F1A\u8BDD\u6458\u8981"),
+      h("div", null, "/yes \u6216 /no\uFF08\u6216 1/2\uFF09\u2014 \u56DE\u5E94\u6743\u9650\u5BA1\u6279\u8BF7\u6C42"),
+      h("div", null, "/help \u2014 \u663E\u793A\u5B8C\u6574\u547D\u4EE4\u5E2E\u52A9")
     ),
-    err && React.createElement("div", { style: { ...s.warn, marginTop: 10 } }, err),
+    err && h("div", { style: { ...s.warn, marginTop: 10 } }, err),
     // 已配置：结构化状态看板 + 白名单
-    platform?.configured && React.createElement(
+    platform?.configured && h(
       "div",
       { style: s.block },
       // 结构化状态卡片看板
-      React.createElement(
+      h(
         "div",
         {
           style: {
@@ -4164,7 +4873,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
             marginBottom: 12
           }
         },
-        React.createElement(
+        h(
           "div",
           {
             style: {
@@ -4174,11 +4883,11 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
               padding: "8px 12px"
             }
           },
-          React.createElement("div", { style: { ...s.muted, fontSize: 11 } }, "\u8FDE\u63A5\u72B6\u6001"),
-          React.createElement(
+          h("div", { style: { ...s.muted, fontSize: 11 } }, "\u8FDE\u63A5\u72B6\u6001"),
+          h(
             "div",
             { style: { ...s.label, fontSize: 13, marginTop: 2, display: "flex", alignItems: "center", gap: 6 } },
-            React.createElement("span", {
+            h("span", {
               style: {
                 width: 6,
                 height: 6,
@@ -4189,7 +4898,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
             statusLabel
           )
         ),
-        platform.accountId && React.createElement(
+        platform.accountId && h(
           "div",
           {
             style: {
@@ -4199,10 +4908,10 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
               padding: "8px 12px"
             }
           },
-          React.createElement("div", { style: { ...s.muted, fontSize: 11 } }, "\u767B\u5F55\u8D26\u53F7"),
-          React.createElement("div", { style: { ...s.code, fontSize: 12, marginTop: 2, fontWeight: 500 } }, platform.accountId)
+          h("div", { style: { ...s.muted, fontSize: 11 } }, "\u767B\u5F55\u8D26\u53F7"),
+          h("div", { style: { ...s.code, fontSize: 12, marginTop: 2, fontWeight: 500 } }, platform.accountId)
         ),
-        platform.sessionId && React.createElement(
+        platform.sessionId && h(
           "div",
           {
             style: {
@@ -4212,39 +4921,39 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
               padding: "8px 12px"
             }
           },
-          React.createElement("div", { style: { ...s.muted, fontSize: 11 } }, "\u6D3B\u52A8\u4F1A\u8BDD"),
-          React.createElement("div", { style: { ...s.code, fontSize: 12, marginTop: 2 } }, platform.sessionId)
+          h("div", { style: { ...s.muted, fontSize: 11 } }, "\u6D3B\u52A8\u4F1A\u8BDD"),
+          h("div", { style: { ...s.code, fontSize: 12, marginTop: 2 } }, platform.sessionId)
         )
       ),
-      React.createElement(
+      h(
         "div",
         { style: { ...s.muted, fontSize: 12, marginTop: 8, lineHeight: 1.6 } },
-        `\u767D\u540D\u5355 (\u5DF2\u6388\u6743 ${platform.allowFrom?.length || 0} \u4E2A\u8D26\u53F7/\u7FA4):`
+        localeT("\u767D\u540D\u5355 (\u5DF2\u6388\u6743 ${count} \u4E2A\u8D26\u53F7/\u7FA4):", { count: platform.allowFrom?.length || 0 })
       ),
-      React.createElement(
+      h(
         "div",
         { style: { display: "flex", flexWrap: "wrap", gap: 6, marginTop: 6 } },
         platform.allowFrom?.length ? platform.allowFrom.map(
-          (id) => React.createElement(
+          (id) => h(
             "span",
             { key: id, style: { ...s.tag, background: "var(--dsw-alias-bg-layer-2,#f3f4f6)", color: "var(--dsw-alias-label-primary,currentColor)", gap: 6 } },
-            React.createElement("span", { style: { fontSize: 12, wordBreak: "break-all" } }, id),
-            React.createElement("button", {
+            h("span", { style: { fontSize: 12, wordBreak: "break-all" } }, id),
+            h("button", {
               style: { cursor: "pointer", border: "none", background: "none", color: "var(--dsw-alias-label-primary, #0f1115)", fontSize: 12, padding: 0 },
               onClick: () => removeAllow(id),
               title: "\u79FB\u51FA\u767D\u540D\u5355"
             }, "\xD7")
           )
-        ) : React.createElement(
+        ) : h(
           "div",
           { style: { ...s.muted, fontSize: 12 } },
           platformId === "wechat" ? "(\u7A7A \u2014 \u626B\u7801\u540E\u9996\u4E2A\u53D1\u6D88\u606F\u7684\u5FAE\u4FE1\u7528\u6237\u5C06\u81EA\u52A8\u52A0\u5165)" : "(\u7A7A \u2014 \u9996\u4E2A\u53D1\u6D88\u606F\u7684\u7528\u6237\u5C06\u81EA\u52A8\u52A0\u5165)"
         )
       ),
-      React.createElement(
+      h(
         "div",
         { style: { display: "flex", gap: 8, marginTop: 8, alignItems: "center" } },
-        React.createElement("input", {
+        h("input", {
           style: { ...s.input, flex: 1 },
           placeholder: platformId === "wechat" ? "\u6DFB\u52A0\u5141\u8BB8\u7684\u5FAE\u4FE1 ID\uFF08\u5982 xxx@im.wechat\uFF09\uFF0C\u6309 Enter \u6DFB\u52A0" : "\u6DFB\u52A0\u5141\u8BB8\u7684\u7528\u6237/\u7FA4 ID\uFF0C\u6309 Enter \u6DFB\u52A0",
           value: newId,
@@ -4253,34 +4962,34 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
             if (e.key === "Enter" && newId.trim() && !busy) addAllow();
           }
         }),
-        React.createElement("button", {
+        h("button", {
           style: { ...s.btnGhost, whiteSpace: "nowrap", opacity: newId.trim() && !busy ? 1 : 0.5 },
           onClick: addAllow,
           disabled: busy || !newId.trim()
         }, "\u6DFB\u52A0")
       ),
-      React.createElement(
+      h(
         "div",
         { style: { display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap", alignItems: "center" } },
-        platform.status !== "connected" && platform.status !== "starting" && React.createElement("button", { style: s.btnPri, onClick: onReconnect, disabled: busy, title: platform?.configured ? "\u4F7F\u7528\u5DF2\u4FDD\u5B58\u7684\u51ED\u8BC1\u76F4\u63A5\u6062\u590D\u8FDE\u63A5\uFF0C\u65E0\u9700\u91CD\u65B0\u626B\u7801" : "\u9996\u6B21\u4F7F\u7528\u9700\u626B\u7801\u7ED1\u5B9A" }, platform?.configured ? "\u91CD\u65B0\u8FDE\u63A5" : "\u8FDE\u63A5"),
-        (platform.status === "connected" || platform.status === "starting") && React.createElement("button", { style: s.btnGhost, onClick: onStop, disabled: busy, title: '\u505C\u6B62\u63A5\u6536\u6D88\u606F\uFF1B\u51ED\u8BC1\u4FDD\u7559\uFF0C\u53EF\u968F\u65F6"\u91CD\u65B0\u8FDE\u63A5"\u6062\u590D' }, "\u65AD\u5F00"),
-        React.createElement("button", {
+        platform.status !== "connected" && platform.status !== "starting" && h("button", { style: s.btnPri, onClick: onReconnect, disabled: busy, title: platform?.configured ? "\u4F7F\u7528\u5DF2\u4FDD\u5B58\u7684\u51ED\u8BC1\u76F4\u63A5\u6062\u590D\u8FDE\u63A5\uFF0C\u65E0\u9700\u91CD\u65B0\u626B\u7801" : "\u9996\u6B21\u4F7F\u7528\u9700\u626B\u7801\u7ED1\u5B9A" }, platform?.configured ? "\u91CD\u65B0\u8FDE\u63A5" : "\u8FDE\u63A5"),
+        (platform.status === "connected" || platform.status === "starting") && h("button", { style: s.btnGhost, onClick: onStop, disabled: busy, title: '\u505C\u6B62\u63A5\u6536\u6D88\u606F\uFF1B\u51ED\u8BC1\u4FDD\u7559\uFF0C\u53EF\u968F\u65F6"\u91CD\u65B0\u8FDE\u63A5"\u6062\u590D' }, "\u65AD\u5F00"),
+        h("button", {
           style: { ...s.btnGhost, color: "var(--dsw-alias-label-primary, #0f1115)", borderColor: "var(--dsw-alias-state-error-primary,#dc2626)", opacity: busy ? 0.5 : 1 },
           disabled: busy,
           onClick: () => {
-            if (window.confirm("\u786E\u8BA4\u89E3\u7ED1\uFF1F\u8FD9\u5C06\u6E05\u9664\u4FDD\u5B58\u7684\u51ED\u8BC1\u3002")) act(BRIDGE_ENDPOINTS.platformUnbind, {});
+            if (window.confirm(localeT("\u786E\u8BA4\u89E3\u7ED1\uFF1F\u8FD9\u5C06\u6E05\u9664\u4FDD\u5B58\u7684\u51ED\u8BC1\u3002"))) act(BRIDGE_ENDPOINTS.platformUnbind, {});
           },
           title: "\u6E05\u9664\u767B\u5F55\u51ED\u8BC1\uFF0C\u4E0B\u6B21\u9700\u91CD\u65B0\u914D\u7F6E"
         }, "\u89E3\u7ED1\u8D26\u53F7")
       ),
       // 群聊自动授权开关（仅支持群聊的平台）：关闭时新群首次 @机器人 不会自动加白
-      platformId !== "wechat" && React.createElement(
+      platformId !== "wechat" && h(
         "label",
         {
           style: { display: "flex", alignItems: "center", gap: 6, marginTop: 10, fontSize: 12, cursor: "pointer", width: "fit-content", color: "var(--dsw-alias-label-secondary,#6b7280)" },
           title: "\u5F00\u542F\u540E\uFF0C\u767D\u540D\u5355\u4E4B\u5916\u7684\u65B0\u7FA4\u9996\u6B21 @\u673A\u5668\u4EBA \u5373\u81EA\u52A8\u6388\u6743\u5165\u767D\u540D\u5355\uFF1B\u5173\u95ED\uFF08\u9ED8\u8BA4\uFF09\u65F6\u65B0\u7FA4\u5FC5\u987B\u5148\u5728\u6B64\u624B\u52A8\u6DFB\u52A0"
         },
-        React.createElement("input", {
+        h("input", {
           type: "checkbox",
           checked: Boolean(cfgDraft?.groupAutoApprove),
           disabled: busy,
@@ -4290,16 +4999,16 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
             act(BRIDGE_ENDPOINTS.platformSetConfig, { groupAutoApprove: checked });
           }
         }),
-        React.createElement("span", null, "\u7FA4\u804A\u81EA\u52A8\u6388\u6743\uFF08\u65B0\u7FA4\u9996\u6B21 @\u673A\u5668\u4EBA \u81EA\u52A8\u52A0\u5165\u767D\u540D\u5355\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09")
+        h("span", null, "\u7FA4\u804A\u81EA\u52A8\u6388\u6743\uFF08\u65B0\u7FA4\u9996\u6B21 @\u673A\u5668\u4EBA \u81EA\u52A8\u52A0\u5165\u767D\u540D\u5355\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09")
       ),
       // 本轮改动摘要开关：默认开启（IM 侧也能看到"这轮改了哪些文件"）
-      React.createElement(
+      h(
         "label",
         {
           style: { display: "flex", alignItems: "center", gap: 6, marginTop: 10, fontSize: 12, cursor: "pointer", width: "fit-content", color: "var(--dsw-alias-label-secondary,#6b7280)" },
           title: '\u5F00\u542F\u540E\uFF0C\u6BCF\u8F6E\u7ED3\u675F\u4F1A\u628A"\u6539\u4E86\u54EA\u4E9B\u6587\u4EF6\uFF08+\u589E/-\u5220\uFF09"\u64AD\u62A5\u5230\u5F53\u524D\u4F1A\u8BDD\uFF1B/diff \u53EF\u5BFC\u51FA .patch \u8865\u4E01'
         },
-        React.createElement("input", {
+        h("input", {
           type: "checkbox",
           checked: cfgDraft?.changesDigest !== false,
           disabled: busy,
@@ -4309,17 +5018,17 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
             act(BRIDGE_ENDPOINTS.platformSetConfig, { changesDigest: checked });
           }
         }),
-        React.createElement("span", null, "\u672C\u8F6E\u6539\u52A8\u6458\u8981\uFF08\u6BCF\u8F6E\u64AD\u62A5\u6539\u52A8\u6587\u4EF6\u6E05\u5355\uFF0C\u9ED8\u8BA4\u5F00\u542F\uFF09")
+        h("span", null, "\u672C\u8F6E\u6539\u52A8\u6458\u8981\uFF08\u6BCF\u8F6E\u64AD\u62A5\u6539\u52A8\u6587\u4EF6\u6E05\u5355\uFF0C\u9ED8\u8BA4\u5F00\u542F\uFF09")
       ),
       // 实时活动状态开关：仅"卡片可原地更新"的平台支持（飞书 / Telegram）。
       // 用户反馈（2026-10-17）希望"能自己关掉、不要这个状态"，故提供显式开关。
-      (platformId === "feishu" || platformId === "telegram") && React.createElement(
+      (platformId === "feishu" || platformId === "telegram") && h(
         "label",
         {
           style: { display: "flex", alignItems: "center", gap: 6, marginTop: 8, fontSize: 12, cursor: "pointer", width: "fit-content", color: "var(--dsw-alias-label-secondary,#6b7280)" },
           title: "\u5F00\u542F\u540E Agent \u5E72\u6D3B\u65F6\u5361\u7247\u9876\u90E8\u4F1A\u5B9E\u65F6\u663E\u793A\u5F53\u524D\u52A8\u4F5C\uFF08\u5982\u300C\u6B63\u5728\u8FD0\u884C\u547D\u4EE4\u300D\uFF09\uFF1B\u5173\u95ED\u540E\u4E0D\u518D\u663E\u793A"
         },
-        React.createElement("input", {
+        h("input", {
           type: "checkbox",
           checked: cfgDraft?.showActivity === true,
           disabled: busy,
@@ -4329,53 +5038,55 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
             act(BRIDGE_ENDPOINTS.platformSetConfig, { showActivity: checked });
           }
         }),
-        React.createElement("span", null, "\u5B9E\u65F6\u6D3B\u52A8\u72B6\u6001\uFF08\u5361\u7247\u9876\u90E8\u663E\u793A\u300C\u6B63\u5728\u8FD0\u884C\u547D\u4EE4\u300D\u7B49\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09")
+        h("span", null, "\u5B9E\u65F6\u6D3B\u52A8\u72B6\u6001\uFF08\u5361\u7247\u9876\u90E8\u663E\u793A\u300C\u6B63\u5728\u8FD0\u884C\u547D\u4EE4\u300D\u7B49\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09")
       ),
       // 高级设置：会话级配置（工作区 / Agent 预设 / 模型路由）+ 会话节奏参数
-      React.createElement(
+      h(
         "div",
         { style: { marginTop: 12 } },
-        React.createElement("button", {
+        h("button", {
           style: s.btnGhost,
           onClick: () => setShowAdvanced((v) => !v)
         }, showAdvanced ? "\u6536\u8D77\u9AD8\u7EA7\u8BBE\u7F6E" : "\u2699\uFE0F \u9AD8\u7EA7\u8BBE\u7F6E"),
-        showAdvanced && React.createElement(
+        showAdvanced && h(
           "div",
           { style: { ...s.block, marginTop: 8, display: "flex", flexDirection: "column", gap: 10 } },
-          React.createElement(
+          h(
             "div",
             { style: { ...s.muted, fontSize: 12, lineHeight: 1.6 } },
             "\u4EE5\u4E0B\u8BBE\u7F6E\u6309\u5E73\u53F0\u4FDD\u5B58\uFF0C\u53EA\u5F71\u54CD\u8BE5\u5E73\u53F0\u901A\u8FC7 Bot \u65B0\u5EFA\u7684\u4F1A\u8BDD\uFF08\u7559\u7A7A = \u4F7F\u7528 DSH \u9ED8\u8BA4\u503C\uFF09\u3002"
           ),
           // Agent 预设：决定远程会话挂载哪些工具/技能
-          React.createElement(
+          h(
             "div",
             null,
-            React.createElement("div", { style: { ...s.muted, marginBottom: 4 } }, "Agent \u9884\u8BBE \u2014 \u51B3\u5B9A\u8FDC\u7A0B\u4F1A\u8BDD\u53EF\u7528\u7684\u5DE5\u5177\u4E0E\u6280\u80FD\uFF0C\u7559\u7A7A\u7528 DSH \u9ED8\u8BA4\u9884\u8BBE"),
-            React.createElement("input", {
+            h("div", { style: { ...s.muted, marginBottom: 4 } }, "Agent \u9884\u8BBE \u2014 \u51B3\u5B9A\u8FDC\u7A0B\u4F1A\u8BDD\u53EF\u7528\u7684\u5DE5\u5177\u4E0E\u6280\u80FD\uFF0C\u7559\u7A7A\u7528 DSH \u9ED8\u8BA4\u9884\u8BBE"),
+            h("input", {
               style: { ...s.input, width: "100%" },
               list: "dsh-bridge-agent-presets",
-              placeholder: presetOptions?.default ? `\u7559\u7A7A = DSH \u9ED8\u8BA4\uFF08${presetOptions.default}\uFF09` : "\u7559\u7A7A = DSH \u9ED8\u8BA4\u9884\u8BBE",
+              placeholder: presetOptions?.default ? localeT("\u7559\u7A7A = DSH \u9ED8\u8BA4\uFF08${name}\uFF09", { name: presetOptions.default }) : "\u7559\u7A7A = DSH \u9ED8\u8BA4\u9884\u8BBE",
               value: cfgDraft?.agentPreset ?? "",
               onChange: (e) => setCfgDraft((d) => ({ ...d, agentPreset: e.target.value }))
             }),
-            React.createElement(
+            h(
               "datalist",
               { id: "dsh-bridge-agent-presets" },
-              (presetOptions?.presets ?? []).map((p) => React.createElement("option", { key: p.id, value: p.id }, p.name && p.name !== p.id ? p.name : null))
+              (presetOptions?.presets ?? []).map((p) => h("option", { key: p.id, value: p.id }, p.name && p.name !== p.id ? p.name : null))
             ),
-            React.createElement(
+            h(
               "div",
               { style: { ...s.muted, fontSize: 11, marginTop: 4 } },
-              presetOptions == null ? "\u6B63\u5728\u8BFB\u53D6\u672C\u673A\u53EF\u7528\u9884\u8BBE\u2026" : presetOptions.available ? `\u672C\u673A\u53EF\u7528\uFF1A${(presetOptions.presets ?? []).map((p) => p.id).join(" / ") || "\uFF08\u65E0\uFF09"}` : "\u5F53\u524D DSH \u7248\u672C\u672A\u63D0\u4F9B\u9884\u8BBE\u5217\u8868\uFF0C\u8BF7\u624B\u52A8\u586B\u5199\u9884\u8BBE\u540D"
+              presetOptions == null ? "\u6B63\u5728\u8BFB\u53D6\u672C\u673A\u53EF\u7528\u9884\u8BBE\u2026" : presetOptions.available ? localeT("\u672C\u673A\u53EF\u7528\uFF1A${list}", {
+                list: (presetOptions.presets ?? []).map((p) => p.id).join(" / ") || localeT("\uFF08\u65E0\uFF09")
+              }) : "\u5F53\u524D DSH \u7248\u672C\u672A\u63D0\u4F9B\u9884\u8BBE\u5217\u8868\uFF0C\u8BF7\u624B\u52A8\u586B\u5199\u9884\u8BBE\u540D"
             )
           ),
           // 工作区
-          React.createElement(
+          h(
             "div",
             null,
-            React.createElement("div", { style: { ...s.muted, marginBottom: 4 } }, "\u5DE5\u4F5C\u533A\u76EE\u5F55 \u2014 \u8BE5\u5E73\u53F0 /new \u65B0\u5EFA\u4F1A\u8BDD\u7684\u9ED8\u8BA4\u76EE\u5F55\uFF0C\u7559\u7A7A\u7528\u9996\u4E2A\u5DF2\u6CE8\u518C\u5DE5\u4F5C\u533A"),
-            React.createElement("input", {
+            h("div", { style: { ...s.muted, marginBottom: 4 } }, "\u5DE5\u4F5C\u533A\u76EE\u5F55 \u2014 \u8BE5\u5E73\u53F0 /new \u65B0\u5EFA\u4F1A\u8BDD\u7684\u9ED8\u8BA4\u76EE\u5F55\uFF0C\u7559\u7A7A\u7528\u9996\u4E2A\u5DF2\u6CE8\u518C\u5DE5\u4F5C\u533A"),
+            h("input", {
               style: { ...s.input, width: "100%" },
               placeholder: "\u7EDD\u5BF9\u8DEF\u5F84\uFF0C\u4F8B\u5982 /home/me/project \u6216 D:\\project",
               value: cfgDraft?.cwd ?? "",
@@ -4383,25 +5094,25 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
             })
           ),
           // 模型路由
-          React.createElement(
+          h(
             "div",
             { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(160px, 1fr))", gap: 8 } },
-            React.createElement(
+            h(
               "div",
               null,
-              React.createElement("div", { style: { ...s.muted, marginBottom: 4 } }, "\u6A21\u578B\u63D0\u4F9B\u65B9\uFF08\u53EF\u9009\uFF09"),
-              React.createElement("input", {
+              h("div", { style: { ...s.muted, marginBottom: 4 } }, "\u6A21\u578B\u63D0\u4F9B\u65B9\uFF08\u53EF\u9009\uFF09"),
+              h("input", {
                 style: { ...s.input, width: "100%" },
                 placeholder: "\u7559\u7A7A = DSH \u9ED8\u8BA4",
                 value: cfgDraft?.agentProvider ?? "",
                 onChange: (e) => setCfgDraft((d) => ({ ...d, agentProvider: e.target.value }))
               })
             ),
-            React.createElement(
+            h(
               "div",
               null,
-              React.createElement("div", { style: { ...s.muted, marginBottom: 4 } }, "\u6A21\u578B\uFF08\u53EF\u9009\uFF09"),
-              React.createElement("input", {
+              h("div", { style: { ...s.muted, marginBottom: 4 } }, "\u6A21\u578B\uFF08\u53EF\u9009\uFF09"),
+              h("input", {
                 style: { ...s.input, width: "100%" },
                 placeholder: "\u7559\u7A7A = DSH \u9ED8\u8BA4",
                 value: cfgDraft?.agentModel ?? "",
@@ -4410,7 +5121,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
             )
           ),
           // 会话节奏参数
-          React.createElement(
+          h(
             "div",
             { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 8 } },
             [
@@ -4418,11 +5129,11 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
               ["approvalTimeoutSec", "\u5BA1\u6279\u8D85\u65F6\uFF08\u79D2\uFF09"],
               ["maxMessageChars", "\u5355\u6761\u6D88\u606F\u4E0A\u9650\uFF08\u5B57\u7B26\uFF09"],
               ["sendChunkDelayMs", "\u5206\u5757\u53D1\u9001\u95F4\u9694\uFF08\u6BEB\u79D2\uFF09"]
-            ].map(([key, label]) => React.createElement(
+            ].map(([key, label]) => h(
               "div",
               { key },
-              React.createElement("div", { style: { ...s.muted, marginBottom: 4 } }, label),
-              React.createElement("input", {
+              h("div", { style: { ...s.muted, marginBottom: 4 } }, label),
+              h("input", {
                 style: { ...s.input, width: "100%" },
                 inputMode: "numeric",
                 value: cfgDraft?.[key] ?? "",
@@ -4430,15 +5141,15 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
               })
             ))
           ),
-          React.createElement(
+          h(
             "div",
             { style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" } },
-            React.createElement("button", {
+            h("button", {
               style: { ...s.btnPri, opacity: busy || !cfgDirty ? 0.5 : 1 },
               onClick: saveConfig,
               disabled: busy || !cfgDirty
             }, busy ? "\u4FDD\u5B58\u4E2D\u2026" : "\u4FDD\u5B58\u9AD8\u7EA7\u8BBE\u7F6E"),
-            React.createElement("button", {
+            h("button", {
               style: { ...s.btnGhost },
               onClick: resetDefaults,
               disabled: busy
@@ -4447,7 +5158,7 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
         )
       ),
       // 飞书 / Telegram 扫码直达对话引导卡片
-      (platformId === "feishu" || platformId === "telegram") && platform.botQr && React.createElement(
+      (platformId === "feishu" || platformId === "telegram") && platform.botQr && h(
         "div",
         {
           style: {
@@ -4462,58 +5173,58 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
             flexWrap: "wrap"
           }
         },
-        React.createElement("img", { src: platform.botQr, alt: `${platformName} Bot QR`, style: { width: 110, height: 110, borderRadius: 8, border: "1px solid var(--dsw-alias-border-l2,#e5e7eb)", padding: 4, background: "#fff" } }),
-        React.createElement(
+        h("img", { src: platform.botQr, alt: localeT("${name} Bot QR", { name: localeT(platformName) }), style: { width: 110, height: 110, borderRadius: 8, border: "1px solid var(--dsw-alias-border-l2,#e5e7eb)", padding: 4, background: "#fff" } }),
+        h(
           "div",
           { style: { flex: 1, minWidth: 160 } },
-          React.createElement("div", { style: { ...s.label, fontSize: 13, fontWeight: 600 } }, `\u{1F4F1} \u624B\u673A ${platformName} \u626B\u7801\u76F4\u8FBE\u5BF9\u8BDD`),
-          React.createElement(
+          h("div", { style: { ...s.label, fontSize: 13, fontWeight: 600 } }, localeT("\u{1F4F1} \u624B\u673A ${name} \u626B\u7801\u76F4\u8FBE\u5BF9\u8BDD", { name: localeT(platformName) })),
+          h(
             "div",
             { style: { ...s.muted, fontSize: 12, marginTop: 4, lineHeight: 1.5 } },
-            `\u7528 ${platformName} \u626B\u63CF\u5DE6\u4FA7\u4E8C\u7EF4\u7801\uFF0C\u7ACB\u5373\u6253\u5F00\u4E0E Bot \u5BF9\u8BDD\uFF1B\u53D1\u9001\u9996\u6761\u6D88\u606F\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002`
+            localeT("\u7528 ${name} \u626B\u63CF\u5DE6\u4FA7\u4E8C\u7EF4\u7801\uFF0C\u7ACB\u5373\u6253\u5F00\u4E0E Bot \u5BF9\u8BDD\uFF1B\u53D1\u9001\u9996\u6761\u6D88\u606F\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002", { name: localeT(platformName) })
           ),
-          platform.botLink && React.createElement(
+          platform.botLink && h(
             "div",
             { style: { display: "flex", gap: 8, marginTop: 8 } },
-            React.createElement("a", {
+            h("a", {
               href: platform.botLink,
               target: "_blank",
               rel: "noopener noreferrer",
               style: { ...s.btnGhost, textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 4, padding: "4px 10px", fontSize: 12 }
-            }, `\u5728 ${platformName} \u5BA2\u6237\u7AEF\u6253\u5F00 \u2197`)
+            }, localeT("\u5728 ${name} \u5BA2\u6237\u7AEF\u6253\u5F00 \u2197", { name: localeT(platformName) }))
           )
         )
       )
     ),
     // 未配置 / 登录中：表单（QQ / 飞书 / Telegram）或二维码（微信）
-    (!platform?.configured || showQr) && React.createElement(
+    (!platform?.configured || showQr) && h(
       "div",
       { style: s.block },
-      showQr && login.qr ? React.createElement(
+      showQr && login.qr ? h(
         "div",
         null,
-        React.createElement("img", { src: login.qr, alt: "login QR", style: s.qr }),
-        React.createElement(
+        h("img", { src: login.qr, alt: "login QR", style: s.qr }),
+        h(
           "div",
           { style: { ...s.muted, marginTop: 4 } },
           login.phase === "scaned" ? "\u5DF2\u626B\u7801\uFF0C\u8BF7\u5728\u624B\u673A\u4E0A\u786E\u8BA4\u2026" : platformId === "wechat" ? "\u8BF7\u4F7F\u7528\u5FAE\u4FE1\u626B\u7801\u767B\u5F55\uFF08ClawBot\uFF09" : platformId === "feishu" ? "\u8BF7\u7528\u98DE\u4E66\u626B\u7801\u521B\u5EFA\u5E94\u7528\uFF08\u4E8C\u7EF4\u7801 10 \u5206\u949F\u5185\u6709\u6548\uFF09" : "\u8BF7\u626B\u7801\u767B\u5F55"
         ),
-        login.error && React.createElement("div", { style: { ...s.muted, marginTop: 4, color: "var(--dsw-alias-label-primary, #0f1115)" } }, login.error),
-        platformId === "feishu" && React.createElement(
+        login.error && h("div", { style: { ...s.muted, marginTop: 4, color: "var(--dsw-alias-label-primary, #0f1115)" } }, login.error),
+        platformId === "feishu" && h(
           "div",
           { style: { display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap", alignItems: "center" } },
-          React.createElement("button", {
+          h("button", {
             style: { ...s.btnGhost, opacity: busy ? 0.5 : 1 },
             onClick: onRefreshQr,
             disabled: busy,
             title: "\u4F5C\u5E9F\u5F53\u524D\u4E8C\u7EF4\u7801\u5E76\u91CD\u65B0\u751F\u6210\uFF08\u65E7\u7801\u7ACB\u5373\u5931\u6548\uFF09"
           }, busy ? "\u751F\u6210\u4E2D\u2026" : "\u{1F504} \u91CD\u65B0\u751F\u6210\u4E8C\u7EF4\u7801"),
-          React.createElement("span", { style: { ...s.muted, fontSize: 12 } }, "\u626B\u4E0D\u51FA\u6765\u6216\u5DF2\u8FC7\u671F\u65F6\u53EF\u70B9\u6B64\u6362\u65B0\u7801")
+          h("span", { style: { ...s.muted, fontSize: 12 } }, "\u626B\u4E0D\u51FA\u6765\u6216\u5DF2\u8FC7\u671F\u65F6\u53EF\u70B9\u6B64\u6362\u65B0\u7801")
         )
-      ) : platformId === "qq" || platformId === "feishu" || platformId === "telegram" ? React.createElement(
+      ) : platformId === "qq" || platformId === "feishu" || platformId === "telegram" ? h(
         "div",
         { style: { display: "flex", flexDirection: "column", gap: 10, marginTop: 4 } },
-        platformId === "feishu" && React.createElement(
+        platformId === "feishu" && h(
           "div",
           {
             style: {
@@ -4525,44 +5236,44 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
               lineHeight: 1.5
             }
           },
-          React.createElement("div", { style: { ...s.label, marginBottom: 4 } }, "\u{1F4F1} \u4E00\u952E\u521B\u5EFA\u98DE\u4E66\u5E94\u7528\uFF08\u63A8\u8350\uFF09"),
-          React.createElement(
+          h("div", { style: { ...s.label, marginBottom: 4 } }, "\u{1F4F1} \u4E00\u952E\u521B\u5EFA\u98DE\u4E66\u5E94\u7528\uFF08\u63A8\u8350\uFF09"),
+          h(
             "div",
             { style: { ...s.muted, marginBottom: 8 } },
             "\u70B9\u51FB\u540E\u7528\u98DE\u4E66\u626B\u7801\uFF1A\u81EA\u52A8\u521B\u5EFA\u673A\u5668\u4EBA\u5E94\u7528\u5E76\u9884\u7F6E\u6240\u9700\u6743\u9650\u3001\u4E8B\u4EF6\u8BA2\u9605\u4E0E\u5361\u7247\u56DE\u8C03\uFF0C\u65E0\u9700\u8FDB\u5F00\u53D1\u8005\u540E\u53F0\u624B\u5DE5\u914D\u7F6E\u3002"
           ),
-          React.createElement("button", {
+          h("button", {
             style: { ...s.btnPri, opacity: busy ? 0.5 : 1 },
             onClick: onRegisterApp,
             disabled: busy,
             title: "\u4F7F\u7528\u98DE\u4E66\u626B\u7801\u521B\u5EFA\u5E94\u7528\u5E76\u81EA\u52A8\u586B\u5165\u51ED\u8BC1"
           }, busy ? "\u5904\u7406\u4E2D\u2026" : "\u626B\u7801\u4E00\u952E\u521B\u5EFA\u5E94\u7528"),
-          React.createElement(
+          h(
             "div",
             { style: { ...s.muted, marginTop: 8, fontSize: 11 } },
             "\u5DF2\u6709\u5E94\u7528\uFF1F\u5728\u4E0B\u65B9\u624B\u52A8\u586B\u5165 App ID \u4E0E App Secret\uFF0C\u6216 ",
-            React.createElement("a", { href: "https://open.feishu.cn/app", target: "_blank", rel: "noopener noreferrer", style: s.btnLink }, "\u524D\u5F80\u98DE\u4E66\u5F00\u653E\u5E73\u53F0"),
+            h("a", { href: "https://open.feishu.cn/app", target: "_blank", rel: "noopener noreferrer", style: s.btnLink }, "\u524D\u5F80\u98DE\u4E66\u5F00\u653E\u5E73\u53F0"),
             " \u521B\u5EFA\u540E\u586B\u5165\u3002"
           )
         ),
-        platformId === "telegram" ? React.createElement(
+        platformId === "telegram" ? h(
           React.Fragment,
           null,
-          React.createElement(
+          h(
             "div",
             null,
-            React.createElement("div", { style: { ...s.muted, marginBottom: 4 } }, "Bot Token \u2014 Telegram @BotFather \u4E0B\u53D1\u7684\u673A\u5668\u4EBA Token"),
-            React.createElement(
+            h("div", { style: { ...s.muted, marginBottom: 4 } }, "Bot Token \u2014 Telegram @BotFather \u4E0B\u53D1\u7684\u673A\u5668\u4EBA Token"),
+            h(
               "div",
               { style: { display: "flex", gap: 6, alignItems: "center" } },
-              React.createElement("input", {
+              h("input", {
                 style: { ...s.input, flex: 1 },
                 type: showSecret ? "text" : "password",
                 placeholder: "\u8BF7\u8F93\u5165 Telegram Bot Token (\u5982 123456789:ABCdef...)",
                 value: cfgDraft?.botToken ?? "",
                 onChange: (e) => setCfgDraft((d) => ({ ...d, botToken: e.target.value }))
               }),
-              React.createElement("button", {
+              h("button", {
                 style: { ...s.btnGhost, height: 32, padding: "0 10px", fontSize: 13, flexShrink: 0 },
                 onClick: () => setShowSecret((v) => !v),
                 type: "button",
@@ -4570,54 +5281,54 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
               }, showSecret ? "\u{1F648} \u9690\u85CF" : "\u{1F441}\uFE0F \u663E\u793A")
             )
           ),
-          React.createElement(
+          h(
             "div",
             null,
-            React.createElement("div", { style: { ...s.muted, marginBottom: 4 } }, "\u7F51\u7EDC\u4EE3\u7406 (\u53EF\u9009) \u2014 \u652F\u6301\u56FD\u5185 HTTP / HTTPS \u4EE3\u7406"),
-            React.createElement("input", {
+            h("div", { style: { ...s.muted, marginBottom: 4 } }, "\u7F51\u7EDC\u4EE3\u7406 (\u53EF\u9009) \u2014 \u652F\u6301\u56FD\u5185 HTTP / HTTPS \u4EE3\u7406"),
+            h("input", {
               style: { ...s.input, width: "100%" },
               placeholder: "\u53EF\u9009\uFF0C\u4F8B\u5982 http://127.0.0.1:7890\uFF08\u4E3A\u7A7A\u5219\u76F4\u8FDE\u6216\u8BFB\u53D6\u73AF\u5883\u53D8\u91CF\uFF09",
               value: cfgDraft?.proxy ?? "",
               onChange: (e) => setCfgDraft((d) => ({ ...d, proxy: e.target.value }))
             })
           )
-        ) : React.createElement(
+        ) : h(
           React.Fragment,
           null,
-          React.createElement(
+          h(
             "div",
             null,
-            React.createElement(
+            h(
               "div",
               { style: { ...s.muted, marginBottom: 4 } },
               platformId === "qq" ? "AppID \u2014 QQ \u5F00\u653E\u5E73\u53F0\u673A\u5668\u4EBA\u5E94\u7528 ID" : "App ID \u2014 \u98DE\u4E66\u5F00\u653E\u5E73\u53F0\u81EA\u5EFA\u5E94\u7528 ID (cli_xxx)"
             ),
-            React.createElement("input", {
+            h("input", {
               style: { ...s.input, width: "100%" },
               placeholder: platformId === "qq" ? "\u8BF7\u8F93\u5165 AppID" : "\u8BF7\u8F93\u5165 App ID (\u5982 cli_a1b2c3d4...)",
               value: cfgDraft?.appId ?? "",
               onChange: (e) => setCfgDraft((d) => ({ ...d, appId: e.target.value }))
             })
           ),
-          React.createElement(
+          h(
             "div",
             null,
-            React.createElement(
+            h(
               "div",
               { style: { ...s.muted, marginBottom: 4 } },
               platformId === "qq" ? "ClientSecret \u2014 QQ \u5F00\u653E\u5E73\u53F0\u673A\u5668\u4EBA\u5BC6\u94A5" : "App Secret \u2014 \u98DE\u4E66\u5F00\u653E\u5E73\u53F0\u5E94\u7528\u5BC6\u94A5"
             ),
-            React.createElement(
+            h(
               "div",
               { style: { display: "flex", gap: 6, alignItems: "center" } },
-              React.createElement("input", {
+              h("input", {
                 style: { ...s.input, flex: 1 },
                 type: showSecret ? "text" : "password",
                 placeholder: platformId === "qq" ? "\u8BF7\u8F93\u5165 ClientSecret" : "\u8BF7\u8F93\u5165 App Secret",
                 value: platformId === "qq" ? cfgDraft?.clientSecret ?? "" : cfgDraft?.appSecret ?? "",
                 onChange: (e) => setCfgDraft((d) => platformId === "qq" ? { ...d, clientSecret: e.target.value } : { ...d, appSecret: e.target.value })
               }),
-              React.createElement("button", {
+              h("button", {
                 style: { ...s.btnGhost, height: 32, padding: "0 10px", fontSize: 13, flexShrink: 0 },
                 onClick: () => setShowSecret((v) => !v),
                 type: "button",
@@ -4626,41 +5337,41 @@ function PlatformCard({ platformId, platformName, platformDesc, rpcCall, platfor
             )
           )
         ),
-        React.createElement(
+        h(
           "div",
           null,
-          React.createElement("a", {
+          h("a", {
             href: platformId === "qq" ? "https://bot.q.qq.com/wiki/develop/api-v2/" : platformId === "feishu" ? "https://open.feishu.cn/app" : "https://t.me/BotFather",
             target: "_blank",
             rel: "noopener noreferrer",
             style: s.btnLink
           }, platformId === "qq" ? "\u{1F4D6} \u524D\u5F80 QQ \u5F00\u653E\u5E73\u53F0\u7533\u8BF7\u673A\u5668\u4EBA" : "\u{1F4D6} \u524D\u5F80\u98DE\u4E66\u5F00\u653E\u5E73\u53F0\u521B\u5EFA\u4F01\u4E1A\u81EA\u5EFA\u5E94\u7528")
         ),
-        React.createElement(
+        h(
           "div",
           { style: { display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" } },
-          React.createElement("button", {
+          h("button", {
             style: { ...s.btnPri, opacity: busy ? 0.5 : 1 },
             onClick: saveConfig,
             disabled: busy || (platformId === "telegram" ? !cfgDraft?.botToken?.trim() : !cfgDraft?.appId?.trim() || (platformId === "qq" ? !cfgDraft?.clientSecret?.trim() : !cfgDraft?.appSecret?.trim()))
           }, busy ? "\u4FDD\u5B58\u4E2D\u2026" : "\u4FDD\u5B58\u5E76\u8FDE\u63A5"),
-          login.phase === "error" && React.createElement("div", { style: { ...s.muted, fontSize: 12 } }, login.error ?? "\u8FDE\u63A5\u5931\u8D25")
+          login.phase === "error" && h("div", { style: { ...s.muted, fontSize: 12 } }, login.error ?? "\u8FDE\u63A5\u5931\u8D25")
         )
-      ) : React.createElement(
+      ) : h(
         "div",
         { style: { display: "flex", gap: 8, marginTop: 4, flexWrap: "wrap", alignItems: "center" } },
-        React.createElement("button", {
+        h("button", {
           style: { ...s.btnPri, opacity: busy ? 0.5 : 1 },
           onClick: onLogin,
           disabled: busy
         }, busy ? "\u5904\u7406\u4E2D\u2026" : "\u626B\u7801\u767B\u5F55"),
-        login.phase === "error" && React.createElement("div", { style: { ...s.muted, fontSize: 12 } }, login.error ?? "\u767B\u5F55\u5931\u8D25")
+        login.phase === "error" && h("div", { style: { ...s.muted, fontSize: 12 } }, login.error ?? "\u767B\u5F55\u5931\u8D25")
       )
     ),
-    React.createElement(
+    h(
       "div",
       { style: s.block },
-      React.createElement(
+      h(
         "div",
         { style: { ...s.tip, fontSize: 12 } },
         platformId === "wechat" ? "\u8BF4\u660E: \u626B\u7801\u6210\u529F\u540E\uFF0C\u5411\u8BE5\u5FAE\u4FE1 Bot \u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684\u5FAE\u4FE1\u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002\u4F7F\u7528\u4E13\u7528\u5FAE\u4FE1\u53F7\uFF0C\u907F\u514D\u5F71\u54CD\u4E3B\u53F7\u3002" : platformId === "qq" ? "\u8BF4\u660E: \u586B\u5165 QQ \u5F00\u653E\u5E73\u53F0\u673A\u5668\u4EBA\u7684 AppID \u4E0E ClientSecret \u540E\u4FDD\u5B58\u5373\u81EA\u52A8\u8FDE\u63A5\u3002\u7528\u6237\u5411 Bot \u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684 QQ \u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002" : "\u8BF4\u660E: \u767B\u5F55\u6210\u529F\u540E\uFF0C\u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684\u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002"
@@ -4678,12 +5389,12 @@ function SystemMetricsWidget({ metrics }) {
     const days = Math.floor(sec / 86400);
     const hrs = Math.floor(sec % 86400 / 3600);
     const mins = Math.floor(sec % 3600 / 60);
-    if (days > 0) return `${days}\u5929 ${hrs}\u5C0F\u65F6 ${mins}\u5206`;
-    if (hrs > 0) return `${hrs}\u5C0F\u65F6 ${mins}\u5206`;
-    return `${mins}\u5206\u949F`;
+    if (days > 0) return localeT("${days}\u5929 ${hrs}\u5C0F\u65F6 ${mins}\u5206", { days, hrs, mins });
+    if (hrs > 0) return localeT("${hrs}\u5C0F\u65F6 ${mins}\u5206", { hrs, mins });
+    return localeT("${mins}\u5206\u949F", { mins, count: mins });
   };
   const progressColor = memUsedPercent > 85 ? "#dc2626" : memUsedPercent > 70 ? "#d97706" : "#059669";
-  return React.createElement(
+  return h(
     "div",
     {
       style: {
@@ -4691,64 +5402,68 @@ function SystemMetricsWidget({ metrics }) {
         marginBottom: 16
       }
     },
-    React.createElement(
+    h(
       "div",
       { style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 6 } },
-      React.createElement(
+      h(
         "div",
         { style: { ...s.label, fontSize: 13, display: "flex", alignItems: "center", gap: 6 } },
         "\u{1F4CA} \u5BBF\u4E3B\u7CFB\u7EDF\u4E0E\u8FD0\u884C\u770B\u677F"
       ),
-      React.createElement(
+      h(
         "div",
         { style: { fontSize: 11, color: "var(--dsw-alias-label-secondary, #6b7280)" } },
         `Node ${metrics.os?.nodeVersion || ""} \xB7 ${metrics.os?.platform || ""} ${metrics.os?.arch || ""}`
       )
     ),
-    React.createElement(
+    h(
       "div",
       { style: { display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 12, marginBottom: 12 } },
-      React.createElement(
+      h(
         "div",
         null,
-        React.createElement("div", { style: { color: "var(--dsw-alias-label-tertiary, #9ca3af)", fontSize: 11, marginBottom: 2 } }, "CPU \u6838\u5FC3\u4E0E\u578B\u53F7"),
-        React.createElement(
+        h("div", { style: { color: "var(--dsw-alias-label-tertiary, #9ca3af)", fontSize: 11, marginBottom: 2 } }, "CPU \u6838\u5FC3\u4E0E\u578B\u53F7"),
+        h(
           "div",
           { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, currentColor)", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }, title: metrics.cpu?.model },
-          `${metrics.cpu?.cores || 0} \u6838\u5FC3 (${(metrics.cpu?.model || "").split("@")[0].trim()})`
+          localeT("${cores} \u6838\u5FC3 (${model})", {
+            cores: metrics.cpu?.cores || 0,
+            count: metrics.cpu?.cores || 0,
+            model: (metrics.cpu?.model || "").split("@")[0].trim()
+          })
         )
       ),
-      React.createElement(
+      h(
         "div",
         null,
-        React.createElement("div", { style: { color: "var(--dsw-alias-label-tertiary, #9ca3af)", fontSize: 11, marginBottom: 2 } }, "DSH \u8FD0\u884C\u65F6\u95F4 (Uptime)"),
-        React.createElement(
+        h("div", { style: { color: "var(--dsw-alias-label-tertiary, #9ca3af)", fontSize: 11, marginBottom: 2 } }, "DSH \u8FD0\u884C\u65F6\u95F4 (Uptime)"),
+        h(
           "div",
           { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, #0f1115)" } },
           formatUptime(metrics.uptime?.processSec)
         )
       ),
-      React.createElement(
+      h(
         "div",
         null,
-        React.createElement("div", { style: { color: "var(--dsw-alias-label-tertiary, #9ca3af)", fontSize: 11, marginBottom: 2 } }, "Node \u8FDB\u7A0B\u5806\u5185\u5B58"),
-        React.createElement(
+        h("div", { style: { color: "var(--dsw-alias-label-tertiary, #9ca3af)", fontSize: 11, marginBottom: 2 } }, "Node \u8FDB\u7A0B\u5806\u5185\u5B58"),
+        h(
           "div",
           { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, currentColor)" } },
           `${heapMb} MB`
         )
       )
     ),
-    React.createElement(
+    h(
       "div",
       null,
-      React.createElement(
+      h(
         "div",
         { style: { display: "flex", justifyContent: "space-between", fontSize: 11, color: "var(--dsw-alias-label-secondary, #6b7280)", marginBottom: 4 } },
-        React.createElement("span", null, `\u7CFB\u7EDF\u5185\u5B58\u5360\u7528: ${memUsedGb} GB / ${memTotalGb} GB`),
-        React.createElement("span", { style: { fontWeight: 600, color: progressColor } }, `${memUsedPercent}%`)
+        h("span", null, localeT("\u7CFB\u7EDF\u5185\u5B58\u5360\u7528: ${used} GB / ${total} GB", { used: memUsedGb, total: memTotalGb })),
+        h("span", { style: { fontWeight: 600, color: progressColor } }, `${memUsedPercent}%`)
       ),
-      React.createElement(
+      h(
         "div",
         {
           style: {
@@ -4759,7 +5474,7 @@ function SystemMetricsWidget({ metrics }) {
             overflow: "hidden"
           }
         },
-        React.createElement("div", {
+        h("div", {
           style: {
             width: `${memUsedPercent}%`,
             height: "100%",
@@ -4786,27 +5501,27 @@ function NetworkDiagnosticWidget({ rpcCall }) {
       setRunning(false);
     }
   }, [rpcCall]);
-  return React.createElement(
+  return h(
     "div",
     { style: { ...s.card, marginBottom: 16 } },
-    React.createElement(
+    h(
       "div",
       { style: { marginBottom: 10 } },
-      React.createElement(
+      h(
         "div",
         { style: { ...s.label, fontSize: 13, display: "flex", alignItems: "center", gap: 6 } },
         "\u{1F50D} \u7F51\u7EDC\u8FDE\u901A\u6027\u4E00\u952E\u8BCA\u65AD"
       ),
-      React.createElement(
+      h(
         "div",
         { style: { ...s.muted, marginTop: 3 } },
         "\u4E00\u952E\u68C0\u6D4B\u672C\u5730\u53CD\u5411\u4EE3\u7406\u7AEF\u53E3\u3001\u5C40\u57DF\u7F51 IPv4\u3001Cloudflare Anycast \u5EF6\u8FDF\u4EE5\u53CA\u56FD\u5185 npmmirror \u955C\u50CF\u6E90\u8FDE\u901A\u6027\u3002"
       )
     ),
-    React.createElement(
+    h(
       "div",
       { style: { display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: result ? 12 : 0 } },
-      React.createElement(
+      h(
         "button",
         {
           type: "button",
@@ -4816,7 +5531,7 @@ function NetworkDiagnosticWidget({ rpcCall }) {
         },
         running ? "\u6B63\u5728\u63A2\u6D4B\u8FDE\u901A\u6027\u2026" : result ? "\u{1F504} \u91CD\u65B0\u8BCA\u65AD\u7F51\u7EDC" : "\u{1F50D} \u5F00\u59CB\u4E00\u952E\u8BCA\u65AD"
       ),
-      result && React.createElement("span", {
+      result && h("span", {
         style: {
           fontSize: 12,
           color: "var(--dsw-alias-label-primary, #0f1115)",
@@ -4824,7 +5539,7 @@ function NetworkDiagnosticWidget({ rpcCall }) {
         }
       }, result.overall === "healthy" ? "\u2713 \u6240\u6709\u7F51\u7EDC\u63A2\u6D4B\u9879\u6B63\u5E38" : "\u25B2 \u68C0\u6D4B\u5230\u90E8\u5206\u5EF6\u8FDF\u8F83\u9AD8\u6216\u5F02\u5E38")
     ),
-    running && !result && React.createElement(
+    running && !result && h(
       "div",
       {
         style: {
@@ -4839,10 +5554,10 @@ function NetworkDiagnosticWidget({ rpcCall }) {
           fontSize: 12
         }
       },
-      React.createElement("span", { style: { animation: "spin 1s linear infinite", display: "inline-flex" } }, React.createElement(Icons.refresh)),
+      h("span", { style: { animation: "spin 1s linear infinite", display: "inline-flex" } }, h(Icons.refresh)),
       "\u6B63\u5728\u6267\u884C\u7F51\u7EDC\u7AEF\u53E3\u4E0E\u4E91\u7AEF\u8282\u70B9\u8FDE\u901A\u6027\u63A2\u6D4B\u2026"
     ),
-    result?.results && React.createElement(
+    result?.results && h(
       "div",
       {
         style: {
@@ -4857,7 +5572,7 @@ function NetworkDiagnosticWidget({ rpcCall }) {
       result.results.map((item, idx) => {
         const isPass = item.status === "pass";
         const isWarn = item.status === "warn";
-        return React.createElement(
+        return h(
           "div",
           {
             key: idx,
@@ -4873,18 +5588,18 @@ function NetworkDiagnosticWidget({ rpcCall }) {
               boxSizing: "border-box"
             }
           },
-          React.createElement(
+          h(
             "div",
             { style: { flex: 1, minWidth: 0 } },
-            React.createElement(
+            h(
               "div",
               { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, currentColor)", marginBottom: 2 } },
               isPass ? "\u2713 " : isWarn ? "\u25B2 " : "\u2715 ",
               item.name
             ),
-            React.createElement("div", { style: { fontSize: 11, color: "var(--dsw-alias-label-secondary, #6b7280)" } }, item.detail)
+            h("div", { style: { fontSize: 11, color: "var(--dsw-alias-label-secondary, #6b7280)" } }, item.detail)
           ),
-          item.latencyMs != null && React.createElement("span", {
+          item.latencyMs != null && h("span", {
             style: {
               fontSize: 11,
               fontWeight: 600,
@@ -4946,45 +5661,45 @@ function BackupRestoreWidget({ rpcCall, onUpdate }) {
         setMsg({ ok: false, text: r?.error?.message || "\u5BFC\u5165\u914D\u7F6E\u5931\u8D25" });
       }
     } catch (err) {
-      setMsg({ ok: false, text: `\u5BFC\u5165\u89E3\u6790\u5931\u8D25: ${err.message}` });
+      setMsg({ ok: false, text: localeT("\u5BFC\u5165\u89E3\u6790\u5931\u8D25: ${reason}", { reason: localeT(err.message) }) });
     } finally {
       setImporting(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
   };
-  return React.createElement(
+  return h(
     "div",
     { style: { ...s.card, marginBottom: 16 } },
-    React.createElement(
+    h(
       "div",
       { style: { marginBottom: 10 } },
-      React.createElement(
+      h(
         "div",
         { style: { ...s.label, fontSize: 13, display: "flex", alignItems: "center", gap: 6 } },
         "\u{1F5C4}\uFE0F \u5168\u5C40\u914D\u7F6E\u5907\u4EFD\u4E0E\u6062\u590D"
       ),
-      React.createElement(
+      h(
         "div",
         { style: { ...s.muted, marginTop: 3 } },
         "\u652F\u6301\u4E00\u952E\u5BFC\u51FA\u6216\u5BFC\u5165\u6062\u590D\u672C\u63D2\u4EF6\u6240\u6709\u914D\u7F6E\uFF08\u5305\u542B\u5404 IM \u5E73\u53F0\u51ED\u8BC1\u3001\u6388\u6743\u767D\u540D\u5355\u3001\u516C\u7F51\u96A7\u9053\u4E0E\u5B89\u5168\u8BA4\u8BC1\u89C4\u5219\uFF09\u3002"
       )
     ),
-    React.createElement(
+    h(
       "div",
       { style: { display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" } },
-      React.createElement("button", {
+      h("button", {
         type: "button",
         style: { ...s.btnPri, height: 32, fontSize: 12, padding: "0 14px" },
         onClick: handleExport,
         disabled: exporting || importing
       }, exporting ? "\u6B63\u5728\u5BFC\u51FA\u2026" : "\u{1F4E5} \u5BFC\u51FA\u914D\u7F6E\u5907\u4EFD (.json)"),
-      React.createElement("button", {
+      h("button", {
         type: "button",
         style: { ...s.btnGhost, height: 32, fontSize: 12, padding: "0 14px" },
         onClick: () => fileInputRef.current?.click(),
         disabled: exporting || importing
       }, importing ? "\u6B63\u5728\u5BFC\u5165\u2026" : "\u{1F4E4} \u5BFC\u5165\u914D\u7F6E\u6062\u590D"),
-      React.createElement("input", {
+      h("input", {
         type: "file",
         ref: fileInputRef,
         accept: ".json",
@@ -4992,7 +5707,7 @@ function BackupRestoreWidget({ rpcCall, onUpdate }) {
         onChange: handleFileChange
       })
     ),
-    msg && React.createElement("div", {
+    msg && h("div", {
       style: {
         marginTop: 10,
         padding: "6px 12px",
@@ -5008,33 +5723,29 @@ function formatActiveWorkWarning(work) {
   if (!work || !work.total) return null;
   const lines = [];
   if (work.sessions?.length) {
-    lines.push(`\u2022 \u8FDB\u884C\u4E2D\u7684\u4F1A\u8BDD ${work.sessions.length} \u4E2A\uFF1A`);
+    lines.push(localeT("\u2022 \u8FDB\u884C\u4E2D\u7684\u4F1A\u8BDD ${count} \u4E2A\uFF1A", { count: work.sessions.length }));
     for (const s2 of work.sessions.slice(0, 5)) {
-      const detail = s2.tools > 0 ? `${s2.tools} \u6B21\u5DE5\u5177\u8C03\u7528${s2.lastTool ? `\uFF08\u6700\u8FD1\uFF1A${s2.lastTool}\uFF09` : ""}` : "\u601D\u8003\u4E2D";
-      lines.push(`    - ${s2.title}\uFF08\u7B2C ${s2.turn} \u8F6E\uFF0C${detail}\uFF09`);
+      const detail = s2.tools > 0 ? localeT("${count} \u6B21\u5DE5\u5177\u8C03\u7528", { count: s2.tools }) + (s2.lastTool ? localeT("\uFF08\u6700\u8FD1\uFF1A${tool}\uFF09", { tool: s2.lastTool }) : "") : localeT("\u601D\u8003\u4E2D");
+      lines.push(localeT("    - ${title}\uFF08\u7B2C ${turn} \u8F6E\uFF0C${detail}\uFF09", { title: localeT(s2.title), turn: s2.turn, detail }));
     }
-    if (work.sessions.length > 5) lines.push(`    \u2026\u7B49\u5171 ${work.sessions.length} \u4E2A`);
+    if (work.sessions.length > 5) lines.push(localeT("    \u2026\u7B49\u5171 ${count} \u4E2A", { count: work.sessions.length }));
   }
   if (work.subagentSessions?.length) {
-    lines.push(`\u2022 \u8FDB\u884C\u4E2D\u7684\u5B50\u4EE3\u7406/agent \u4EFB\u52A1 ${work.subagentSessions.length} \u4E2A\uFF1A`);
+    lines.push(localeT("\u2022 \u8FDB\u884C\u4E2D\u7684\u5B50\u4EE3\u7406/agent \u4EFB\u52A1 ${count} \u4E2A\uFF1A", { count: work.subagentSessions.length }));
     for (const s2 of work.subagentSessions.slice(0, 5)) {
-      const detail = s2.tools > 0 ? `${s2.tools} \u6B21\u5DE5\u5177\u8C03\u7528` : "\u601D\u8003\u4E2D";
-      lines.push(`    - ${s2.title}\uFF08\u7B2C ${s2.turn} \u8F6E\uFF0C${detail}\uFF09`);
+      const detail = s2.tools > 0 ? localeT("${count} \u6B21\u5DE5\u5177\u8C03\u7528", { count: s2.tools }) : localeT("\u601D\u8003\u4E2D");
+      lines.push(localeT("    - ${title}\uFF08\u7B2C ${turn} \u8F6E\uFF0C${detail}\uFF09", { title: localeT(s2.title), turn: s2.turn, detail }));
     }
-    if (work.subagentSessions.length > 5) lines.push(`    \u2026\u7B49\u5171 ${work.subagentSessions.length} \u4E2A`);
+    if (work.subagentSessions.length > 5) lines.push(localeT("    \u2026\u7B49\u5171 ${count} \u4E2A", { count: work.subagentSessions.length }));
   }
   if (work.pendingApprovals?.length) {
-    lines.push(`\u2022 \u5F85\u5BA1\u6279\u8BF7\u6C42 ${work.pendingApprovals.length} \u4E2A\uFF1A`);
+    lines.push(localeT("\u2022 \u5F85\u5BA1\u6279\u8BF7\u6C42 ${count} \u4E2A\uFF1A", { count: work.pendingApprovals.length }));
     for (const a of work.pendingApprovals.slice(0, 5)) {
-      lines.push(`    - [${a.platform}] ${a.summary}`);
+      lines.push(localeT("    - [${platform}] ${summary}", { platform: a.platform, summary: localeT(a.summary) }));
     }
-    if (work.pendingApprovals.length > 5) lines.push(`    \u2026\u7B49\u5171 ${work.pendingApprovals.length} \u4E2A`);
+    if (work.pendingApprovals.length > 5) lines.push(localeT("    \u2026\u7B49\u5171 ${count} \u4E2A", { count: work.pendingApprovals.length }));
   }
-  return `\u26A0\uFE0F \u68C0\u6D4B\u5230\u6709\u4EFB\u52A1\u6B63\u5728\u8FD0\u884C\uFF0C\u91CD\u542F\u4F1A\u4E2D\u65AD\u5B83\u4EEC\uFF1A
-
-${lines.join("\n")}
-
-\u4E2D\u65AD\u540E\u53EF\u80FD\u9700\u8981\u91CD\u65B0\u53D1\u8D77\u3002\u786E\u5B9A\u8981\u7EE7\u7EED\u91CD\u542F\u5417\uFF1F`;
+  return localeT("\u26A0\uFE0F \u68C0\u6D4B\u5230\u6709\u4EFB\u52A1\u6B63\u5728\u8FD0\u884C\uFF0C\u91CD\u542F\u4F1A\u4E2D\u65AD\u5B83\u4EEC\uFF1A\n\n${list}\n\n\u4E2D\u65AD\u540E\u53EF\u80FD\u9700\u8981\u91CD\u65B0\u53D1\u8D77\u3002\u786E\u5B9A\u8981\u7EE7\u7EED\u91CD\u542F\u5417\uFF1F", { list: lines.join("\n") });
 }
 function useDshRestart({ rpcCall, maxAttempts = 30, texts = {} } = {}) {
   const T = {
@@ -5059,19 +5770,19 @@ function useDshRestart({ rpcCall, maxAttempts = 30, texts = {} } = {}) {
       const r = await rpcCall(BRIDGE_ENDPOINTS.restartDsh, {});
       if (r && r.ok === false && r.error?.code === "busy") {
         const warning = formatActiveWorkWarning(r.error?.details?.activeWork);
-        if (!window.confirm(warning || "\u5F53\u524D\u6709\u4EFB\u52A1\u6B63\u5728\u8FD0\u884C\uFF0C\u91CD\u542F\u4F1A\u4E2D\u65AD\u5B83\u4EEC\u3002\u786E\u5B9A\u7EE7\u7EED\u5417\uFF1F")) {
+        if (!window.confirm(warning || localeT("\u5F53\u524D\u6709\u4EFB\u52A1\u6B63\u5728\u8FD0\u884C\uFF0C\u91CD\u542F\u4F1A\u4E2D\u65AD\u5B83\u4EEC\u3002\u786E\u5B9A\u7EE7\u7EED\u5417\uFF1F"))) {
           setStatus(null);
           setRestarting(false);
           return;
         }
         const r2 = await rpcCall(BRIDGE_ENDPOINTS.restartDsh, { confirm: true });
         if (r2 && r2.ok === false) {
-          setStatus({ phase: "timeout", text: `${T.timeout}\uFF1A${r2.error?.message || "\u672A\u77E5\u539F\u56E0"}` });
+          setStatus({ phase: "timeout", text: localeT("${label}\uFF1A${reason}", { label: localeT(T.timeout), reason: localeT(r2.error?.message) || localeT("\u672A\u77E5\u539F\u56E0") }) });
           setRestarting(false);
           return;
         }
       } else if (r && r.ok === false) {
-        setStatus({ phase: "timeout", text: `${T.timeout}\uFF1A${r.error?.message || r.error || "\u672A\u77E5\u539F\u56E0"}` });
+        setStatus({ phase: "timeout", text: localeT("${label}\uFF1A${reason}", { label: localeT(T.timeout), reason: localeT(r.error?.message || r.error) || localeT("\u672A\u77E5\u539F\u56E0") }) });
         setRestarting(false);
         return;
       }
@@ -5108,29 +5819,29 @@ function useDshRestart({ rpcCall, maxAttempts = 30, texts = {} } = {}) {
 }
 function RestartDshCard({ rpcCall }) {
   const { restarting, status, startRestart: handleRestart } = useDshRestart({ rpcCall });
-  return React.createElement(
+  return h(
     "div",
     { style: { ...s.card, marginBottom: 16 } },
-    React.createElement(
+    h(
       "div",
       { style: { marginBottom: 10 } },
-      React.createElement(
+      h(
         "div",
         { style: { ...s.label, fontSize: 13, display: "flex", alignItems: "center", gap: 6 } },
         "\u{1F504} DSH \u670D\u52A1\u5E73\u6ED1\u91CD\u542F"
       ),
-      React.createElement(
+      h(
         "div",
         { style: { ...s.muted, marginTop: 3 } },
         "\u4F18\u96C5\u9000\u51FA\u5E76\u91CD\u65B0\u62C9\u8D77\u5F53\u524D DSH \u8FDB\u7A0B\u4E0E\u6240\u6709\u63D2\u4EF6\u670D\u52A1\uFF0C\u524D\u7AEF\u5C06\u5728\u51E0\u79D2\u540E\u81EA\u52A8\u63A2\u6D4B\u91CD\u8FDE\u5E76\u5237\u65B0\u9875\u9762\u3002"
       )
     ),
-    !restarting && !status && React.createElement("button", {
+    !restarting && !status && h("button", {
       type: "button",
       style: { ...s.btnGhost, height: 32, fontSize: 12, padding: "0 14px" },
       onClick: handleRestart
     }, "\u{1F504} \u7ACB\u5373\u91CD\u542F DSH \u670D\u52A1"),
-    (restarting || status) && React.createElement(
+    (restarting || status) && h(
       "div",
       {
         style: {
@@ -5142,9 +5853,9 @@ function RestartDshCard({ rpcCall }) {
           fontWeight: 500
         }
       },
-      status?.phase !== "success" && status?.phase !== "timeout" && React.createElement("span", {
+      status?.phase !== "success" && status?.phase !== "timeout" && h("span", {
         style: { animation: "spin 1s linear infinite", display: "inline-flex" }
-      }, React.createElement(Icons.refresh)),
+      }, h(Icons.refresh)),
       status?.text || "\u6B63\u5728\u8C03\u5EA6\u2026"
     )
   );
@@ -5171,39 +5882,39 @@ function PageTweaksCard({ status, rpcCall }) {
       setPending(false);
     }
   };
-  return React.createElement(
+  return h(
     "div",
     { style: { ...s.card, marginBottom: 16 } },
-    React.createElement(
+    h(
       "div",
       { style: { marginBottom: 10 } },
-      React.createElement(
+      h(
         "div",
         { style: { ...s.label, fontSize: 13, display: "flex", alignItems: "center", gap: 6 } },
         "\u{1F4F1} \u79FB\u52A8\u7AEF\u9875\u9762\u6539\u5199\u5C42"
       ),
-      React.createElement(
+      h(
         "div",
         { style: { ...s.muted, marginTop: 3 } },
-        "\u63A7\u5236\u624B\u673A\u7AEF\u9876\u680F\u3001\u5168\u5C40\u79FB\u52A8\u6837\u5F0F\u3001\u8F93\u5165\u6846\u6298\u53E0\u7B49\u9875\u9762\u6539\u5199\u3002\u5173\u95ED\u540E\u4EC5\u4FDD\u7559\u8FDC\u7A0B\u8BBF\u95EE/\u96A7\u9053/\u673A\u5668\u4EBA\u529F\u80FD\uFF0C\u5237\u65B0\u9875\u9762\u751F\u6548\u3002" + (!hostAllows ? "\u5F53\u524D\u5BBF\u4E3B\u5DF2\u5168\u5C40\u5173\u95ED\u6B64\u5C42\uFF08mobileUi:false\uFF09\uFF0C\u6B64\u5904\u4E0D\u53EF\u5F00\u542F\u3002" : "")
+        localeT("\u63A7\u5236\u624B\u673A\u7AEF\u9876\u680F\u3001\u5168\u5C40\u79FB\u52A8\u6837\u5F0F\u3001\u8F93\u5165\u6846\u6298\u53E0\u7B49\u9875\u9762\u6539\u5199\u3002\u5173\u95ED\u540E\u4EC5\u4FDD\u7559\u8FDC\u7A0B\u8BBF\u95EE/\u96A7\u9053/\u673A\u5668\u4EBA\u529F\u80FD\uFF0C\u5237\u65B0\u9875\u9762\u751F\u6548\u3002") + (!hostAllows ? localeT("\u5F53\u524D\u5BBF\u4E3B\u5DF2\u5168\u5C40\u5173\u95ED\u6B64\u5C42\uFF08mobileUi:false\uFF09\uFF0C\u6B64\u5904\u4E0D\u53EF\u5F00\u542F\u3002") : "")
       )
     ),
-    React.createElement(
+    h(
       "div",
       { style: { display: "flex", alignItems: "center", gap: 10 } },
-      React.createElement("button", {
+      h("button", {
         type: "button",
         disabled: pending || !hostAllows,
         onClick: toggle,
         style: { ...effective ? s.btnGhost : s.btnPri, height: 32, fontSize: 12, padding: "0 14px", opacity: pending || !hostAllows ? 0.5 : 1 }
       }, pending ? "\u4FDD\u5B58\u4E2D\u2026" : effective ? "\u5173\u95ED\u9875\u9762\u6539\u5199" : hostAllows ? "\u5F00\u542F\u9875\u9762\u6539\u5199" : "\u5BBF\u4E3B\u5DF2\u5173\u95ED"),
-      React.createElement(
+      h(
         "span",
         { style: { ...s.muted, fontSize: 12 } },
-        "\u5F53\u524D\uFF1A" + (effective ? "\u5F00\u542F" : "\u5173\u95ED")
+        localeT("\u5F53\u524D\uFF1A${state}", { state: effective ? localeT("\u5F00\u542F") : localeT("\u5173\u95ED") })
       )
     ),
-    err && React.createElement("div", { style: { marginTop: 8, fontSize: 12, color: "var(--dsw-alias-label-primary, #0f1115)" } }, "\u4FDD\u5B58\u5931\u8D25\uFF1A" + err)
+    err && h("div", { style: { marginTop: 8, fontSize: 12, color: "var(--dsw-alias-label-primary, #0f1115)" } }, localeT("\u4FDD\u5B58\u5931\u8D25\uFF1A${reason}", { reason: localeT(err) }))
   );
 }
 function RemoteWorkspaceCard({ rpcCall }) {
@@ -5225,29 +5936,29 @@ function RemoteWorkspaceCard({ rpcCall }) {
   React.useEffect(() => {
     load();
   }, [load]);
-  return React.createElement(
+  return h(
     "div",
     { style: { ...s.card, marginBottom: 16 } },
-    React.createElement(
+    h(
       "div",
       {
         style: { display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 10, flexWrap: "wrap", gap: 8 }
       },
-      React.createElement(
+      h(
         "div",
         null,
-        React.createElement(
+        h(
           "div",
           { style: { ...s.label, fontSize: 13, display: "flex", alignItems: "center", gap: 6 } },
           "\u{1F5C2}\uFE0F \u8FDC\u7A0B\u5DE5\u4F5C\u533A\u7BA1\u7406 (\u76EE\u5F55\u6D4F\u89C8\u5668)"
         ),
-        React.createElement(
+        h(
           "div",
           { style: { ...s.muted, marginTop: 3 } },
           "\u5728\u79FB\u52A8\u7AEF\u6216\u8FDC\u7A0B\u8BBE\u5907\u4E0A\u53EF\u89C6\u70B9\u9009\u7535\u8111\u4E0A\u7684\u6587\u4EF6\u5939\u6216\u76F4\u63A5\u8F93\u5165\u8DEF\u5F84\u6DFB\u52A0\u81F3 DSH\u3002"
         )
       ),
-      React.createElement("button", {
+      h("button", {
         type: "button",
         style: { ...s.btnPri, height: 32, fontSize: 12, padding: "0 14px" },
         onClick: () => {
@@ -5257,12 +5968,12 @@ function RemoteWorkspaceCard({ rpcCall }) {
         }
       }, "+ \u8FDC\u7A0B\u6DFB\u52A0\u5DE5\u4F5C\u533A")
     ),
-    workspaces.length > 0 ? React.createElement(
+    workspaces.length > 0 ? h(
       "div",
       {
         style: { display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }
       },
-      workspaces.map((ws, i) => React.createElement(
+      workspaces.map((ws, i) => h(
         "div",
         {
           key: ws.path || i,
@@ -5277,27 +5988,27 @@ function RemoteWorkspaceCard({ rpcCall }) {
             fontSize: 12
           }
         },
-        React.createElement(
+        h(
           "div",
           { style: { display: "flex", alignItems: "center", gap: 8, overflow: "hidden" } },
-          React.createElement("span", { style: { fontWeight: 600, color: "var(--dsw-alias-brand-primary,#4f6ef7)", flexShrink: 0 } }, `@${i + 1} ${ws.title || ""}`),
-          React.createElement("span", { style: { ...s.code, color: "var(--dsw-alias-label-tertiary,#6b7280)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, ws.path)
+          h("span", { style: { fontWeight: 600, color: "var(--dsw-alias-brand-primary,#4f6ef7)", flexShrink: 0 } }, `@${i + 1} ${ws.title || ""}`),
+          h("span", { style: { ...s.code, color: "var(--dsw-alias-label-tertiary,#6b7280)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" } }, ws.path)
         )
       ))
-    ) : React.createElement("div", {
+    ) : h("div", {
       style: { ...s.muted, marginTop: 6, padding: "10px 14px", background: "var(--dsw-alias-bg-layer-1,#ffffff)", border: "1px solid var(--dsw-alias-border-l2,#e5e7eb)", borderRadius: 8, textAlign: "center" }
     }, loading ? "\u6B63\u5728\u8BFB\u53D6\u5DE5\u4F5C\u533A\u5217\u8868\u2026" : "\u6682\u65E0\u5DF2\u6CE8\u518C\u5DE5\u4F5C\u533A\uFF0C\u70B9\u51FB\u53F3\u4E0A\u89D2\u300C+ \u8FDC\u7A0B\u6DFB\u52A0\u5DE5\u4F5C\u533A\u300D\u5373\u53EF\u6D4F\u89C8\u6DFB\u52A0\u3002")
   );
 }
 function UpgradeCommandRow({ cmd }) {
   const [copied, copy] = useCopy();
-  return React.createElement(
+  return h(
     "div",
     { style: { display: "flex", gap: 6, alignItems: "center" } },
-    React.createElement("code", {
+    h("code", {
       style: { ...s.code, flex: "1 1 auto", fontSize: 12, lineHeight: 1.5, wordBreak: "break-all" }
     }, cmd),
-    React.createElement("button", {
+    h("button", {
       style: { ...s.btnGhost, height: 26, padding: "0 10px", fontSize: 11, flex: "0 0 auto" },
       onClick: () => copy(cmd)
     }, copied ? "\u2713 \u5DF2\u590D\u5236" : "\u590D\u5236")
@@ -5342,7 +6053,7 @@ function VersionBanner({ rpcCall }) {
     try {
       const r = await rpcCall(BRIDGE_ENDPOINTS.upgradePlugin, { version: info.latest });
       if (r?.ok && r.value?.ok) {
-        setUpgradeResult({ ok: true, message: `\u5DF2\u6210\u529F\u5347\u7EA7\u5230 v${info.latest}\uFF01` });
+        setUpgradeResult({ ok: true, message: localeT("\u5DF2\u6210\u529F\u5347\u7EA7\u5230 v${version}\uFF01", { version: info.latest }) });
       } else {
         setUpgradeResult({ ok: false, message: r?.value?.error || r?.error?.message || "\u5347\u7EA7\u5931\u8D25" });
         setShowManual(true);
@@ -5365,7 +6076,7 @@ function VersionBanner({ rpcCall }) {
     try {
       const r = await rpcCall(BRIDGE_ENDPOINTS.upgradeDsh, { version: info.dshLatest });
       if (r?.ok && r.value?.ok) {
-        setDshUpgradeResult({ ok: true, message: `DSH \u5DF2\u6210\u529F\u5347\u7EA7\u5230 v${info.dshLatest}\uFF01` });
+        setDshUpgradeResult({ ok: true, message: localeT("DSH \u5DF2\u6210\u529F\u5347\u7EA7\u5230 v${version}\uFF01", { version: info.dshLatest }) });
       } else {
         const msg = r?.value?.error || r?.error?.message || "\u5347\u7EA7\u5931\u8D25";
         setDshUpgradeResult({ ok: false, message: msg, manual: true });
@@ -5376,33 +6087,33 @@ function VersionBanner({ rpcCall }) {
       setDshUpgrading(false);
     }
   }, [info?.dshLatest, dshUpgrading, rpcCall]);
-  const links = React.createElement(
+  const links = h(
     "div",
     { style: { display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" } },
-    React.createElement("a", {
+    h("a", {
       href: GITHUB_URL,
       target: "_blank",
       rel: "noreferrer",
       style: s.btnLink
-    }, React.createElement(Icons.github), "GitHub"),
-    React.createElement("a", {
+    }, h(Icons.github), "GitHub"),
+    h("a", {
       href: RELEASES_URL,
       target: "_blank",
       rel: "noreferrer",
       style: s.btnLink
     }, "\u66F4\u65B0\u65E5\u5FD7"),
-    React.createElement("a", {
+    h("a", {
       href: ISSUES_URL,
       target: "_blank",
       rel: "noreferrer",
       style: s.btnLink
     }, "\u53CD\u9988 Issue")
   );
-  return React.createElement(
+  return h(
     "div",
     { style: { marginBottom: 16 } },
     // 顶部状态行：版本徽标 + 刷新按钮 + 链接组
-    React.createElement(
+    h(
       "div",
       {
         style: {
@@ -5417,11 +6128,11 @@ function VersionBanner({ rpcCall }) {
       // flexWrap + minWidth:0 是必需的：此前只写 display:flex，左组既不能收缩也不能换行，
       // 会把整行顶到 305px；手机设置页内容列只有 277px，溢出部分被
       // overflow-x:hidden 静默裁掉（「检查更新」按钮被切一半）。
-      React.createElement(
+      h(
         "div",
         { style: { display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", minWidth: 0 } },
         // 版本状态徽标
-        React.createElement(
+        h(
           "span",
           {
             style: {
@@ -5436,16 +6147,16 @@ function VersionBanner({ rpcCall }) {
               gap: 5
             }
           },
-          loading ? React.createElement("span", {
+          loading ? h("span", {
             style: { display: "inline-flex", alignItems: "center" }
-          }, React.createElement(Icons.refresh)) : isLatest ? React.createElement(Icons.check) : null,
+          }, h(Icons.refresh)) : isLatest ? h(Icons.check) : null,
           info ? `v${info.current}` : "\u7248\u672C\u68C0\u67E5\u4E2D\u2026",
-          isLatest && React.createElement("span", { style: { opacity: 0.85, fontSize: 11, fontWeight: 400 } }, "\xB7 \u5DF2\u662F\u6700\u65B0"),
-          hasUpdate && React.createElement("span", { style: { fontWeight: 600, fontSize: 11 } }, `\u2794 v${info.latest}`),
-          info?.error && React.createElement("span", { style: { color: "var(--dsw-alias-label-primary, #0f1115)", fontSize: 11 } }, "(\u7F51\u7EDC\u8D85\u65F6)")
+          isLatest && h("span", { style: { opacity: 0.85, fontSize: 11, fontWeight: 400 } }, "\xB7 \u5DF2\u662F\u6700\u65B0"),
+          hasUpdate && h("span", { style: { fontWeight: 600, fontSize: 11 } }, `\u2794 v${info.latest}`),
+          info?.error && h("span", { style: { color: "var(--dsw-alias-label-primary, #0f1115)", fontSize: 11 } }, "(\u7F51\u7EDC\u8D85\u65F6)")
         ),
         // DSH 宿主版本标签（有新版时黄色高亮）
-        info?.dshVersion && React.createElement(
+        info?.dshVersion && h(
           "span",
           {
             style: {
@@ -5459,14 +6170,14 @@ function VersionBanner({ rpcCall }) {
               alignItems: "center",
               gap: 5
             },
-            title: dshHasUpdate ? `\u53D1\u73B0 DSH \u65B0\u7248\u672C v${info.dshLatest}` : void 0
+            title: dshHasUpdate ? localeT("\u53D1\u73B0 DSH \u65B0\u7248\u672C v${version}", { version: info.dshLatest }) : void 0
           },
-          React.createElement("span", { style: { opacity: 0.75, fontSize: 11, fontWeight: 400 } }, "DSH"),
+          h("span", { style: { opacity: 0.75, fontSize: 11, fontWeight: 400 } }, "DSH"),
           `v${info.dshVersion}`,
-          dshHasUpdate && React.createElement("span", { style: { fontWeight: 600, fontSize: 11 } }, `\u2794 v${info.dshLatest}`)
+          dshHasUpdate && h("span", { style: { fontWeight: 600, fontSize: 11 } }, `\u2794 v${info.dshLatest}`)
         ),
         // 刷新检查按钮
-        React.createElement(
+        h(
           "button",
           {
             style: {
@@ -5485,14 +6196,14 @@ function VersionBanner({ rpcCall }) {
             disabled: loading || upgrading || restarting,
             title: "\u91CD\u65B0\u68C0\u67E5 npm \u7EBF\u4E0A\u7248\u672C"
           },
-          React.createElement(Icons.refresh),
+          h(Icons.refresh),
           loading ? "\u68C0\u67E5\u4E2D\u2026" : "\u68C0\u67E5\u66F4\u65B0"
         )
       ),
       links
     ),
     // 发现新版本高亮卡片（支持一键直接升级）
-    hasUpdate && React.createElement(
+    hasUpdate && h(
       "div",
       {
         style: {
@@ -5504,24 +6215,24 @@ function VersionBanner({ rpcCall }) {
           marginBottom: 0
         }
       },
-      React.createElement(
+      h(
         "div",
         { style: { display: "flex", alignItems: "flex-start", gap: 12 } },
-        React.createElement("span", { style: { fontSize: 22 } }, "\u{1F680}"),
-        React.createElement(
+        h("span", { style: { fontSize: 22 } }, "\u{1F680}"),
+        h(
           "div",
           { style: { flex: 1, minWidth: 0 } },
-          React.createElement(
+          h(
             "div",
             { style: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginBottom: 8 } },
-            React.createElement("div", {
+            h("div", {
               style: {
                 fontSize: 13,
                 fontWeight: 600,
                 color: "var(--dsw-alias-label-primary, #0f1115)"
               }
-            }, `\u53D1\u73B0\u65B0\u7248\u672C v${info.latest}\uFF08\u5F53\u524D v${info.current}\uFF09`),
-            React.createElement(
+            }, localeT("\u53D1\u73B0\u65B0\u7248\u672C v${latest}\uFF08\u5F53\u524D v${current}\uFF09", { latest: info.latest, current: info.current })),
+            h(
               "button",
               {
                 style: {
@@ -5536,16 +6247,16 @@ function VersionBanner({ rpcCall }) {
                 onClick: handleUpgrade,
                 disabled: upgrading || restarting || upgradeResult?.ok
               },
-              upgrading ? React.createElement(
+              upgrading ? h(
                 "span",
                 { style: { display: "inline-flex", alignItems: "center", gap: 6 } },
-                React.createElement("span", { style: { animation: "spin 1s linear infinite", display: "inline-flex" } }, React.createElement(Icons.refresh)),
+                h("span", { style: { animation: "spin 1s linear infinite", display: "inline-flex" } }, h(Icons.refresh)),
                 "\u6B63\u5728\u81EA\u52A8\u5347\u7EA7\u2026"
-              ) : upgradeResult?.ok ? "\u2713 \u5347\u7EA7\u5B8C\u6210" : `\u4E00\u952E\u5347\u7EA7\u5230 v${info.latest}`
+              ) : upgradeResult?.ok ? "\u2713 \u5347\u7EA7\u5B8C\u6210" : localeT("\u4E00\u952E\u5347\u7EA7\u5230 v${version}", { version: info.latest })
             )
           ),
           // 简短更新内容 / Release Notes 亮点展示
-          info?.releaseNotes && React.createElement(
+          info?.releaseNotes && h(
             "div",
             {
               style: {
@@ -5560,11 +6271,11 @@ function VersionBanner({ rpcCall }) {
                 whiteSpace: "pre-line"
               }
             },
-            React.createElement("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, #0f1115)", marginBottom: 2 } }, "\u2728 \u66F4\u65B0\u4EAE\u70B9\uFF1A"),
+            h("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, #0f1115)", marginBottom: 2 } }, "\u2728 \u66F4\u65B0\u4EAE\u70B9\uFF1A"),
             info.releaseNotes
           ),
           // 升级成功后：引导重启 DSH 操作卡片
-          upgradeResult?.ok && !dismissRestart && React.createElement(
+          upgradeResult?.ok && !dismissRestart && h(
             "div",
             {
               style: {
@@ -5575,20 +6286,20 @@ function VersionBanner({ rpcCall }) {
                 marginBottom: 10
               }
             },
-            React.createElement(
+            h(
               "div",
               { style: { display: "flex", alignItems: "center", gap: 8, marginBottom: 8 } },
-              React.createElement("span", { style: { fontSize: 16 } }, "\u2728"),
-              React.createElement("span", {
+              h("span", { style: { fontSize: 16 } }, "\u2728"),
+              h("span", {
                 style: { fontSize: 13, fontWeight: 600, color: "var(--dsw-alias-label-primary, #0f1115)" }
-              }, `\u5DF2\u6210\u529F\u5347\u7EA7\u5230 v${info.latest}\uFF01\u9700\u8981\u91CD\u542F DSH \u670D\u52A1\u4F7F\u65B0\u7248\u672C\u751F\u6548`)
+              }, localeT("\u5DF2\u6210\u529F\u5347\u7EA7\u5230 v${version}\uFF01\u9700\u8981\u91CD\u542F DSH \u670D\u52A1\u4F7F\u65B0\u7248\u672C\u751F\u6548", { version: info.latest }))
             ),
-            !restarting && !restartStatus && React.createElement(
+            !restarting && !restartStatus && h(
               "div",
               {
                 style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap" }
               },
-              React.createElement("button", {
+              h("button", {
                 style: {
                   ...s.btnPri,
                   height: 30,
@@ -5599,7 +6310,7 @@ function VersionBanner({ rpcCall }) {
                 },
                 onClick: handleRestart
               }, "\u{1F504} \u7ACB\u5373\u91CD\u542F DSH \u670D\u52A1"),
-              React.createElement("button", {
+              h("button", {
                 style: {
                   ...s.btnGhost,
                   height: 30,
@@ -5609,7 +6320,7 @@ function VersionBanner({ rpcCall }) {
                 onClick: () => setDismissRestart(true)
               }, "\u7A0D\u540E\u624B\u52A8\u91CD\u542F")
             ),
-            (restarting || restartStatus) && React.createElement(
+            (restarting || restartStatus) && h(
               "div",
               {
                 style: {
@@ -5621,14 +6332,14 @@ function VersionBanner({ rpcCall }) {
                   fontWeight: 500
                 }
               },
-              restartStatus?.phase !== "success" && restartStatus?.phase !== "timeout" && React.createElement("span", {
+              restartStatus?.phase !== "success" && restartStatus?.phase !== "timeout" && h("span", {
                 style: { animation: "spin 1s linear infinite", display: "inline-flex" }
-              }, React.createElement(Icons.refresh)),
+              }, h(Icons.refresh)),
               restartStatus?.text || "\u6B63\u5728\u5904\u7406\u2026"
             )
           ),
           // 失败提示
-          upgradeResult && !upgradeResult.ok && React.createElement("div", {
+          upgradeResult && !upgradeResult.ok && h("div", {
             style: {
               background: "var(--dsw-alias-state-error-bg,#fef2f2)",
               border: "1px solid var(--dsw-alias-state-error-border,#fecaca)",
@@ -5640,28 +6351,28 @@ function VersionBanner({ rpcCall }) {
               lineHeight: 1.5
             }
           }, upgradeResult.message),
-          React.createElement(
+          h(
             "div",
             { style: { marginTop: 4 } },
-            React.createElement("button", {
+            h("button", {
               style: { ...s.btnLink, fontSize: 11, color: "var(--dsw-alias-label-secondary,#6b7280)" },
               onClick: () => setShowManual((v) => !v)
             }, showManual ? "\u25B4 \u6298\u53E0\u624B\u52A8\u547D\u4EE4\u884C" : "\u25BE \u67E5\u770B\u624B\u52A8\u5347\u7EA7\u547D\u4EE4 (\u5982\u9700)")
           ),
-          showManual && React.createElement(
+          showManual && h(
             "div",
             {
               style: { display: "flex", flexDirection: "column", gap: 6, marginTop: 8 }
             },
             upgradeCommands(info.latest).map(
-              ({ id, cmd }) => React.createElement(UpgradeCommandRow, { key: id, cmd })
+              ({ id, cmd }) => h(UpgradeCommandRow, { key: id, cmd })
             )
           )
         )
       )
     ),
     // ── DSH 宿主有新版本时的提示 / 一键升级卡片 ──
-    dshHasUpdate && React.createElement(
+    dshHasUpdate && h(
       "div",
       {
         style: {
@@ -5673,20 +6384,20 @@ function VersionBanner({ rpcCall }) {
           marginBottom: 0
         }
       },
-      React.createElement(
+      h(
         "div",
         { style: { display: "flex", alignItems: "flex-start", gap: 12 } },
-        React.createElement("span", { style: { fontSize: 22 } }, "\u{1F6E0}\uFE0F"),
-        React.createElement(
+        h("span", { style: { fontSize: 22 } }, "\u{1F6E0}\uFE0F"),
+        h(
           "div",
           { style: { flex: 1, minWidth: 0 } },
-          React.createElement(
+          h(
             "div",
             { style: { display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8, marginBottom: 8 } },
-            React.createElement("div", {
+            h("div", {
               style: { fontSize: 13, fontWeight: 600, color: "var(--dsw-alias-label-primary, #0f1115)" }
-            }, `DSH \u6709\u65B0\u7248\u672C v${info.dshLatest}\uFF08\u5F53\u524D v${info.dshVersion}\uFF09`),
-            info?.dshUpgradable ? React.createElement(
+            }, localeT("DSH \u6709\u65B0\u7248\u672C v${latest}\uFF08\u5F53\u524D v${current}\uFF09", { latest: info.dshLatest, current: info.dshVersion })),
+            info?.dshUpgradable ? h(
               "button",
               {
                 style: {
@@ -5701,27 +6412,27 @@ function VersionBanner({ rpcCall }) {
                 onClick: handleUpgradeDsh,
                 disabled: dshUpgrading || restarting || dshUpgradeResult?.ok
               },
-              dshUpgrading ? React.createElement(
+              dshUpgrading ? h(
                 "span",
                 { style: { display: "inline-flex", alignItems: "center", gap: 6 } },
-                React.createElement("span", { style: { animation: "spin 1s linear infinite", display: "inline-flex" } }, React.createElement(Icons.refresh)),
+                h("span", { style: { animation: "spin 1s linear infinite", display: "inline-flex" } }, h(Icons.refresh)),
                 "\u6B63\u5728\u5347\u7EA7 DSH\u2026"
-              ) : dshUpgradeResult?.ok ? "\u2713 DSH \u5347\u7EA7\u5B8C\u6210" : `\u4E00\u952E\u5347\u7EA7 DSH \u5230 v${info.dshLatest}`
-            ) : React.createElement("a", {
+              ) : dshUpgradeResult?.ok ? "\u2713 DSH \u5347\u7EA7\u5B8C\u6210" : localeT("\u4E00\u952E\u5347\u7EA7 DSH \u5230 v${version}", { version: info.dshLatest })
+            ) : h("a", {
               href: GITHUB_URL,
               target: "_blank",
               rel: "noreferrer",
               style: { ...s.btnLink, fontSize: 12, fontWeight: 600 }
             }, "\u67E5\u770B\u5B98\u65B9\u5347\u7EA7\u65B9\u5F0F \u2197")
           ),
-          React.createElement(
+          h(
             "div",
             {
               style: { fontSize: 12, color: "var(--dsw-alias-label-secondary,#6b7280)", lineHeight: 1.6 }
             },
             info?.dshUpgradable ? "\u5347\u7EA7 DSH \u547D\u4EE4\u884C\u5DE5\u5177\u540E\u9700\u91CD\u542F DSH \u670D\u52A1\u751F\u6548\u3002" : info?.dshUpgradeReason || "\u5F53\u524D DSH \u975E npm \u5168\u5C40\u5B89\u88C5\uFF0C\u65E0\u6CD5\u4E00\u952E\u81EA\u52A8\u5347\u7EA7\uFF0C\u8BF7\u6309\u5B98\u65B9\u6E20\u9053\u624B\u52A8\u66F4\u65B0\u3002"
           ),
-          dshUpgradeResult && React.createElement("div", {
+          dshUpgradeResult && h("div", {
             style: {
               marginTop: 10,
               fontSize: 12,
@@ -5729,21 +6440,21 @@ function VersionBanner({ rpcCall }) {
               color: "var(--dsw-alias-label-primary, #0f1115)"
             }
           }, dshUpgradeResult.message),
-          dshUpgradeResult?.ok && !dismissRestart && React.createElement(
+          dshUpgradeResult?.ok && !dismissRestart && h(
             "div",
             {
               style: { display: "flex", gap: 8, alignItems: "center", flexWrap: "wrap", marginTop: 10 }
             },
-            React.createElement("button", {
+            h("button", {
               style: { ...s.btnPri, height: 30, fontSize: 12, padding: "0 14px", background: "#047857", color: "#ffffff" },
               onClick: handleRestart
             }, "\u{1F504} \u7ACB\u5373\u91CD\u542F DSH \u670D\u52A1"),
-            React.createElement("button", {
+            h("button", {
               style: { ...s.btnGhost, height: 30, fontSize: 12, padding: "0 12px" },
               onClick: () => setDismissRestart(true)
             }, "\u7A0D\u540E\u624B\u52A8\u91CD\u542F")
           ),
-          (restarting || restartStatus) && React.createElement(
+          (restarting || restartStatus) && h(
             "div",
             {
               style: {
@@ -5756,9 +6467,9 @@ function VersionBanner({ rpcCall }) {
                 fontWeight: 500
               }
             },
-            restartStatus?.phase !== "success" && restartStatus?.phase !== "timeout" && React.createElement("span", {
+            restartStatus?.phase !== "success" && restartStatus?.phase !== "timeout" && h("span", {
               style: { animation: "spin 1s linear infinite", display: "inline-flex" }
-            }, React.createElement(Icons.refresh)),
+            }, h(Icons.refresh)),
             restartStatus?.text || "\u6B63\u5728\u5904\u7406\u2026"
           )
         )
@@ -5813,7 +6524,7 @@ function TabBar({ active, onChange, dots }) {
   if (edges.right) maskStops.push("#000 calc(100% - 20px)", "transparent 100%");
   else maskStops.push("#000 100%");
   const maskImage = `linear-gradient(to right, ${maskStops.join(", ")})`;
-  return React.createElement(
+  return h(
     "div",
     {
       ref: scrollRef,
@@ -5836,7 +6547,7 @@ function TabBar({ active, onChange, dots }) {
     TABS.map(({ id, label, icon: TabIcon }) => {
       const isActive = active === id;
       const hasDot = dots?.[id];
-      return React.createElement(
+      return h(
         "button",
         {
           key: id,
@@ -5861,7 +6572,7 @@ function TabBar({ active, onChange, dots }) {
             flexShrink: 0
           }
         },
-        TabIcon && React.createElement(TabIcon, {
+        TabIcon && h(TabIcon, {
           style: {
             color: isActive ? "var(--dsw-alias-brand-primary,#4f6ef7)" : "var(--dsw-alias-label-tertiary,#9ca3af)",
             width: 16,
@@ -5870,7 +6581,7 @@ function TabBar({ active, onChange, dots }) {
           }
         }),
         label,
-        hasDot && React.createElement("span", {
+        hasDot && h("span", {
           style: {
             width: 6,
             height: 6,
@@ -5990,9 +6701,9 @@ function BridgePanel({ rpcCall, preferredTab }) {
   }, [rpcCall, unlockPassword]);
   const handleLockAdmin = React.useCallback(async () => {
     try {
-      const t = getAdminToken();
-      if (t) {
-        await rpcCall(BRIDGE_ENDPOINTS.authAdminLock, { adminToken: t });
+      const t2 = getAdminToken();
+      if (t2) {
+        await rpcCall(BRIDGE_ENDPOINTS.authAdminLock, { adminToken: t2 });
       }
     } catch {
     }
@@ -6061,17 +6772,17 @@ function BridgePanel({ rpcCall, preferredTab }) {
     };
     if (!adminUnlocked && !isLocalhost) return;
     poll();
-    const t = setInterval(poll, 4e3);
+    const t2 = setInterval(poll, 4e3);
     return () => {
       alive = false;
-      clearInterval(t);
+      clearInterval(t2);
     };
   }, [authRpcCall, adminUnlocked, isLocalhost, platformsSeq]);
   React.useEffect(() => {
     load();
     if (!adminUnlocked && !isLocalhost) return;
-    const t = setInterval(() => load(true), 3e3);
-    return () => clearInterval(t);
+    const t2 = setInterval(() => load(true), 3e3);
+    return () => clearInterval(t2);
   }, [load, adminUnlocked, isLocalhost]);
   const act = React.useCallback(async (endpoint, payload) => {
     try {
@@ -6114,7 +6825,7 @@ function BridgePanel({ rpcCall, preferredTab }) {
   );
   const navSecurity = React.useCallback(() => setActiveTab("security"), []);
   if (!status && !err) {
-    return React.createElement("div", {
+    return h("div", {
       style: { padding: 32, color: "var(--dsw-alias-label-tertiary,#9ca3af)", fontSize: 13 }
     }, "\u52A0\u8F7D\u4E2D\u2026");
   }
@@ -6130,7 +6841,7 @@ function BridgePanel({ rpcCall, preferredTab }) {
   };
   let tabContent;
   if (activeTab === "lan") {
-    tabContent = React.createElement(
+    tabContent = h(
       TunnelCard,
       {
         title: "\u5C40\u57DF\u7F51\u8BBF\u95EE",
@@ -6139,7 +6850,7 @@ function BridgePanel({ rpcCall, preferredTab }) {
         auth: status?.auth,
         onNavigateSecurity: navSecurity
       },
-      React.createElement(LanNetworkSelector, {
+      h(LanNetworkSelector, {
         lan: status?.lan,
         onSelectIp: onSelectLanIp
       })
@@ -6189,10 +6900,10 @@ function BridgePanel({ rpcCall, preferredTab }) {
     ].filter(Boolean);
     const primary = entries[0] || null;
     const otherCount = primary ? entries.length - 1 : entries.length;
-    tabContent = React.createElement(
+    tabContent = h(
       React.Fragment,
       null,
-      React.createElement(TunnelEntryCard, {
+      h(TunnelEntryCard, {
         entry: primary,
         onCopy: copyEntryUrl,
         copied: Boolean(copiedUrl && primary && copiedUrl === primary.url),
@@ -6202,13 +6913,13 @@ function BridgePanel({ rpcCall, preferredTab }) {
         onStop: primary ? primary.onStop : void 0,
         onReset: primary ? primary.onReset : void 0
       }),
-      otherCount > 0 && React.createElement("div", {
+      otherCount > 0 && h("div", {
         style: { ...s.muted, fontSize: 11, marginBottom: 8, textAlign: "center" }
-      }, "\u53E6\u6709 " + otherCount + " \u4E2A\u96A7\u9053\u5165\u53E3\u5728\u8FD0\u884C\uFF0C\u53EF\u5728\u4E0B\u65B9\u300C\u96A7\u9053\u914D\u7F6E\u300D\u4E2D\u67E5\u770B\u4E0E\u7BA1\u7406"),
-      React.createElement(
+      }, localeT("\u53E6\u6709 ${count} \u4E2A\u96A7\u9053\u5165\u53E3\u5728\u8FD0\u884C\uFF0C\u53EF\u5728\u4E0B\u65B9\u300C\u96A7\u9053\u914D\u7F6E\u300D\u4E2D\u67E5\u770B\u4E0E\u7BA1\u7406", { count: otherCount })),
+      h(
         TunnelConfigGroup,
         null,
-        React.createElement(
+        h(
           TunnelCard,
           {
             title: "Cloudflare \u96A7\u9053",
@@ -6227,12 +6938,12 @@ function BridgePanel({ rpcCall, preferredTab }) {
             onStop: onStopCloudflared,
             onReset: cf && cf.running ? onResetCloudflared : null
           },
-          React.createElement(CloudflareDiagnostics, {
+          h(CloudflareDiagnostics, {
             dataPlane: cf && cf.dataPlane,
             binary: cf && cf.binary,
             foreignRunner: cf && cf.foreignRunner
           }),
-          React.createElement(CloudflareConfigForm, {
+          h(CloudflareConfigForm, {
             token: cf && cf.token || "",
             hostname: cf && cf.hostname || "",
             network: cf && {
@@ -6243,7 +6954,7 @@ function BridgePanel({ rpcCall, preferredTab }) {
             onSave: saveCloudflaredConfig
           })
         ),
-        React.createElement(
+        h(
           TunnelCard,
           {
             title: "\u81EA\u5EFA\u96A7\u9053",
@@ -6262,38 +6973,38 @@ function BridgePanel({ rpcCall, preferredTab }) {
             onStart: onStartCustom,
             onStop: onStopCustom
           },
-          React.createElement(CustomTunnelGuide),
-          React.createElement(CustomTunnelConfigForm, {
+          h(CustomTunnelGuide),
+          h(CustomTunnelConfigForm, {
             serverUrl: ct && ct.serverUrl || "",
             accessToken: ct && ct.accessToken || "",
             onSave: saveConfig
           })
         ),
-        React.createElement(ExternalTunnelCard, {
+        h(ExternalTunnelCard, {
           ext,
           onSave: saveExternalTunnel
         })
       )
     );
   } else if (activeTab === "security") {
-    tabContent = React.createElement(AccessAuthCard, {
+    tabContent = h(AccessAuthCard, {
       auth: status?.auth,
       rpcCall: authRpcCall,
       onUpdate: () => load(true)
     });
   } else if (activeTab === "ops") {
-    tabContent = React.createElement(
+    tabContent = h(
       React.Fragment,
       null,
-      React.createElement(SystemMetricsWidget, { metrics: status?.system }),
-      React.createElement(PageTweaksCard, { status, rpcCall: authRpcCall }),
-      React.createElement(RemoteWorkspaceCard, { rpcCall: authRpcCall }),
-      React.createElement(NetworkDiagnosticWidget, { rpcCall: authRpcCall }),
-      React.createElement(BackupRestoreWidget, {
+      h(SystemMetricsWidget, { metrics: status?.system }),
+      h(PageTweaksCard, { status, rpcCall: authRpcCall }),
+      h(RemoteWorkspaceCard, { rpcCall: authRpcCall }),
+      h(NetworkDiagnosticWidget, { rpcCall: authRpcCall }),
+      h(BackupRestoreWidget, {
         rpcCall: authRpcCall,
         onUpdate: () => load(true)
       }),
-      React.createElement(RestartDshCard, { rpcCall: authRpcCall })
+      h(RestartDshCard, { rpcCall: authRpcCall })
     );
   } else if (activeTab === "im") {
     const IM_PLATFORMS = [
@@ -6302,7 +7013,7 @@ function BridgePanel({ rpcCall, preferredTab }) {
       { id: "qq", label: "QQ", icon: Icons.qq, brandColor: "#12B7F5", desc: "\u5B98\u65B9\u673A\u5668\u4EBA \xB7 \u79C1\u804A/\u7FA4\u804A/\u6309\u94AE" },
       { id: "telegram", label: "Telegram", icon: Icons.telegram, brandColor: "#24A1DE", desc: "\u5B98\u65B9 Bot API" }
     ];
-    const RecommendedTag = () => React.createElement("span", {
+    const RecommendedTag = () => h("span", {
       style: {
         fontSize: 10,
         lineHeight: "16px",
@@ -6315,17 +7026,17 @@ function BridgePanel({ rpcCall, preferredTab }) {
         flexShrink: 0
       }
     }, "\u63A8\u8350");
-    tabContent = React.createElement(
+    tabContent = h(
       "div",
       null,
       // #55：清单查询失败时显错 + 重试，不再静默画成“即将支持”
-      platformsError && React.createElement(
+      platformsError && h(
         "div",
         {
           style: { display: "flex", alignItems: "center", gap: 10, marginBottom: 12, padding: "10px 12px", borderRadius: 8, border: "1px solid var(--dsw-alias-state-danger-primary,#f87171)", background: "var(--dsw-alias-state-danger-bg,#fef2f2)", fontSize: 12 }
         },
-        React.createElement("span", { style: { flex: 1 } }, "\u5E73\u53F0\u6E05\u5355\u52A0\u8F7D\u5931\u8D25\uFF1A" + platformsError),
-        React.createElement("button", {
+        h("span", { style: { flex: 1 } }, localeT("\u5E73\u53F0\u6E05\u5355\u52A0\u8F7D\u5931\u8D25\uFF1A${reason}", { reason: localeT(platformsError) })),
+        h("button", {
           onClick: () => {
             setPlatformsError(null);
             setPlatformsSeq((s2) => s2 + 1);
@@ -6334,7 +7045,7 @@ function BridgePanel({ rpcCall, preferredTab }) {
         }, "\u91CD\u8BD5")
       ),
       // 平台选择器（可点击切换）
-      React.createElement(
+      h(
         "div",
         {
           style: { display: "flex", gap: 10, marginBottom: 16, flexWrap: "wrap" }
@@ -6344,7 +7055,7 @@ function BridgePanel({ rpcCall, preferredTab }) {
           const platformData = loaded ? platforms[id] : void 0;
           const available = !!platformData;
           const active = platformData?.status === "connected" || platformData?.status === "starting" || platformData?.status === "reconnecting";
-          return React.createElement(
+          return h(
             "div",
             {
               key: id,
@@ -6361,32 +7072,32 @@ function BridgePanel({ rpcCall, preferredTab }) {
               },
               onClick: available ? () => setSelectedPlatform(id) : void 0
             },
-            React.createElement(
+            h(
               "div",
               { style: { ...s.label, fontSize: 13, display: "flex", alignItems: "center", justifyContent: "space-between" } },
-              React.createElement(
+              h(
                 "span",
                 { style: { display: "flex", alignItems: "center", gap: 7, minWidth: 0 } },
-                IconComponent && React.createElement(IconComponent, { style: { color: brandColor, width: 18, height: 18, flexShrink: 0 } }),
+                IconComponent && h(IconComponent, { style: { color: brandColor, width: 18, height: 18, flexShrink: 0 } }),
                 label,
-                recommended && React.createElement(RecommendedTag)
+                recommended && h(RecommendedTag)
               ),
-              active && React.createElement("span", {
+              active && h("span", {
                 style: { width: 6, height: 6, borderRadius: "50%", background: "var(--dsw-alias-state-success-primary,#10b981)", flexShrink: 0 }
               }),
-              !active && available && React.createElement("span", {
+              !active && available && h("span", {
                 style: { fontSize: 11, color: "var(--dsw-alias-label-tertiary,#6b7280)", fontWeight: 400 }
               }, "\u672A\u8FDE\u63A5"),
-              !available && React.createElement("span", {
+              !available && h("span", {
                 style: { fontSize: 11, color: "var(--dsw-alias-label-tertiary,#9ca3af)", fontWeight: 400 }
               }, !loaded ? "\u52A0\u8F7D\u4E2D\u2026" : "\u6570\u636E\u7F3A\u5931")
             ),
-            React.createElement("div", { style: { ...s.muted, marginTop: 4, fontSize: 11 } }, desc)
+            h("div", { style: { ...s.muted, marginTop: 4, fontSize: 11 } }, desc)
           );
         })
       ),
       // 显示选中的平台卡片（带有 key 保证切换时重置表单状态）
-      selectedPlatform && platforms?.[selectedPlatform] && React.createElement(PlatformCard, {
+      selectedPlatform && platforms?.[selectedPlatform] && h(PlatformCard, {
         key: selectedPlatform,
         platformRecommended: IM_PLATFORMS.find((p) => p.id === selectedPlatform)?.recommended === true,
         platformId: selectedPlatform,
@@ -6400,35 +7111,35 @@ function BridgePanel({ rpcCall, preferredTab }) {
   const policy = auth?.adminPolicy ?? "password_unlock";
   const hasAnyPassword = !!(auth?.hasPassword || auth?.hasAdminPassword);
   const unlockUsesAdmin = !!auth?.hasAdminPassword;
-  const unlockPwdKind = unlockUsesAdmin ? "\u7BA1\u7406\u5BC6\u7801" : "\u8BBF\u95EE\u5BC6\u7801";
-  const unlockPwdHint = unlockUsesAdmin ? "\u8BF7\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\u7BA1\u7406\u6743\u9650\u3002" : "\u5F53\u524D\u672A\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801\uFF0C\u8F93\u5165\u60A8\u7684\u8BBF\u95EE\u5BC6\u7801\u5373\u53EF\u89E3\u9501\u3002";
+  const unlockPwdKind = unlockUsesAdmin ? localeT("\u7BA1\u7406\u5BC6\u7801") : localeT("\u8BBF\u95EE\u5BC6\u7801");
+  const unlockPwdHint = unlockUsesAdmin ? localeT("\u8BF7\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\u7BA1\u7406\u6743\u9650\u3002") : localeT("\u5F53\u524D\u672A\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801\uFF0C\u8F93\u5165\u60A8\u7684\u8BBF\u95EE\u5BC6\u7801\u5373\u53EF\u89E3\u9501\u3002");
   const isLocked = !isLocalhost && auth?.adminProtection !== false && policy !== "open" && !adminUnlocked && (policy === "local_only" || hasAnyPassword);
   if (isLocked) {
-    return React.createElement(
+    return h(
       "div",
       { style: { maxWidth: 620 } },
-      policy === "local_only" ? React.createElement(
+      policy === "local_only" ? h(
         "div",
         {
           style: { ...s.card, textAlign: "center", padding: "36px 20px", marginTop: 10 }
         },
-        React.createElement("div", { style: { fontSize: 40, marginBottom: 12 } }, "\u{1F6E1}\uFE0F"),
-        React.createElement("div", { style: { ...s.label, fontSize: 16, fontWeight: 600, marginBottom: 8 } }, "\u7BA1\u7406\u63A7\u5236\u53F0\u5DF2\u9501\u5B9A\uFF08\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406\uFF09"),
-        React.createElement(
+        h("div", { style: { fontSize: 40, marginBottom: 12 } }, "\u{1F6E1}\uFE0F"),
+        h("div", { style: { ...s.label, fontSize: 16, fontWeight: 600, marginBottom: 8 } }, "\u7BA1\u7406\u63A7\u5236\u53F0\u5DF2\u9501\u5B9A\uFF08\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406\uFF09"),
+        h(
           "div",
           { style: { ...s.muted, maxWidth: 420, margin: "0 auto", lineHeight: 1.6, fontSize: 13 } },
           "\u5F53\u524D\u8BBE\u5907\u901A\u8FC7\u8FDC\u7A0B\u5C40\u57DF\u7F51\u6216\u516C\u7F51\u63A5\u5165\u3002\u5DF2\u5F00\u542F\u300C\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406\u300D\u6700\u9AD8\u5B89\u5168\u7B56\u7565\uFF0C\u8FDC\u7A0B\u8BBE\u5907\u7981\u6B62\u67E5\u770B\u4E0E\u4FEE\u6539\u4EFB\u4F55\u7F51\u7EDC\u4E0E\u673A\u5668\u4EBA\u914D\u7F6E\u3002\u5982\u9700\u7BA1\u7406\u8BF7\u5728\u7535\u8111\u672C\u673A\uFF08127.0.0.1\uFF09\u4E0A\u64CD\u4F5C\u3002"
         ),
-        React.createElement(
+        h(
           "div",
           { style: { marginTop: 20 } },
-          React.createElement("button", {
+          h("button", {
             type: "button",
             style: { ...s.btnLink, fontSize: 12, color: "var(--dsw-alias-label-secondary,#6b7280)" },
             onClick: () => setShowForgotGuide((v) => !v)
           }, "\u2753 \u8FDC\u7A0B\u5982\u4F55\u6551\u6025\u89E3\u9664\u9501\u5B9A\uFF1F")
         ),
-        showForgotGuide && React.createElement(
+        showForgotGuide && h(
           "div",
           {
             style: {
@@ -6445,25 +7156,25 @@ function BridgePanel({ rpcCall, preferredTab }) {
               margin: "14px auto 0"
             }
           },
-          React.createElement("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary,currentColor)", marginBottom: 4 } }, "\u{1F6DF} \u6551\u6025\u89E3\u9664\u9501\u5B9A\u6307\u5F15\uFF1A"),
-          React.createElement("div", null, "1. ", React.createElement("strong", null, "\u7535\u8111\u672C\u673A\u76F4\u8FDE\u4FEE\u6539"), "\uFF1A\u76F4\u63A5\u5728\u8FD0\u884C\u672C\u7A0B\u5E8F\u7684\u7535\u8111\u672C\u673A\u6253\u5F00\u672C\u63A7\u5236\u53F0\uFF08127.0.0.1 \u4EAB\u6709\u7269\u7406\u514D\u9501\u7279\u6743\uFF09\uFF0C\u53EF\u968F\u65F6\u4FEE\u6539\u7B56\u7565\u6216\u6E05\u9664\u5BC6\u7801\u3002"),
-          React.createElement("div", { style: { marginTop: 4 } }, "2. ", React.createElement("strong", null, "\u670D\u52A1\u5668 / \u65E0\u5934\u73AF\u5883"), "\uFF1A\u6551\u6025\u91CD\u7F6E\u6B65\u9AA4\u53C2\u89C1 GitHub README \u7684\u300C\u4E09\u91CD\u5BB9\u707E\u4FDD\u547D\u4F53\u7CFB\u300D\u7AE0\u8282\u3002")
+          h("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary,currentColor)", marginBottom: 4 } }, "\u{1F6DF} \u6551\u6025\u89E3\u9664\u9501\u5B9A\u6307\u5F15\uFF1A"),
+          h("div", null, "1. ", h("strong", null, "\u7535\u8111\u672C\u673A\u76F4\u8FDE\u4FEE\u6539"), "\uFF1A\u76F4\u63A5\u5728\u8FD0\u884C\u672C\u7A0B\u5E8F\u7684\u7535\u8111\u672C\u673A\u6253\u5F00\u672C\u63A7\u5236\u53F0\uFF08127.0.0.1 \u4EAB\u6709\u7269\u7406\u514D\u9501\u7279\u6743\uFF09\uFF0C\u53EF\u968F\u65F6\u4FEE\u6539\u7B56\u7565\u6216\u6E05\u9664\u5BC6\u7801\u3002"),
+          h("div", { style: { marginTop: 4 } }, "2. ", h("strong", null, "\u670D\u52A1\u5668 / \u65E0\u5934\u73AF\u5883"), "\uFF1A\u6551\u6025\u91CD\u7F6E\u6B65\u9AA4\u53C2\u89C1 GitHub README \u7684\u300C\u4E09\u91CD\u5BB9\u707E\u4FDD\u547D\u4F53\u7CFB\u300D\u7AE0\u8282\u3002")
         )
-      ) : React.createElement(
+      ) : h(
         "div",
         {
           style: { ...s.card, maxWidth: 440, margin: "20px auto", padding: "32px 24px" }
         },
-        React.createElement(
+        h(
           "div",
           { style: { textAlign: "center", marginBottom: 20 } },
-          React.createElement("div", { style: { fontSize: 40, marginBottom: 10 } }, "\u{1F512}"),
-          React.createElement("div", { style: { ...s.label, fontSize: 16, fontWeight: 600 } }, "\u7BA1\u7406\u63A7\u5236\u53F0\u5DF2\u9501\u5B9A"),
+          h("div", { style: { fontSize: 40, marginBottom: 10 } }, "\u{1F512}"),
+          h("div", { style: { ...s.label, fontSize: 16, fontWeight: 600 } }, "\u7BA1\u7406\u63A7\u5236\u53F0\u5DF2\u9501\u5B9A"),
           // 醒目提示该输入哪种密码
-          React.createElement(
+          h(
             "div",
             { style: { marginTop: 10, display: "flex", justifyContent: "center" } },
-            unlockUsesAdmin ? React.createElement("span", {
+            unlockUsesAdmin ? h("span", {
               style: {
                 display: "inline-flex",
                 alignItems: "center",
@@ -6476,7 +7187,7 @@ function BridgePanel({ rpcCall, preferredTab }) {
                 color: "var(--dsw-alias-label-primary, #0f1115)",
                 border: "1px solid var(--dsw-alias-state-info-border,#bfdbfe)"
               }
-            }, "\u{1F511} \u4F7F\u7528\u7BA1\u7406\u5BC6\u7801\u89E3\u9501") : React.createElement("span", {
+            }, "\u{1F511} \u4F7F\u7528\u7BA1\u7406\u5BC6\u7801\u89E3\u9501") : h("span", {
               style: {
                 display: "inline-flex",
                 alignItems: "center",
@@ -6491,45 +7202,45 @@ function BridgePanel({ rpcCall, preferredTab }) {
               }
             }, "\u{1F510} \u4F7F\u7528\u8BBF\u95EE\u5BC6\u7801\u89E3\u9501")
           ),
-          React.createElement(
+          h(
             "div",
             { style: { ...s.muted, fontSize: 12, marginTop: 10, lineHeight: 1.6 } },
-            "\u5F53\u524D\u8BBE\u5907\u4E3A\u8FDC\u7A0B\u8BBF\u95EE\u3002\u4E3A\u4FDD\u62A4\u60A8\u7684\u7F51\u7EDC\u4E0E\u5E73\u53F0\u914D\u7F6E\u5B89\u5168\uFF0C" + unlockPwdHint
+            localeT("\u5F53\u524D\u8BBE\u5907\u4E3A\u8FDC\u7A0B\u8BBF\u95EE\u3002\u4E3A\u4FDD\u62A4\u60A8\u7684\u7F51\u7EDC\u4E0E\u5E73\u53F0\u914D\u7F6E\u5B89\u5168\uFF0C${hint}", { hint: unlockPwdHint })
           )
         ),
-        React.createElement(
+        h(
           "form",
           {
             onSubmit: handleUnlockAdmin,
             style: { display: "flex", flexDirection: "column", gap: 12 }
           },
-          React.createElement("input", {
+          h("input", {
             type: "password",
             style: s.input,
-            placeholder: "\u8F93\u5165" + unlockPwdKind,
+            placeholder: localeT("\u8F93\u5165${kind}", { kind: unlockPwdKind }),
             value: unlockPassword,
             onChange: (e) => setUnlockPassword(e.target.value),
             autoFocus: true
           }),
-          unlockErr && React.createElement("div", {
+          unlockErr && h("div", {
             style: { fontSize: 12, color: "var(--dsw-alias-label-primary, #0f1115)" }
           }, unlockErr),
-          React.createElement("button", {
+          h("button", {
             type: "submit",
             style: { ...s.btnPri, width: "100%", justifyContent: "center", height: 36, background: "#4560ea", color: "#ffffff" },
             disabled: unlocking
           }, unlocking ? "\u9A8C\u8BC1\u4E2D\u2026" : "\u89E3\u9501\u7BA1\u7406\u6743\u9650")
         ),
-        React.createElement(
+        h(
           "div",
           { style: { marginTop: 16, textAlign: "center" } },
-          React.createElement("button", {
+          h("button", {
             type: "button",
             style: { ...s.btnLink, fontSize: 12, color: "var(--dsw-alias-label-secondary,#6b7280)" },
             onClick: () => setShowForgotGuide((v) => !v)
-          }, "\u2753 \u5FD8\u8BB0" + unlockPwdKind + "\uFF1F")
+          }, localeT("\u2753 \u5FD8\u8BB0${kind}\uFF1F", { kind: unlockPwdKind }))
         ),
-        showForgotGuide && React.createElement(
+        showForgotGuide && h(
           "div",
           {
             style: {
@@ -6544,19 +7255,19 @@ function BridgePanel({ rpcCall, preferredTab }) {
               textAlign: "left"
             }
           },
-          React.createElement("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary,currentColor)", marginBottom: 4 } }, "\u{1F6DF} \u627E\u56DE\u4E0E\u91CD\u7F6E" + unlockPwdKind + "\u6307\u5F15\uFF1A"),
-          React.createElement("div", null, "1. ", React.createElement("strong", null, "\u7535\u8111\u672C\u673A\u76F4\u8FDE\u4FEE\u6539"), "\uFF1A\u76F4\u63A5\u5728\u8FD0\u884C\u672C\u7A0B\u5E8F\u7684\u7535\u8111\u672C\u673A\u6253\u5F00\u672C\u63A7\u5236\u53F0\uFF08127.0.0.1 \u4EAB\u6709\u7269\u7406\u514D\u9501\u7279\u6743\uFF09\uFF0C\u53EF\u968F\u65F6\u4FEE\u6539\u6216\u6E05\u9664\u5BC6\u7801\u3002"),
-          React.createElement("div", { style: { marginTop: 4 } }, "2. ", React.createElement("strong", null, "\u670D\u52A1\u5668 / \u65E0\u5934\u73AF\u5883"), "\uFF1A\u6551\u6025\u91CD\u7F6E\u6B65\u9AA4\u53C2\u89C1 GitHub README \u7684\u300C\u4E09\u91CD\u5BB9\u707E\u4FDD\u547D\u4F53\u7CFB\u300D\u7AE0\u8282\u3002")
+          h("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary,currentColor)", marginBottom: 4 } }, localeT("\u{1F6DF} \u627E\u56DE\u4E0E\u91CD\u7F6E${kind}\u6307\u5F15\uFF1A", { kind: unlockPwdKind })),
+          h("div", null, "1. ", h("strong", null, "\u7535\u8111\u672C\u673A\u76F4\u8FDE\u4FEE\u6539"), "\uFF1A\u76F4\u63A5\u5728\u8FD0\u884C\u672C\u7A0B\u5E8F\u7684\u7535\u8111\u672C\u673A\u6253\u5F00\u672C\u63A7\u5236\u53F0\uFF08127.0.0.1 \u4EAB\u6709\u7269\u7406\u514D\u9501\u7279\u6743\uFF09\uFF0C\u53EF\u968F\u65F6\u4FEE\u6539\u6216\u6E05\u9664\u5BC6\u7801\u3002"),
+          h("div", { style: { marginTop: 4 } }, "2. ", h("strong", null, "\u670D\u52A1\u5668 / \u65E0\u5934\u73AF\u5883"), "\uFF1A\u6551\u6025\u91CD\u7F6E\u6B65\u9AA4\u53C2\u89C1 GitHub README \u7684\u300C\u4E09\u91CD\u5BB9\u707E\u4FDD\u547D\u4F53\u7CFB\u300D\u7AE0\u8282\u3002")
         )
       )
     );
   }
   const isInterceptionErr = err && (err.includes("\u7BA1\u7406\u5458\u6743\u9650") || err.includes("\u7BA1\u7406\u5BC6\u7801\u89E3\u9501"));
-  return React.createElement(
+  return h(
     "div",
     { style: { maxWidth: 620, position: "relative" } },
     // 错误横幅（如果是权限拦截，直接提供醒目的输入密码解锁按钮）
-    err && React.createElement(
+    err && h(
       "div",
       {
         style: {
@@ -6572,18 +7283,18 @@ function BridgePanel({ rpcCall, preferredTab }) {
           gap: 10
         }
       },
-      React.createElement("span", { style: { flex: "1 1 auto" } }, err),
-      isInterceptionErr && React.createElement("button", {
+      h("span", { style: { flex: "1 1 auto" } }, err),
+      isInterceptionErr && h("button", {
         type: "button",
         style: { ...s.btnPri, background: "#dc2626", color: "#ffffff", height: 26, fontSize: 12, padding: "0 10px", flexShrink: 0 },
         onClick: () => {
           setUnlockErr(err);
           setShowUnlockModal(true);
         }
-      }, "\u{1F511} \u7ACB\u5373\u8F93\u5165" + unlockPwdKind + "\u89E3\u9501")
+      }, localeT("\u{1F511} \u7ACB\u5373\u8F93\u5165${kind}\u89E3\u9501", { kind: unlockPwdKind }))
     ),
     // 管理员解锁状态提示条
-    !isLocalhost && adminUnlocked && React.createElement(
+    !isLocalhost && adminUnlocked && h(
       "div",
       {
         style: {
@@ -6599,14 +7310,14 @@ function BridgePanel({ rpcCall, preferredTab }) {
           color: "var(--dsw-alias-brand-primary,#4f6ef7)"
         }
       },
-      React.createElement("span", null, "\u{1F513} \u7BA1\u7406\u5458\u6743\u9650\u5DF2\u89E3\u9501\uFF08\u5F53\u524D\u4E34\u65F6\u4F1A\u8BDD\u6709\u6548\uFF09"),
-      React.createElement("button", {
+      h("span", null, "\u{1F513} \u7BA1\u7406\u5458\u6743\u9650\u5DF2\u89E3\u9501\uFF08\u5F53\u524D\u4E34\u65F6\u4F1A\u8BDD\u6709\u6548\uFF09"),
+      h("button", {
         style: { ...s.btnGhost, height: 24, fontSize: 11, padding: "0 8px" },
         onClick: handleLockAdmin
       }, "\u{1F512} \u91CD\u65B0\u9501\u5B9A\u540E\u53F0")
     ),
     // 未解锁时的顶部引导条：未设密码 → 提示先设密码；已设密码 → 提示解锁
-    !isLocalhost && !adminUnlocked && auth?.enabled && policy !== "open" && React.createElement(
+    !isLocalhost && !adminUnlocked && auth?.enabled && policy !== "open" && h(
       "div",
       {
         style: {
@@ -6622,26 +7333,26 @@ function BridgePanel({ rpcCall, preferredTab }) {
           color: "var(--dsw-alias-label-primary, #0f1115)"
         }
       },
-      React.createElement(
+      h(
         "span",
         null,
         hasAnyPassword ? "\u{1F512} \u540E\u53F0\u7BA1\u7406\u6743\u9650\u672A\u89E3\u9501\uFF08\u4FEE\u6539\u654F\u611F\u914D\u7F6E\u9700\u5148\u89E3\u9501\uFF09" : "\u26A0\uFE0F \u5C1A\u672A\u8BBE\u7F6E\u4EFB\u4F55\u8BBF\u95EE\u5BC6\u7801 / \u7BA1\u7406\u5BC6\u7801\uFF0C\u8FDC\u7A0B\u8BBF\u5BA2\u53EF\u514D\u5BC6\u8FDB\u5165\uFF01"
       ),
-      hasAnyPassword ? React.createElement("button", {
+      hasAnyPassword ? h("button", {
         type: "button",
         style: { ...s.btnPri, ...s.btnWarn, height: 24, fontSize: 11, padding: "0 10px" },
         onClick: () => setShowUnlockModal(true)
-      }, "\u{1F511} \u89E3\u9501\u7BA1\u7406\u6743\u9650") : React.createElement("button", {
+      }, "\u{1F511} \u89E3\u9501\u7BA1\u7406\u6743\u9650") : h("button", {
         type: "button",
         style: { ...s.btnPri, ...s.btnWarn, height: 24, fontSize: 11, padding: "0 10px" },
         onClick: () => setActiveTab("security")
       }, "\u{1F510} \u7ACB\u5373\u8BBE\u7F6E\u5BC6\u7801")
     ),
-    React.createElement(VersionBanner, { rpcCall: authRpcCall }),
-    React.createElement(TabBar, { active: activeTab, onChange: setActiveTab, dots }),
+    h(VersionBanner, { rpcCall: authRpcCall }),
+    h(TabBar, { active: activeTab, onChange: setActiveTab, dots }),
     tabContent,
     // 全局交互式解锁弹窗 Modal
-    showUnlockModal && React.createElement(
+    showUnlockModal && h(
       "div",
       {
         style: {
@@ -6658,7 +7369,7 @@ function BridgePanel({ rpcCall, preferredTab }) {
           if (e.target === e.currentTarget) setShowUnlockModal(false);
         }
       },
-      React.createElement(
+      h(
         "div",
         {
           style: {
@@ -6671,58 +7382,58 @@ function BridgePanel({ rpcCall, preferredTab }) {
             border: "1px solid var(--dsw-alias-border-l2,#e5e7eb)"
           }
         },
-        React.createElement(
+        h(
           "div",
           { style: { display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 } },
-          React.createElement(
+          h(
             "div",
             { style: { fontSize: 16, fontWeight: 600, color: "var(--dsw-alias-label-primary,currentColor)", display: "flex", alignItems: "center", gap: 8 } },
             "\u{1F512} \u89E3\u9501\u540E\u53F0\u7BA1\u7406\u6743\u9650"
           ),
-          React.createElement("button", {
+          h("button", {
             type: "button",
             style: { border: "none", background: "none", cursor: "pointer", fontSize: 18, color: "var(--dsw-alias-label-tertiary,#9ca3af)", padding: 0 },
             onClick: () => setShowUnlockModal(false)
           }, "\u2715")
         ),
-        React.createElement(
+        h(
           "div",
           { style: { fontSize: 13, color: "var(--dsw-alias-label-secondary,#4b5563)", marginBottom: 16, lineHeight: 1.5 } },
           unlockUsesAdmin ? "\u5F53\u524D\u64CD\u4F5C\u9700\u8981\u540E\u53F0\u7BA1\u7406\u5458\u6743\u9650\u3002\u4E3A\u4FDD\u62A4\u60A8\u7684\u7F51\u7EDC\u914D\u7F6E\u4E0E\u673A\u5668\u4EBA\u5E73\u53F0\u5B89\u5168\uFF0C\u8BF7\u8F93\u5165\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\uFF1A" : "\u5F53\u524D\u64CD\u4F5C\u9700\u8981\u540E\u53F0\u7BA1\u7406\u6743\u9650\u3002\u672A\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801\uFF0C\u8F93\u5165\u60A8\u7684\u8BBF\u95EE\u5BC6\u7801\u5373\u53EF\u89E3\u9501\uFF1A"
         ),
-        React.createElement(
+        h(
           "form",
           {
             onSubmit: handleUnlockAdmin,
             style: { display: "flex", flexDirection: "column", gap: 12 }
           },
-          React.createElement("input", {
+          h("input", {
             type: "password",
             style: s.input,
-            placeholder: "\u8F93\u5165" + unlockPwdKind,
+            placeholder: localeT("\u8F93\u5165${kind}", { kind: unlockPwdKind }),
             value: unlockPassword,
             onChange: (e) => setUnlockPassword(e.target.value),
             autoFocus: true
           }),
-          unlockErr && React.createElement("div", {
+          unlockErr && h("div", {
             style: { fontSize: 12, color: "var(--dsw-alias-label-primary, #0f1115)" }
           }, unlockErr),
-          React.createElement(
+          h(
             "div",
             { style: { display: "flex", justifyContent: "flex-end", gap: 8, marginTop: 4 } },
-            React.createElement("button", {
+            h("button", {
               type: "button",
               style: s.btnGhost,
               onClick: () => setShowUnlockModal(false)
             }, "\u53D6\u6D88"),
-            React.createElement("button", {
+            h("button", {
               type: "submit",
               style: { ...s.btnPri, background: "#4560ea", color: "#fff" },
               disabled: unlocking || !unlockPassword
             }, unlocking ? "\u9A8C\u8BC1\u4E2D\u2026" : "\u7ACB\u5373\u89E3\u9501")
           )
         ),
-        React.createElement(
+        h(
           "div",
           { style: { marginTop: 14, paddingTop: 10, borderTop: "1px solid var(--dsw-alias-border-l2,#f3f4f6)", fontSize: 11, color: "var(--dsw-alias-label-tertiary,#9ca3af)", textAlign: "center", lineHeight: 1.5 } },
           "\u{1F4A1} \u63D0\u793A\uFF1A\u82E5\u672A\u5355\u72EC\u914D\u7F6E\u7BA1\u7406\u5BC6\u7801\uFF0C\u8BF7\u8F93\u5165\u521D\u6B21\u8BBE\u7F6E\u7684\u8BBF\u95EE\u5BC6\u7801\uFF1B\u7535\u8111\u672C\u673A\uFF08127.0.0.1\uFF09\u8BBF\u95EE\u4EAB\u6709\u514D\u5BC6\u7BA1\u7406\u7279\u6743\u3002"
@@ -6889,7 +7600,7 @@ function setupMobileExperience(rpcCall, ctx) {
     };
     titleEl = document.createElement("div");
     titleEl.className = "dsh-mobile-header-title";
-    titleEl.innerText = "\u65B0\u4F1A\u8BDD";
+    titleEl.innerText = localeT("title.fallback");
     titleEl.onclick = () => {
       const openPanels = document.querySelectorAll(workbenchPanelSelector({ openOnly: true }));
       openPanels.forEach((p) => p.classList.add("dsh-bridge-panelHidden"));
@@ -7298,37 +8009,37 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
       return e.name.toLowerCase().includes(filterQuery.trim().toLowerCase());
     });
     modal.innerHTML = `
-      <!-- \u79FB\u52A8\u7AEF\u9876\u90E8\u4E0B\u62C9\u6307\u793A\u6761 -->
+      <!-- mobile drag handle -->
       <div class="dsh-ws-drag-handle" style="width: 36px; height: 4px; background: var(--dsw-alias-border-l2, #d1d5db); border-radius: 2px; margin: 8px auto 0 auto; display: none;"></div>
 
-      <!-- \u5F39\u7A97\u9876\u90E8\u6807\u9898\u680F -->
+      <!-- modal header -->
       <div style="padding: 12px 16px; border-bottom: 1px solid var(--dsw-alias-border-l2, #e5e7eb); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; background: var(--dsw-alias-bg-layer-2, #f9fafb);">
         <div style="display: flex; align-items: center; gap: 8px; overflow: hidden;">
           <span style="font-size: 20px; flex-shrink: 0;">\u{1F5C2}\uFE0F</span>
           <div style="overflow: hidden;">
-            <div style="font-size: 15px; font-weight: 600; color: var(--dsw-alias-label-primary, #111827); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">\u9009\u62E9\u7535\u8111\u5DE5\u4F5C\u533A</div>
-            <div style="font-size: 11px; color: var(--dsw-alias-label-tertiary, #6b7280); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">\u70B9\u51FB\u8FDB\u5165\u6587\u4EF6\u5939\uFF0C\u6216\u70B9\u51FB\u300C+ \u9009\u4E3A\u5DE5\u4F5C\u533A\u300D\u76F4\u63A5\u6DFB\u52A0\u5E76\u5207\u6362</div>
+            <div style="font-size: 15px; font-weight: 600; color: var(--dsw-alias-label-primary, #111827); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${localeT("\u9009\u62E9\u7535\u8111\u5DE5\u4F5C\u533A")}</div>
+            <div style="font-size: 11px; color: var(--dsw-alias-label-tertiary, #6b7280); margin-top: 1px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${localeT("\u70B9\u51FB\u8FDB\u5165\u6587\u4EF6\u5939\uFF0C\u6216\u70B9\u51FB\u300C+ \u9009\u4E3A\u5DE5\u4F5C\u533A\u300D\u76F4\u63A5\u6DFB\u52A0\u5E76\u5207\u6362")}</div>
           </div>
         </div>
         <button id="dsh-ws-close-btn" style="border: none; background: none; font-size: 18px; cursor: pointer; color: var(--dsw-alias-label-tertiary, #9ca3af); padding: 4px 8px; border-radius: 6px; line-height: 1; flex-shrink: 0;">\u2715</button>
       </div>
 
-      <!-- \u7BA1\u7406\u6743\u9650\u89E3\u9501\u5757\uFF08\u8FDC\u7A0B\u8BBF\u95EE\u9700\u8981\u7BA1\u7406\u5BC6\u7801\uFF1Blocal_only \u7B56\u7565\u4E0B\u4E0D\u663E\u793A\uFF0C\u4EC5\u63D0\u793A\uFF09 -->
+      <!-- admin unlock block (remote access needs the admin password; hidden under local_only) -->
       ${needUnlock && unlockable ? `
         <div style="padding: 14px 16px; background: var(--dsw-alias-state-warn-bg, #fffbeb); border-bottom: 1px solid var(--dsw-alias-state-warn-border, #fde68a); flex-shrink: 0;">
-          <div style="font-size: 12px; font-weight: 600; color: var(--dsw-alias-label-primary, #0f1115); margin-bottom: 6px;">\u{1F512} \u6B64\u64CD\u4F5C\u9700\u8981\u7BA1\u7406\u5458\u6743\u9650</div>
-          <div style="font-size: 11px; color: var(--dsw-alias-label-secondary, #6b7280); margin-bottom: 8px; line-height: 1.5;">\u8FDC\u7A0B\u8BBF\u95EE\u65F6\u6D4F\u89C8/\u6DFB\u52A0\u5DE5\u4F5C\u533A\u9700\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\uFF08\u4E0E\u8BBF\u95EE\u5BC6\u7801\u4E0D\u540C\uFF09\u3002</div>
+          <div style="font-size: 12px; font-weight: 600; color: var(--dsw-alias-label-primary, #0f1115); margin-bottom: 6px;">${localeT("\u{1F512} \u6B64\u64CD\u4F5C\u9700\u8981\u7BA1\u7406\u5458\u6743\u9650")}</div>
+          <div style="font-size: 11px; color: var(--dsw-alias-label-secondary, #6b7280); margin-bottom: 8px; line-height: 1.5;">${localeT("\u8FDC\u7A0B\u8BBF\u95EE\u65F6\u6D4F\u89C8/\u6DFB\u52A0\u5DE5\u4F5C\u533A\u9700\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\uFF08\u4E0E\u8BBF\u95EE\u5BC6\u7801\u4E0D\u540C\uFF09\u3002")}</div>
           <form id="dsh-ws-unlock-form" style="display: flex; gap: 8px;">
-            <input id="dsh-ws-unlock-input" type="password" placeholder="\u8BF7\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801" value="${escapeHtml(unlockInput)}"
+            <input id="dsh-ws-unlock-input" type="password" placeholder="${localeT("\u8BF7\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801")}" value="${escapeHtml(unlockInput)}"
               style="flex: 1; font: inherit; font-size: 13px; padding: 7px 10px; border-radius: 8px; border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, currentColor); outline: none; box-sizing: border-box;" />
-            <button type="submit" style="border: none; background: var(--dsw-static-blue-600, #4f6ef7); color: #fff; border-radius: 8px; padding: 0 14px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;" ${unlocking ? "disabled" : ""}>${unlocking ? "\u89E3\u9501\u4E2D\u2026" : "\u89E3\u9501"}</button>
+            <button type="submit" style="border: none; background: var(--dsw-static-blue-600, #4f6ef7); color: #fff; border-radius: 8px; padding: 0 14px; font-size: 12px; font-weight: 600; cursor: pointer; flex-shrink: 0;" ${unlocking ? "disabled" : ""}>${unlocking ? localeT("\u89E3\u9501\u4E2D\u2026") : localeT("\u89E3\u9501")}</button>
           </form>
           ${unlockErr ? `<div style="font-size: 11px; color: var(--dsw-alias-label-primary, #0f1115); margin-top: 6px;">${escapeHtml(unlockErr)}</div>` : ""}
         </div>
       ` : ""}
 
       <div style="padding: 12px 16px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 10px;">
-        <!-- \u63D0\u793A\u4FE1\u606F\u6A2A\u5E45 -->
+        <!-- status banner -->
         ${statusMessage ? `
           <div style="padding: 8px 12px; border-radius: 8px; font-size: 12px; line-height: 1.5; font-weight: 500; display: flex; align-items: center; gap: 8px; ${isErrorMessage ? "background: var(--dsw-alias-state-error-bg, #fef2f2); border: 1px solid var(--dsw-alias-state-error-border, #fecaca); color: var(--dsw-alias-label-primary, #0f1115);" : "background: var(--dsw-alias-state-success-bg, #ecfdf5); border: 1px solid var(--dsw-alias-state-success-border, #a7f3d0); color: var(--dsw-alias-label-primary, #0f1115);"}">
             <span>${isErrorMessage ? "\u26A0\uFE0F" : "\u{1F389}"}</span>
@@ -7336,13 +8047,13 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
           </div>
         ` : ""}
 
-        <!-- \u5FEB\u901F\u76F4\u8FBE\u4E0E\u78C1\u76D8\u6A2A\u5411\u6ED1\u52A8\u680F (\u6781\u7B80\u7701\u7A7A\u95F4) -->
+        <!-- quick access + drives strip -->
         <div class="dsh-ws-chips-scroll">
           ${(drives || []).map((d) => {
       const isActive = currentPath.startsWith(d.path) || currentPath === d.path;
       return `
               <button class="dsh-ws-quick-btn" data-path="${escapeHtml(d.path)}" style="border: 1px solid ${isActive ? "var(--dsw-static-blue-600, #4f6ef7)" : "var(--dsw-alias-border-l2, #d1d5db)"}; background: ${isActive ? "var(--dsw-static-blue-600, #4f6ef7)" : "var(--dsw-alias-bg-layer-2, #f9fafb)"}; color: ${isActive ? "#fff" : "var(--dsw-alias-label-primary, #111827)"}; border-radius: 14px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-weight: 500; flex-shrink: 0; transition: all 0.1s;">
-                \u{1F4BE} ${escapeHtml(d.name)}
+                \u{1F4BE} ${escapeHtml(localeT(d.name))}
               </button>
             `;
     }).join("")}
@@ -7351,13 +8062,13 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
       const isActive = currentPath === r.path;
       return `
               <button class="dsh-ws-quick-btn" data-path="${escapeHtml(r.path)}" style="border: 1px solid ${isActive ? "var(--dsw-alias-brand-primary, #4f6ef7)" : "var(--dsw-alias-border-l2, #d1d5db)"}; background: ${isActive ? "var(--dsw-alias-state-info-bg, #eff6ff)" : "var(--dsw-alias-bg-layer-2, #f9fafb)"}; color: ${isActive ? "var(--dsw-alias-brand-primary, #4f6ef7)" : "var(--dsw-alias-label-secondary, #374151)"}; border-radius: 14px; padding: 4px 10px; font-size: 11px; cursor: pointer; font-weight: 500; flex-shrink: 0;">
-                ${escapeHtml(r.name)}
+                ${escapeHtml(localeT(r.name))}
               </button>
             `;
     }).join("")}
         </div>
 
-        <!-- \u4EA4\u4E92\u5F0F\u9762\u5305\u5C51\u8DEF\u5F84\u5BFC\u822A\u6761 (Breadcrumbs Bar) -->
+        <!-- breadcrumbs -->
         <div style="background: var(--dsw-alias-bg-layer-3, #f3f4f6); border: 1px solid var(--dsw-alias-border-l2, #e5e7eb); border-radius: 10px; padding: 6px 10px; display: flex; align-items: center; justify-content: space-between; gap: 6px;">
           <div class="dsh-ws-chips-scroll" style="flex: 1;">
             <span style="font-size: 12px; margin-right: 2px; flex-shrink: 0;">\u{1F4C2}</span>
@@ -7374,52 +8085,52 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
 
           <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
             ${parentPath ? `
-              <button id="dsh-ws-up-btn" data-path="${escapeHtml(parentPath)}" title="\u8FD4\u56DE\u4E0A\u4E00\u7EA7" style="border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #111827); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 2px;">
-                \u2B06\uFE0F \u4E0A\u7EA7
+              <button id="dsh-ws-up-btn" data-path="${escapeHtml(parentPath)}" title="${localeT("\u8FD4\u56DE\u4E0A\u4E00\u7EA7")}" style="border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #111827); padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 2px;">
+                ${localeT("\u2B06\uFE0F \u4E0A\u7EA7")}
               </button>
             ` : ""}
-            <button id="dsh-ws-refresh-btn" title="\u5237\u65B0\u76EE\u5F55" style="border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #111827); padding: 3px 6px; border-radius: 6px; font-size: 11px; cursor: pointer;">
+            <button id="dsh-ws-refresh-btn" title="${localeT("\u5237\u65B0\u76EE\u5F55")}" style="border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #111827); padding: 3px 6px; border-radius: 6px; font-size: 11px; cursor: pointer;">
               \u{1F504}
             </button>
           </div>
         </div>
 
-        <!-- \u5F53\u524D\u6240\u5728\u76EE\u5F55\u786E\u8BA4\u5361\u7247 (Primary Action Card) -->
+        <!-- current directory action card -->
         <div style="background: var(--dsw-alias-state-info-bg, #eff6ff); border: 1px solid var(--dsw-alias-state-info-border, #bfdbfe); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
           <div style="display: flex; align-items: center; justify-content: space-between; gap: 6px;">
-            <span style="font-size: 11px; font-weight: 600; color: var(--dsw-alias-brand-primary, #2563eb); flex-shrink: 0;">\u5F53\u524D\u76EE\u5F55:</span>
+            <span style="font-size: 11px; font-weight: 600; color: var(--dsw-alias-brand-primary, #2563eb); flex-shrink: 0;">${localeT("\u5F53\u524D\u76EE\u5F55:")}</span>
             <span style="font-family: ui-monospace, Menlo, monospace; font-size: 11px; color: var(--dsw-alias-label-primary, var(--dsw-alias-brand-primary, #1e3a8a)); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; text-align: right; font-weight: 600;">${escapeHtml(currentPath)}</span>
           </div>
           <button id="dsh-ws-add-current-btn" style="border: none; background: var(--dsw-static-blue-600, #2563eb); color: #fff; height: 36px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; box-shadow: 0 2px 4px rgba(37,99,235,0.25); transition: opacity 0.1s;" ${isSubmitting ? "disabled" : ""}>
-            ${isSubmitting ? "\u6B63\u5728\u6DFB\u52A0\u5E76\u5207\u6362\u2026" : "\u{1F449} \u8BBE\u4E3A\u5F53\u524D\u5DE5\u4F5C\u533A\u5E76\u8FDB\u5165"}
+            ${isSubmitting ? localeT("\u6B63\u5728\u6DFB\u52A0\u5E76\u5207\u6362\u2026") : localeT("\u{1F449} \u8BBE\u4E3A\u5F53\u524D\u5DE5\u4F5C\u533A\u5E76\u8FDB\u5165")}
           </button>
         </div>
 
-        <!-- \u5B50\u76EE\u5F55\u5217\u8868\u4E0E\u8FC7\u6EE4\u680F -->
+        <!-- subfolder list + filter -->
         <div style="border: 1px solid var(--dsw-alias-border-l2, #e5e7eb); border-radius: 10px; overflow: hidden; display: flex; flex-direction: column; background: var(--dsw-alias-bg-layer-1, #fff);">
-          <!-- \u5B9E\u65F6\u8FC7\u6EE4\u641C\u7D22\u6846 -->
+          <!-- live filter box -->
           <div style="padding: 7px 10px; background: var(--dsw-alias-bg-layer-2, #f9fafb); border-bottom: 1px solid var(--dsw-alias-border-l2, #e5e7eb); display: flex; align-items: center; justify-content: space-between; gap: 6px;">
             <div style="display: flex; align-items: center; gap: 6px; flex: 1;">
               <span style="font-size: 11px; color: var(--dsw-alias-label-tertiary, #9ca3af);">\u{1F50D}</span>
-              <input id="dsh-ws-filter-input" type="text" value="${escapeHtml(filterQuery)}" placeholder="\u8FC7\u6EE4\u5B50\u6587\u4EF6\u5939\u2026" style="border: none; background: transparent; font-size: 12px; width: 100%; color: var(--dsw-alias-label-primary, #111827); outline: none;" />
+              <input id="dsh-ws-filter-input" type="text" value="${escapeHtml(filterQuery)}" placeholder="${localeT("\u8FC7\u6EE4\u5B50\u6587\u4EF6\u5939\u2026")}" style="border: none; background: transparent; font-size: 12px; width: 100%; color: var(--dsw-alias-label-primary, #111827); outline: none;" />
             </div>
             <span style="font-size: 10px; color: var(--dsw-alias-label-tertiary, #6b7280); flex-shrink: 0;">
-              ${filteredEntries.length} \u4E2A\u6587\u4EF6\u5939
+              ${localeT("${count} \u4E2A\u6587\u4EF6\u5939", { count: filteredEntries.length })}
             </span>
           </div>
 
-          <!-- \u5B50\u6587\u4EF6\u5939\u6EDA\u52A8\u5217\u8868 (\u79FB\u52A8\u7AEF\u8212\u9002\u5927\u70B9\u6309\u533A\u57DF) -->
+          <!-- subfolder list (comfortable tap targets) -->
           <div style="max-height: 240px; min-height: 120px; overflow-y: auto; padding: 2px 0;">
             ${isLoading ? `
               <div style="padding: 32px; text-align: center; font-size: 12px; color: var(--dsw-alias-label-tertiary, #6b7280); display: flex; flex-direction: column; align-items: center; gap: 6px;">
                 <span style="font-size: 20px;">\u23F3</span>
-                <span>\u6B63\u5728\u8BFB\u53D6\u76EE\u5F55\u5185\u5BB9\u2026</span>
+                <span>${localeT("\u6B63\u5728\u8BFB\u53D6\u76EE\u5F55\u5185\u5BB9\u2026")}</span>
               </div>
             ` : filteredEntries.length === 0 ? `
               <div style="padding: 26px 16px; text-align: center; font-size: 12px; color: var(--dsw-alias-label-tertiary, #6b7280); display: flex; flex-direction: column; align-items: center; gap: 4px;">
                 <span style="font-size: 22px;">\u{1F4C1}</span>
-                <span>${filterQuery ? "\u672A\u627E\u5230\u5339\u914D\u7684\u5B50\u6587\u4EF6\u5939" : "\u5F53\u524D\u6587\u4EF6\u5939\u4E0B\u6CA1\u6709\u66F4\u591A\u5B50\u6587\u4EF6\u5939"}</span>
-                <span style="font-size: 11px; color: var(--dsw-alias-label-tertiary, #9ca3af);">\uFF08\u76F4\u63A5\u70B9\u51FB\u4E0A\u65B9\u84DD\u8272\u6309\u94AE\u5373\u53EF\u8FDB\u5165\u5F53\u524D\u76EE\u5F55\uFF09</span>
+                <span>${filterQuery ? localeT("\u672A\u627E\u5230\u5339\u914D\u7684\u5B50\u6587\u4EF6\u5939") : localeT("\u5F53\u524D\u6587\u4EF6\u5939\u4E0B\u6CA1\u6709\u66F4\u591A\u5B50\u6587\u4EF6\u5939")}</span>
+                <span style="font-size: 11px; color: var(--dsw-alias-label-tertiary, #9ca3af);">${localeT("\uFF08\u76F4\u63A5\u70B9\u51FB\u4E0A\u65B9\u84DD\u8272\u6309\u94AE\u5373\u53EF\u8FDB\u5165\u5F53\u524D\u76EE\u5F55\uFF09")}</span>
               </div>
             ` : filteredEntries.map((e) => `
               <div class="dsh-ws-entry-row" data-path="${escapeHtml(e.path)}" style="display: flex; align-items: center; justify-content: space-between; padding: 9px 12px; border-bottom: 1px solid var(--dsw-alias-border-l2, #f3f4f6); cursor: pointer; font-size: 12px; transition: background 0.1s; min-height: 40px;">
@@ -7428,38 +8139,38 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
                   <span style="font-family: ui-monospace, Menlo, monospace; font-weight: 500; color: var(--dsw-alias-label-primary, #111827); overflow: hidden; text-overflow: ellipsis;">${escapeHtml(e.name)}</span>
                   <span style="color: var(--dsw-alias-label-tertiary, #9ca3af); font-size: 12px; margin-left: 2px; flex-shrink: 0;">\u203A</span>
                 </div>
-                <button class="dsh-ws-pick-entry-btn" data-path="${escapeHtml(e.path)}" title="\u76F4\u63A5\u6DFB\u52A0\u6B64\u5B50\u6587\u4EF6\u5939\u4E3A\u5DE5\u4F5C\u533A\u5E76\u8FDB\u5165" style="border: 1px solid var(--dsw-alias-state-success-border, #a7f3d0); background: var(--dsw-alias-state-success-bg, #ecfdf5); color: var(--dsw-alias-label-primary, #0f1115); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; margin-left: 8px; white-space: nowrap; transition: all 0.1s;">
-                  + \u9009\u4E3A\u5DE5\u4F5C\u533A
+                <button class="dsh-ws-pick-entry-btn" data-path="${escapeHtml(e.path)}" title="${localeT("\u76F4\u63A5\u6DFB\u52A0\u6B64\u5B50\u6587\u4EF6\u5939\u4E3A\u5DE5\u4F5C\u533A\u5E76\u8FDB\u5165")}" style="border: 1px solid var(--dsw-alias-state-success-border, #a7f3d0); background: var(--dsw-alias-state-success-bg, #ecfdf5); color: var(--dsw-alias-label-primary, #0f1115); padding: 4px 10px; border-radius: 12px; font-size: 11px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 2px; flex-shrink: 0; margin-left: 8px; white-space: nowrap; transition: all 0.1s;">
+                  ${localeT("+ \u9009\u4E3A\u5DE5\u4F5C\u533A")}
                 </button>
               </div>
             `).join("")}
           </div>
         </div>
 
-        <!-- \u624B\u52A8\u8F93\u5165\u8DEF\u5F84\u6298\u53E0\u533A -->
+        <!-- manual path input (collapsible) -->
         <div>
           <div style="display: flex; align-items: center; justify-content: space-between;">
             <button id="dsh-ws-toggle-manual" style="border: none; background: none; color: var(--dsw-alias-label-tertiary, #6b7280); font-size: 11px; cursor: pointer; padding: 2px 0; text-decoration: underline;">
-              ${showManualInput ? "\u25BC \u6536\u8D77\u7EDD\u5BF9\u8DEF\u5F84\u624B\u52A8\u8F93\u5165" : "\u25B6 \u624B\u52A8\u7C98\u8D34/\u8F93\u5165\u7EDD\u5BF9\u8DEF\u5F84"}
+              ${showManualInput ? localeT("\u25BC \u6536\u8D77\u7EDD\u5BF9\u8DEF\u5F84\u624B\u52A8\u8F93\u5165") : localeT("\u25B6 \u624B\u52A8\u7C98\u8D34/\u8F93\u5165\u7EDD\u5BF9\u8DEF\u5F84")}
             </button>
           </div>
           ${showManualInput ? `
             <div style="margin-top: 6px; display: flex; gap: 6px;">
-              <input id="dsh-ws-manual-input" type="text" value="${escapeHtml(currentPath)}" placeholder="\u8F93\u5165\u7535\u8111\u7EDD\u5BF9\u8DEF\u5F84\uFF0C\u4F8B\u5982 C:\\Projects\\my-app" style="flex: 1; font-family: ui-monospace, Menlo, monospace; font-size: 11px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #111827); outline: none;" />
+              <input id="dsh-ws-manual-input" type="text" value="${escapeHtml(currentPath)}" placeholder="${localeT("\u8F93\u5165\u7535\u8111\u7EDD\u5BF9\u8DEF\u5F84\uFF0C\u4F8B\u5982 C:\\Projects\\my-app")}" style="flex: 1; font-family: ui-monospace, Menlo, monospace; font-size: 11px; padding: 6px 8px; border-radius: 8px; border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #111827); outline: none;" />
               <button id="dsh-ws-manual-jump-btn" style="border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-2, #f9fafb); color: var(--dsw-alias-label-primary, #111827); padding: 0 10px; border-radius: 8px; font-size: 11px; cursor: pointer; white-space: nowrap;">
-                \u524D\u5F80
+                ${localeT("\u524D\u5F80")}
               </button>
               <button id="dsh-ws-manual-add-btn" style="border: none; background: var(--dsw-static-blue-600, #4f6ef7); color: #fff; padding: 0 12px; border-radius: 8px; font-size: 11px; font-weight: 500; cursor: pointer; white-space: nowrap;">
-                \u6DFB\u52A0\u5E76\u8FDB\u5165
+                ${localeT("\u6DFB\u52A0\u5E76\u8FDB\u5165")}
               </button>
             </div>
           ` : ""}
         </div>
 
-        <!-- \u5DF2\u5728 DSH \u6CE8\u518C\u7684\u5DE5\u4F5C\u533A\u5C55\u793A (\u652F\u6301\u4E00\u952E\u5207\u6362) -->
+        <!-- registered workspaces (one-click switch) -->
         ${workspaces && workspaces.length > 0 ? `
           <div style="padding-top: 2px;">
-            <div style="font-size: 11px; font-weight: 600; color: var(--dsw-alias-label-tertiary, #6b7280); margin-bottom: 4px;">\u5DF2\u6CE8\u518C\u5DE5\u4F5C\u533A (${workspaces.length} \u4E2A\uFF0C\u70B9\u51FB\u76F4\u63A5\u5207\u6362)\uFF1A</div>
+            <div style="font-size: 11px; font-weight: 600; color: var(--dsw-alias-label-tertiary, #6b7280); margin-bottom: 4px;">${localeT("\u5DF2\u6CE8\u518C\u5DE5\u4F5C\u533A (${count} \u4E2A\uFF0C\u70B9\u51FB\u76F4\u63A5\u5207\u6362)\uFF1A", { count: workspaces.length })}</div>
             <div style="display: flex; flex-direction: column; gap: 4px; max-height: 80px; overflow-y: auto;">
               ${workspaces.map((w, i) => `
                 <div class="dsh-ws-registered-row" data-ws-id="${escapeHtml(w.id || "")}" data-ws-path="${escapeHtml(w.path)}" style="display: flex; align-items: center; justify-content: space-between; background: var(--dsw-alias-bg-layer-2, #f9fafb); border: 1px solid var(--dsw-alias-border-l2, #e5e7eb); border-radius: 6px; padding: 4px 8px; font-size: 11px; cursor: pointer; transition: background 0.1s;">
@@ -7468,7 +8179,7 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
                     <span style="color: var(--dsw-alias-label-tertiary, #6b7280); margin-left: 6px; font-family: ui-monospace, Menlo, monospace; font-size: 10px;">${escapeHtml(w.path)}</span>
                   </div>
                   <button class="dsh-ws-switch-btn" data-ws-id="${escapeHtml(w.id || "")}" data-ws-path="${escapeHtml(w.path)}" style="border: 1px solid var(--dsw-alias-brand-primary, #4f6ef7); background: var(--dsw-alias-state-info-bg, #eff6ff); color: var(--dsw-alias-brand-primary, #4f6ef7); padding: 2px 8px; border-radius: 6px; font-size: 10px; font-weight: 600; cursor: pointer; flex-shrink: 0; margin-left: 6px; white-space: nowrap;">
-                    \u8FDB\u5165 \u2794
+                    ${localeT("\u8FDB\u5165 \u2794")}
                   </button>
                 </div>
               `).join("")}
@@ -7477,12 +8188,12 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
         ` : ""}
       </div>
 
-      <!-- \u5F39\u7A97\u5E95\u90E8\u64CD\u4F5C\u6761 -->
+      <!-- modal footer -->
       <div style="padding: 8px 16px; border-top: 1px solid var(--dsw-alias-border-l2, #e5e7eb); display: flex; align-items: center; justify-content: space-between; background: var(--dsw-alias-bg-layer-2, #f9fafb); flex-shrink: 0;">
         <span style="font-size: 10px; color: var(--dsw-alias-label-tertiary, #6b7280);">
-          \u{1F4A1} \u70B9\u51FB\u6587\u4EF6\u5939\u53EF\u9010\u7EA7\u8FDB\u5165
+          ${localeT("\u{1F4A1} \u70B9\u51FB\u6587\u4EF6\u5939\u53EF\u9010\u7EA7\u8FDB\u5165")}
         </span>
-        <button id="dsh-ws-cancel-btn" style="border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #111827); padding: 5px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: 500;">\u5173\u95ED</button>
+        <button id="dsh-ws-cancel-btn" style="border: 1px solid var(--dsw-alias-border-l2, #d1d5db); background: var(--dsw-alias-bg-layer-1, #fff); color: var(--dsw-alias-label-primary, #111827); padding: 5px 14px; border-radius: 8px; font-size: 12px; cursor: pointer; font-weight: 500;">${localeT("\u5173\u95ED")}</button>
       </div>
     `;
     modal.querySelector("#dsh-ws-close-btn")?.addEventListener("click", closeModal);
@@ -7506,7 +8217,7 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
           isErrorMessage = false;
           await loadDirectory(currentPath);
         } else {
-          unlockErr = res.error || "\u89E3\u9501\u5931\u8D25";
+          unlockErr = localeT(res.error) || localeT("\u89E3\u9501\u5931\u8D25");
         }
         unlocking = false;
         render();
@@ -7640,7 +8351,7 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
     if (isSubmitting) return;
     isSubmitting = true;
     try {
-      statusMessage = `\u6B63\u5728\u5207\u6362\u5DE5\u4F5C\u533A\u2026`;
+      statusMessage = localeT("\u6B63\u5728\u5207\u6362\u5DE5\u4F5C\u533A\u2026");
       isErrorMessage = false;
       render();
       if (typeof onPicked === "function" && wsPath) {
@@ -7687,7 +8398,7 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
         } catch (e) {
         }
       }
-      statusMessage = `\u2713 \u5DF2\u5207\u6362\u81F3\u5DE5\u4F5C\u533A\uFF01`;
+      statusMessage = localeT("\u2713 \u5DF2\u5207\u6362\u81F3\u5DE5\u4F5C\u533A\uFF01");
       render();
       setTimeout(() => {
         closeModal();
@@ -7717,7 +8428,7 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
         drives = res.drives || [];
         workspaces = res.workspaces || [];
         if (res.error) {
-          statusMessage = typeof res.error === "string" ? res.error : res.error?.message || "\u8BFB\u53D6\u76EE\u5F55\u5931\u8D25";
+          statusMessage = typeof res.error === "string" ? localeT(res.error) : localeT(res.error?.message) || localeT("\u8BFB\u53D6\u76EE\u5F55\u5931\u8D25");
           isErrorMessage = true;
         }
       }
@@ -7729,11 +8440,11 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
         isErrorMessage = false;
         unlockable = err.unlockable !== false;
         if (!unlockable) {
-          statusMessage = err.message || "\u5F53\u524D\u7B56\u7565\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406\uFF0C\u8FDC\u7A0B\u65E0\u6CD5\u89E3\u9501";
+          statusMessage = localeT(err.message) || localeT("\u5F53\u524D\u7B56\u7565\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406\uFF0C\u8FDC\u7A0B\u65E0\u6CD5\u89E3\u9501");
           isErrorMessage = true;
         }
       } else {
-        statusMessage = err.message || "\u8BFB\u53D6\u76EE\u5F55\u5931\u8D25";
+        statusMessage = localeT(err.message) || localeT("\u8BFB\u53D6\u76EE\u5F55\u5931\u8D25");
         isErrorMessage = true;
       }
     } finally {
@@ -7745,7 +8456,7 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
     if (isSubmitting) return;
     const p = (pathToRegister || currentPath || "").trim();
     if (!p) {
-      statusMessage = "\u8BF7\u8F93\u5165\u6216\u9009\u62E9\u5DE5\u4F5C\u533A\u8DEF\u5F84";
+      statusMessage = localeT("\u8BF7\u8F93\u5165\u6216\u9009\u62E9\u5DE5\u4F5C\u533A\u8DEF\u5F84");
       isErrorMessage = true;
       render();
       return;
@@ -7767,7 +8478,7 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
       const raw = await authRpc(BRIDGE_ENDPOINTS.addRemoteWorkspace, { path: p });
       const res = raw?.value || raw;
       if (res && res.ok) {
-        statusMessage = `\u2713 \u5DE5\u4F5C\u533A\u300C${res.title || p}\u300D\u5DF2\u9009\u5B9A\uFF0C\u6B63\u5728\u5207\u6362\u2026`;
+        statusMessage = localeT("\u2713 \u5DE5\u4F5C\u533A\u300C${name}\u300D\u5DF2\u9009\u5B9A\uFF0C\u6B63\u5728\u5207\u6362\u2026", { name: res.title || p });
         isErrorMessage = false;
         workspaces = res.workspaces || [];
         render();
@@ -7802,7 +8513,7 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
           document.body.classList.remove("dsh-drawer-open");
         }, 500);
       } else {
-        statusMessage = res?.error || raw?.error || "\u6DFB\u52A0\u5DE5\u4F5C\u533A\u5931\u8D25";
+        statusMessage = localeT(res?.error) || localeT(raw?.error) || localeT("\u6DFB\u52A0\u5DE5\u4F5C\u533A\u5931\u8D25");
         isErrorMessage = true;
         render();
       }
@@ -7814,11 +8525,11 @@ function showRemoteWorkspaceDialog(rpcCall, onWorkspaceAdded, clientCtx, onPicke
         statusMessage = null;
         isErrorMessage = false;
         if (!unlockable) {
-          statusMessage = err.message || "\u5F53\u524D\u7B56\u7565\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406\uFF0C\u8FDC\u7A0B\u65E0\u6CD5\u89E3\u9501";
+          statusMessage = localeT(err.message) || localeT("\u5F53\u524D\u7B56\u7565\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406\uFF0C\u8FDC\u7A0B\u65E0\u6CD5\u89E3\u9501");
           isErrorMessage = true;
         }
       } else {
-        statusMessage = err.message || "\u6DFB\u52A0\u5DE5\u4F5C\u533A\u5F02\u5E38";
+        statusMessage = localeT(err.message) || localeT("\u6DFB\u52A0\u5DE5\u4F5C\u533A\u5F02\u5E38");
         isErrorMessage = true;
       }
       render();
@@ -8097,9 +8808,9 @@ function apply(ctx) {
   if (pageTweaksOn) {
     const navIconFamilies = () => hostFamilies;
     if (typeof ctx.effect === "function") {
-      ctx.effect(() => registerSettingsNavIcon(() => "\u8FDC\u7A0B\u8BBF\u95EE", navIconFamilies), "dsh-bridge: settings nav icon");
+      ctx.effect(() => registerSettingsNavIcon(() => localeT("\u8FDC\u7A0B\u8BBF\u95EE"), navIconFamilies), "dsh-bridge: settings nav icon");
     } else {
-      registerSettingsNavIcon(() => "\u8FDC\u7A0B\u8BBF\u95EE", navIconFamilies);
+      registerSettingsNavIcon(() => localeT("\u8FDC\u7A0B\u8BBF\u95EE"), navIconFamilies);
     }
   }
   const rpcCall = (endpoint, payload, signal) => ctx.connection.rpc.call(BRIDGE_RPC_CHANNEL, endpoint, payload, signal);
@@ -8145,7 +8856,7 @@ function apply(ctx) {
           name: "settings.section",
           id: "dsh-bridge",
           order: 10,
-          label: () => "\u8FDC\u7A0B\u8BBF\u95EE",
+          label: () => localeT("\u8FDC\u7A0B\u8BBF\u95EE"),
           inject: () => ({ rpcCall })
         },
         BridgePanel
@@ -8187,7 +8898,7 @@ function apply(ctx) {
     version: 1,
     /** 把插件自己的面板交给宿主渲染（返回 React element） */
     render: (props = {}) => {
-      return React.createElement(BridgePanel, {
+      return h(BridgePanel, {
         rpcCall,
         preferredTab: props.preferredTab,
         ...props

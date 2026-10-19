@@ -8,9 +8,17 @@
 // 插件把 "locale" 加进 inject 后即可拿到 ctx.locale，从而自动跟随 DSH 主体语言
 // （含用户手动切换、浏览器语言回退、<html lang> 同步），无需自建语言开关。
 //
-// 本文件只收「移动端自绘 UI 的用户可见文案」（A 类）：顶栏按钮、工作区选择器、
-// 远程访问面板、浏览器输入区提示等。内部字符串（DOM/CSS 类名匹配、注释、日志）
-// 保持中文原样——它们不是 UI 文案，翻译会破坏匹配（见 readHostSessionTitle 教训）。
+// 本文件有两类词条，分属两层：
+//   ① 语义化键词典（下面的 `zh` / `en`）：移动端自绘 UI、DOM 注入、aria/title 等
+//      「拿不到原文上下文」的调用点，用 localeT('menu.open') 这类键；
+//   ② 「中文原文 → 英文」渲染层词典（panel-locales.mjs 的 panelEn / serverEn）：
+//      client/index.js 的 h() 包装器在渲染时按原文精确命中翻译，动态拼接与服务端
+//      运行时文案另有 `${var}` 占位符与正则模式。
+// 内部字符串（DOM/CSS 类名匹配、注释、日志）保持中文原样——它们不是 UI 文案，
+// 翻译会破坏匹配（见 readHostSessionTitle 教训）；这类字面量由
+// test/panel-i18n.test.mjs 的内部白名单显式登记。
+
+import { panelEn, serverEn, serverPatterns } from './panel-locales.mjs';
 
 export const LOCALE_NAMESPACE = '@wenbin_wb/dsh-bridge';
 
@@ -154,14 +162,58 @@ export const en = {
 export function createTranslator(ctx) {
   // 当前语言：宿主把 active 语言同步到 <html lang>（zh→zh-CN，其余原样）。
   // 读它即可跟随 DSH 主体语言且无需声明 locale 服务。
-  const active = () => {
-    const lang = (typeof document !== 'undefined' ? document.documentElement.getAttribute('lang') : '') || '';
-    return lang.toLowerCase().startsWith('zh') ? 'zh' : 'en';
+  // 读 <html lang>。document 可能不存在（Node 测试）或只有残缺 stub（宿主外壳/测试
+  // 替身没有 documentElement.getAttribute）——整体容错：翻译函数在渲染/初始化链路上
+  // 被高频调用，任何一个残缺 document 都不该把面板初始化打断。
+  const readLang = () => {
+    try {
+      const root = typeof document !== 'undefined' ? document.documentElement : null;
+      return (root && typeof root.getAttribute === 'function' ? root.getAttribute('lang') : '') || '';
+    } catch {
+      return '';
+    }
   };
-  const entryOf = (key) => ({ zh: zh[key], en: en[key] });
+  const active = () => (readLang().toLowerCase().startsWith('zh') ? 'zh' : 'en');
+  // 词典查询必须用「自有属性」判定：词典是普通对象，直接 dict[key] 会让
+  // 'constructor' / 'toString' / '__proto__' 这类原型属性名返回函数或对象。
+  // 渲染层 h() 会把**所有**字符串子节点送进来（含用户数据、路径、会话标题），
+  // 一旦命中就会把函数当 React child 渲染（React 直接抛错）。见
+  // test/panel-i18n.test.mjs 的「h() 包装器」用例。
+  const own = (dict, key) => (typeof key === 'string' && Object.hasOwn(dict, key) ? dict[key] : undefined);
+  // 先查语义化键词典（locales.mjs），未命中再查「中文原文 → 译文」词典
+  // （panel-locales.mjs，渲染层兜底翻译用）。中文模式下 panel 词典不生效——
+  // 中文就是原文本身（键），直接返回 undefined 让 t() 回退键。
+  const lookup = (key, lang, vars, depth = 0) => {
+    if (typeof key !== 'string') return undefined;
+    // `$1t` 允许捕获组再翻译一次；深度设上限，防止超长嵌套前缀把调用栈打爆
+    if (depth > 8) return undefined;
+    const semantic = lang === 'zh' ? own(zh, key) : (own(en, key) ?? own(zh, key));
+    if (semantic !== undefined) return semantic;
+    if (lang === 'zh') return undefined;
+    const panel = own(panelEn, key);
+    if (panel !== undefined) {
+      if (Array.isArray(panel)) return vars && vars.count === 1 ? panel[0] : panel[1];
+      return panel;
+    }
+    // 服务端运行时文案（RPC 错误 / 隧道状态 / 网络诊断）：精确匹配优先，其次正则模式。
+    const server = own(serverEn, key);
+    if (server !== undefined) return server;
+    for (const [pattern, english] of serverPatterns) {
+      const matched = pattern.exec(key);
+      if (!matched) continue;
+      // `$1` 原样插入捕获组；`$1t` 表示「该捕获组本身也要过一遍词典」
+      // （服务端常把中文原因/状态嵌在英文模板里，如『连接异常: 连接超时 (3.5s)』）。
+      return english.replace(/\$(\d)(t?)/g, (_, group, translate) => {
+        const captured = matched[Number(group)] ?? '';
+        return translate ? (lookup(captured, 'en', undefined, depth + 1) ?? captured) : captured;
+      });
+    }
+    return undefined;
+  };
   const t = (key, vars) => {
-    const e = entryOf(key);
-    let text = e[active()] ?? e.en ?? e.zh ?? '';
+    let text = lookup(key, active(), vars);
+    // 英文缺失译文时回退原文（宁可见中文，也不显示键名/空白）
+    if (text === undefined) text = key;
     if (vars && text) {
       for (const [k, v] of Object.entries(vars)) text = text.replaceAll(`\${${k}}`, String(v));
     }
@@ -176,3 +228,15 @@ export function createTranslator(ctx) {
   } catch { /* 动态插件的 locale 服务被宿主门控时忽略 */ }
   return { t, active };
 }
+
+const globalTranslator = createTranslator(null);
+
+/**
+ * 无 ctx 的全局翻译函数：给「不在 React 渲染层、也拿不到 ctx」的模块用
+ * （例：client/unlock-manager.js 的错误文案、client/settings-nav-icon.js 的兜底标签）。
+ * 语言每次调用实时读 <html lang>，与面板翻译器同源。
+ * @param {string} key 语义化键或中文原文
+ * @param {Record<string, unknown>} [vars] 占位符/单复数变量
+ * @returns {string}
+ */
+export const t = (key, vars) => globalTranslator.t(key, vars);
