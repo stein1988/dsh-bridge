@@ -21,7 +21,7 @@
   - **客户端**：本机访问却拿不到管理令牌时，面板顶部给出明确出路提示——「请改用电脑浏览器打开 `http://127.0.0.1:<代理端口>` 进行管理类操作」+ 直达链接与「知道了」，不再让管理类操作"点了没反应"。
   - **契约收紧（同 PR 内）**：loopback-token 对**带 Origin 但未获授权**的请求（含 opaque `"null"`、空 Origin、白名单外来源）由原先的「照常签发、只靠不回显 ACAO 让浏览器拦读」改为 **403 且不签发令牌**——不再依赖 CORS 实现细节；无 Origin 的非浏览器客户端行为不变。
   - 测试：新增 `test/desktop-admin-token.test.mjs`（3 例，安全边界与客户端接线）；`security-hardening` 增加 HTTP 预检/实际请求与 WS 升级两组行为断言（桌面来源放行、`null` 与陌生来源 403 且响应体不含令牌）；`proxy-auth` / `phase2-fixes` 中两条旧 CORS 断言同步改为 403 口径。
-  - **待实机确认**：桌面 Electron 实际发送的 Origin 头究竟是字面量 `dsh-app://app` 还是 opaque 的 `null`（未在 Windows 桌面版抓包核实）。若是前者，第一层即修复；若是后者，第一层不生效，由第二层的明确提示与浏览器控制台出路兜底。
+  - **实机确认（2026-10-20）**：Windows 10 + DSH Desktop（Electron 44 / `dsh-app://app`）上用 `webRequest.onBeforeSendHeaders` 抓包，桌面壳真实发送的 Origin 就是**字面量 `dsh-app://app`**（不是 opaque `null`，也不是缺省），故第一层白名单放行即为有效修复；同一环境对照验证：旧版实机代理 `Failed to fetch` → 修复版读到 `200` 与 `adminToken`，WebSocket 握手由 `403` 变为连接成功；`null` / 陌生来源 / 空 Origin 仍为 403（安全边界未放松）。
 
 - **未设置访问密码时「开启公网隧道」点了没反应（issue #75）**：开启 Cloudflare/自建隧道、保存隧道配置、隧道随 DSH 自启这类高危操作，服务端都带 `requireConfigured` 守卫——从未设置任何访问/管理密码时会被直接拒绝并返回可读错误；但旧实现只把错误写到**面板顶部横幅**，隧道卡片在长页面下方时用户看不到任何反馈，观感就是"点了没反应、也不知道为什么"。现在：
   - 客户端与**服务端同源**判断前置条件（新增纯函数 `client/tunnel-guard.js`，覆盖 `local_only`、管理保护关闭、宽松策略等例外分支）；「重置链接」在服务端虽是普通操作，但它是 stop+start 复合操作，客户端同样按 start 的前置条件预检（避免"停掉成功、启动被拒"把隧道留在停用态）；
