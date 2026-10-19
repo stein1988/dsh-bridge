@@ -368,3 +368,27 @@ test('issue #32: no proxy URL returns undefined agent', () => {
   assert.equal(createConnectProxyAgent(''), undefined)
   assert.equal(createConnectProxyAgent('not a url'), undefined)
 })
+
+test('issue #77①: TelegramService.getStatus().config 回读 showActivity / changesDigest / groupAutoApprove', async () => {
+  const ctx = makeMockCordisCtx()
+  const service = new TelegramService({
+    ctx,
+    logger: ctx.logger(),
+    config: { botToken: '', proxy: '' },
+    onPersist: () => {},
+  })
+  try {
+    const defaults = service.getStatus().config
+    assert.equal(defaults.showActivity, false)
+    assert.equal(defaults.changesDigest, true)
+    assert.equal(defaults.groupAutoApprove, false)
+
+    await service.setConfig({ showActivity: true, changesDigest: false, groupAutoApprove: true })
+    const cfg = service.getStatus().config
+    assert.equal(cfg.showActivity, true)
+    assert.equal(cfg.changesDigest, false)
+    assert.equal(cfg.groupAutoApprove, true)
+  } finally {
+    service.destroy()
+  }
+})

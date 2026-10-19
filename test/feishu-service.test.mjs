@@ -1390,3 +1390,28 @@ test('[飞书] 一键创建应用：断开连接会中止扫码流程', async ()
 
   svc.dispose()
 })
+
+// ---------------------------------------------------------------------------
+// issue #77 ①：设置页开关回读（缺字段会让勾选"莫名其妙回退"）
+// ---------------------------------------------------------------------------
+
+test('[飞书] issue #77①：getStatus().config 回读 showActivity / changesDigest / groupAutoApprove', async () => {
+  const { svc } = makeService()
+  try {
+    // 默认值语义必须与桥的 opt-in 一致：活动状态默认关、改动摘要默认开、群自动授权默认关
+    const defaults = svc.getStatus().config
+    assert.equal(defaults.showActivity, false)
+    assert.equal(defaults.changesDigest, true)
+    assert.equal(defaults.groupAutoApprove, false)
+
+    // 设置页勾选 → setConfig 落盘 → getStatus 必须读回同一状态（旧实现这 3 个字段直接缺失，
+    // 前端读到的永远是 undefined，于是切页/重开面板后勾选回退成未勾选）
+    await svc.setConfig({ showActivity: true, changesDigest: false, groupAutoApprove: true })
+    const cfg = svc.getStatus().config
+    assert.equal(cfg.showActivity, true)
+    assert.equal(cfg.changesDigest, false)
+    assert.equal(cfg.groupAutoApprove, true)
+  } finally {
+    svc.dispose()
+  }
+})

@@ -571,8 +571,10 @@ test('[活动] 飞书：状态不得引入"孤儿空卡片"（曾显示为 "(no 
   // 真机截图（2026-10-17）：会话里出现一张只有 "(no content)" 的卡片，且上面的卡片不停覆盖重写。
   // 成因：曾尝试"有状态就先预热建卡"，但建卡异步，一旦与"文本到达建卡"竞态，
   // 预热那张会因 _stream 已被占用而被收尾成**空卡片**（本地已复现）。
-  // 结论：**不做预热**——实测 tool/call 与文本总是同一时刻到达，文本本身就会建卡并带上状态。
-  // 本用例锁住该不变量：任何情况下都不得出现"从未写入内容"的卡片。
+  // 现行设计（issue #77 ②）：预热卡带 **400ms 观察窗口**——窗口内正文到达 / 轮次结束
+  // 会取消建卡；窗口过后才真正建卡，且 openStream 网络往返期间若状态/轮次已变，会先把
+  // 状态快照写进卡片再收尾。本用例锁住不变量：任何情况下都不得出现"从未写入内容"的卡片，
+  // 且所有建出的卡片都必须被收尾。
   const { Context } = await import('@deepseek-ai/cordis')
   const { activityParts } = await import('../lib/platform/activity.js')
   const app = new Context()
@@ -600,7 +602,7 @@ test('[活动] 飞书：状态不得引入"孤儿空卡片"（曾显示为 "(no 
     async createCard() { return null },
   })
   const { FeishuConversationNode } = await import('../lib/feishu/node.js')
-  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false, activityIntervalSec: 0 },
+  const node = new FeishuConversationNode(root, { allowFrom: ['x'], changesDigest: false, activityIntervalSec: 0, warmCardDelayMs: 0 },
     { info: () => {}, warn: () => {}, error: () => {}, debug: () => {} })
   node._lastPeer = { peerId: 'oc', isGroup: false }
   node.activeSessionId = 's1'
