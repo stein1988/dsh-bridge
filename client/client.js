@@ -2157,7 +2157,10 @@ var panelEn = {
   "cloudflared\uFF1A${path}\uFF08${version} \xB7 ${source}\uFF09": "cloudflared: ${path} (${version} \xB7 ${source})",
   "\u26A1 \u81EA\u52A8\u63A8\u8350 (${ip} \xB7 ${label})": "\u26A1 Auto (recommended: ${ip} \xB7 ${label})",
   "\u5F00\u542F\u516C\u7F51\u96A7\u9053\u524D\uFF0C\u8BF7\u5148\u5728\u300C\u5B89\u5168\u8BA4\u8BC1\u300D\u4E2D\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801": "Before enabling the public tunnel, set an access password under \u201CSecurity\u201D",
-  "\u53BB\u8BBE\u7F6E \u2794": "Set up \u2794"
+  "\u53BB\u8BBE\u7F6E \u2794": "Set up \u2794",
+  "\u672C\u673A\u8BBF\u95EE\u672A\u80FD\u81EA\u52A8\u83B7\u53D6\u7BA1\u7406\u4EE4\u724C\uFF08\u53EF\u80FD\u662F\u684C\u9762\u7A97\u53E3/\u81EA\u5B9A\u4E49\u534F\u8BAE\u7684\u8DE8\u6E90\u9650\u5236\uFF09\u3002\u8BF7\u6539\u7528\u7535\u8111\u6D4F\u89C8\u5668\u6253\u5F00 ${url} \u8FDB\u884C\u7BA1\u7406\u7C7B\u64CD\u4F5C\u3002": "This local page could not obtain the admin token automatically (possibly a cross-origin restriction of the desktop window or a custom protocol). Open ${url} in your computer's browser to perform admin operations.",
+  "\u6253\u5F00\u63A7\u5236\u53F0 \u2197": "Open console \u2197",
+  "\u77E5\u9053\u4E86": "Got it"
 };
 var serverEn = {
   "App ID \u4E0E App Secret \u672A\u914D\u7F6E": "App ID and App Secret are not configured",
@@ -6671,6 +6674,7 @@ function BridgePanel({ rpcCall, preferredTab }) {
   const [adminUnlocked, setAdminUnlocked] = React.useState(false);
   const [unlockPassword, setUnlockPassword] = React.useState("");
   const [unlockErr, setUnlockErr] = React.useState(null);
+  const [tokenHint, setTokenHint] = React.useState(false);
   const [unlocking, setUnlocking] = React.useState(false);
   const [showForgotGuide, setShowForgotGuide] = React.useState(false);
   const [showUnlockModal, setShowUnlockModal] = React.useState(false);
@@ -6699,6 +6703,8 @@ function BridgePanel({ rpcCall, preferredTab }) {
     let token = getAdminToken();
     if (isLocalhost && !token) {
       token = await fetchLoopbackToken();
+      if (!token) setTokenHint(true);
+      else setTokenHint(false);
     }
     const enriched = {
       ...payload,
@@ -7344,9 +7350,48 @@ function BridgePanel({ rpcCall, preferredTab }) {
     );
   }
   const isInterceptionErr = err && (err.includes("\u7BA1\u7406\u5458\u6743\u9650") || err.includes("\u7BA1\u7406\u5BC6\u7801\u89E3\u9501"));
+  const consoleUrl = `http://127.0.0.1:${status?.proxy?.port || 3082}`;
   return h(
     "div",
     { style: { maxWidth: 620, position: "relative" } },
+    // issue #76：桌面窗口（dsh-app://app）无法跨源领取 adminToken 时的明确出路提示
+    tokenHint && h(
+      "div",
+      {
+        style: {
+          ...s.card,
+          background: "var(--dsw-alias-state-warn-bg,#fffbeb)",
+          border: "1px solid var(--dsw-alias-state-warn-border,#fde68a)",
+          color: "var(--dsw-alias-label-primary, #0f1115)",
+          fontSize: 12,
+          lineHeight: 1.6,
+          marginBottom: 16,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "space-between",
+          flexWrap: "wrap",
+          gap: 8
+        }
+      },
+      h(
+        "span",
+        { style: { flex: "1 1 auto" } },
+        // 措辞中性化：isLocalhost 还覆盖 file: / vscode-webview: / *.local 等场景，
+        // 不一定都是"桌面窗口跨源限制"（复核建议 F3）。
+        localeT("\u672C\u673A\u8BBF\u95EE\u672A\u80FD\u81EA\u52A8\u83B7\u53D6\u7BA1\u7406\u4EE4\u724C\uFF08\u53EF\u80FD\u662F\u684C\u9762\u7A97\u53E3/\u81EA\u5B9A\u4E49\u534F\u8BAE\u7684\u8DE8\u6E90\u9650\u5236\uFF09\u3002\u8BF7\u6539\u7528\u7535\u8111\u6D4F\u89C8\u5668\u6253\u5F00 ${url} \u8FDB\u884C\u7BA1\u7406\u7C7B\u64CD\u4F5C\u3002", { url: consoleUrl })
+      ),
+      h("a", {
+        href: consoleUrl,
+        target: "_blank",
+        rel: "noreferrer",
+        style: { ...s.btnGhost, height: 26, fontSize: 12, textDecoration: "none", display: "inline-flex", alignItems: "center", flexShrink: 0 }
+      }, localeT("\u6253\u5F00\u63A7\u5236\u53F0 \u2197")),
+      h("button", {
+        type: "button",
+        style: { ...s.btnGhost, height: 26, fontSize: 12, flexShrink: 0 },
+        onClick: () => setTokenHint(false)
+      }, localeT("\u77E5\u9053\u4E86"))
+    ),
     // 错误横幅（如果是权限拦截，直接提供醒目的输入密码解锁按钮）
     err && h(
       "div",

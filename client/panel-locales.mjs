@@ -524,6 +524,9 @@ export const panelEn = {
   "⚡ 自动推荐 (${ip} · ${label})": "⚡ Auto (recommended: ${ip} · ${label})",
   "开启公网隧道前，请先在「安全认证」中设置访问密码": "Before enabling the public tunnel, set an access password under “Security”",
   "去设置 ➔": "Set up ➔",
+  "本机访问未能自动获取管理令牌（可能是桌面窗口/自定义协议的跨源限制）。请改用电脑浏览器打开 ${url} 进行管理类操作。": "This local page could not obtain the admin token automatically (possibly a cross-origin restriction of the desktop window or a custom protocol). Open ${url} in your computer's browser to perform admin operations.",
+  "打开控制台 ↗": "Open console ↗",
+  "知道了": "Got it",
 };
 
 // 服务端（RPC / 隧道管理器 / 网络诊断）产生的运行时文案：面板以子节点原样渲染，

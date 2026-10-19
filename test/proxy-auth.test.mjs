@@ -224,8 +224,8 @@ test('issue #28 regression: DSH native origin (dshPort) can read loopback-token 
     assert.ok(okData.adminToken)
     assert.equal(authManager.validateAdminSession(okData.adminToken), true)
 
-    // 2. 非白名单 origin：服务端仍按回环签发（TCP 层无法拒绝本机来源），
-    //    但不回显 ACAO 头 —— 浏览器跨域读不到响应（CORS 拦截），这是本端点的安全语义
+    // 2. 非白名单 origin：issue #76 复核后改为**硬拒绝**——带 Origin 但未获授权时直接 403，
+    //    既不签发令牌也不回显 ACAO（不再只依赖浏览器 CORS 拦截这一实现细节）
     const evilRes = await doRequest({
       host: '127.0.0.1',
       port: proxyPort,
@@ -233,8 +233,9 @@ test('issue #28 regression: DSH native origin (dshPort) can read loopback-token 
       method: 'POST',
       headers: { Origin: 'http://evil.example' },
     })
-    assert.equal(evilRes.statusCode, 200)
+    assert.equal(evilRes.statusCode, 403)
     assert.equal(evilRes.headers['access-control-allow-origin'], undefined)
+    assert.equal(evilRes.body.includes('adminToken'), false, '未授权来源不得拿到令牌')
   } finally {
     await proxy.stop()
     authManager.dispose()

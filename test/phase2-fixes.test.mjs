@@ -121,8 +121,9 @@ test('ProxyServer loopback-token 仅对白名单 Origin 放开跨域', async () 
       req.end()
     })
 
+    // issue #76 复核后改为硬拒绝：陌生 Origin 连预检都不再回 204，直接 403 且无 ACAO
     const preflightEvil = await call('OPTIONS', 'https://evil.example')
-    assert.equal(preflightEvil.status, 204)
+    assert.equal(preflightEvil.status, 403)
     assert.equal(preflightEvil.headers['access-control-allow-origin'], undefined, '陌生来源不得获得 ACAO 回显')
     assert.equal(preflightEvil.headers.vary, 'Origin')
 
@@ -131,8 +132,9 @@ test('ProxyServer loopback-token 仅对白名单 Origin 放开跨域', async () 
     assert.equal(preflightGood.headers['access-control-allow-origin'], 'http://192.168.1.5:30882')
 
     const post = await call('POST', 'https://evil.example')
-    assert.equal(post.status, 403, 'authManager 缺失时拒绝签发')
+    assert.equal(post.status, 403, '陌生来源直接拒绝，不再依赖 CORS 拦截')
     assert.equal(post.headers['access-control-allow-origin'], undefined)
+    assert.match(post.body, /origin not allowed/)
   } finally {
     await proxy.stop()
   }

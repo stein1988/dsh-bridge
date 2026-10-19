@@ -3506,6 +3506,9 @@ function BridgePanel({ rpcCall, preferredTab }) {
   const [adminUnlocked, setAdminUnlocked] = React.useState(false);
   const [unlockPassword, setUnlockPassword] = React.useState('');
   const [unlockErr, setUnlockErr]         = React.useState(null);
+  // issue #76：本机访问却拿不到管理令牌（桌面窗口 dsh-app://app 的跨源限制等）时，
+  // 必须给用户一条明确出路，而不是让管理类操作静默失败。
+  const [tokenHint, setTokenHint]         = React.useState(false);
   const [unlocking, setUnlocking]         = React.useState(false);
   const [showForgotGuide, setShowForgotGuide] = React.useState(false);
   const [showUnlockModal, setShowUnlockModal] = React.useState(false);
@@ -3545,6 +3548,10 @@ function BridgePanel({ rpcCall, preferredTab }) {
     let token = getAdminToken();
     if (isLocalhost && !token) {
       token = await fetchLoopbackToken();
+      // 本机却拿不到令牌：桌面窗口/自定义协议的跨源限制（issue #76）或端点不可达。
+      // 记下来给出一条可操作的提示，避免"点了没反应"；后续成功拿到令牌时自动收起。
+      if (!token) setTokenHint(true);
+      else setTokenHint(false);
     }
     const enriched = {
       ...payload,
@@ -4133,8 +4140,34 @@ function BridgePanel({ rpcCall, preferredTab }) {
   }
 
   const isInterceptionErr = err && (err.includes('管理员权限') || err.includes('管理密码解锁'));
+  const consoleUrl = `http://127.0.0.1:${status?.proxy?.port || 3082}`;
 
   return h('div', { style: { maxWidth: 620, position: 'relative' } },
+    // issue #76：桌面窗口（dsh-app://app）无法跨源领取 adminToken 时的明确出路提示
+    tokenHint && h('div', {
+      style: {
+        ...s.card,
+        background: 'var(--dsw-alias-state-warn-bg,#fffbeb)',
+        border: '1px solid var(--dsw-alias-state-warn-border,#fde68a)',
+        color: 'var(--dsw-alias-label-primary, #0f1115)',
+        fontSize: 12, lineHeight: 1.6, marginBottom: 16,
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 8,
+      },
+    },
+      h('span', { style: { flex: '1 1 auto' } },
+        // 措辞中性化：isLocalhost 还覆盖 file: / vscode-webview: / *.local 等场景，
+        // 不一定都是"桌面窗口跨源限制"（复核建议 F3）。
+        localeT('本机访问未能自动获取管理令牌（可能是桌面窗口/自定义协议的跨源限制）。请改用电脑浏览器打开 ${url} 进行管理类操作。', { url: consoleUrl })),
+      h('a', {
+        href: consoleUrl, target: '_blank', rel: 'noreferrer',
+        style: { ...s.btnGhost, height: 26, fontSize: 12, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', flexShrink: 0 },
+      }, localeT('打开控制台 ↗')),
+      h('button', {
+        type: 'button',
+        style: { ...s.btnGhost, height: 26, fontSize: 12, flexShrink: 0 },
+        onClick: () => setTokenHint(false),
+      }, localeT('知道了')),
+    ),
     // 错误横幅（如果是权限拦截，直接提供醒目的输入密码解锁按钮）
     err && h('div', {
       style: {

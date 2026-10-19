@@ -9,7 +9,7 @@ import { request as httpRequest } from 'node:http'
 import { readFileSync } from 'node:fs'
 import { dirname, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { BridgeService, ProxyServer, toHttpOrigin } from '../lib/index.js'
+import { BridgeService, ProxyServer, toHttpOrigin, DESKTOP_APP_ORIGIN } from '../lib/index.js'
 import { AuthManager } from '../lib/auth/manager.js'
 import { makeSessionsFile } from './helpers.mjs'
 
@@ -169,8 +169,12 @@ test('BridgeService 白名单：隧道地址非 http(s) 时不产生 "null"', as
   try {
     const origins = proxy.allowedOrigins()
     assert.equal(origins.includes('null'), false, `白名单不得含 "null"，实际: ${JSON.stringify(origins)}`)
+    // 白名单只允许 http(s) origin **加上**官方桌面版固定来源 dsh-app://app（issue #76）。
+    // 后者是浏览器生成的字面量、网页无法伪造，且绝不等于 opaque 的 "null"。
+    assert.ok(origins.includes(DESKTOP_APP_ORIGIN), `白名单应含官方桌面版来源，实际: ${JSON.stringify(origins)}`)
     for (const origin of origins) {
-      assert.match(origin, /^https?:\/\//, `白名单只允许 http(s) origin，实际: ${origin}`)
+      assert.ok(origin === DESKTOP_APP_ORIGIN || /^https?:\/\//.test(origin),
+        `白名单只允许 http(s) origin 与 ${DESKTOP_APP_ORIGIN}，实际: ${origin}`)
     }
     // http(s) 的隧道地址仍应正常放行（修复不得削弱既有能力）。
     // 用严格相等比对而非子串匹配：CodeQL js/incomplete-url-substring-sanitization
@@ -225,6 +229,87 @@ test('WS 升级：白名单被污染出 "null" 时仍拒绝 Origin: null', async
     assert.match(status, /^HTTP\/1\.1 403/, `白名单含 "null" 时仍应拒绝，实际: ${status}`)
     const ok = await rawUpgrade(port, { Origin: 'http://127.0.0.1:3082' })
     assert.match(ok, /^HTTP\/1\.1 101/, `合法回环来源仍应放行，实际: ${ok}`)
+  } finally { await close() }
+})
+
+test('issue #76：官方桌面版来源 dsh-app://app 可跨源读取 loopback-token，且仍拒绝 null', async () => {
+  const proxy = new ProxyServer({
+    localPort: 0, targetPort: 1,
+    authManager: { createAdminSession: () => 'admin-token-xyz', internalTunnelSecret: 'secret' },
+    logger: { info() {}, warn() {}, error() {}, debug() {} },
+    allowedOrigins: () => [DESKTOP_APP_ORIGIN, 'http://127.0.0.1:30882'],
+  })
+  await proxy.start()
+  try {
+    const port = proxy.server.address().port
+    // origin === undefined 表示「完全不带 Origin 头」（curl / Electron 主进程）；
+    // 传 '' 才是真正的空 Origin 头。两者语义不同（空头必须 fail-closed），
+    // 因此不能用 `origin ? ... : ...` 真值判断，否则空头会被误当成"无头"而测不到目标行为。
+    const call = (method, origin) => new Promise((resolve, reject) => {
+      const req = httpRequest({ host: '127.0.0.1', port, method, path: '/__dsh_bridge__/loopback-token',
+        headers: origin === undefined ? {} : { origin } }, (res) => {
+        const chunks = []
+        res.on('data', (c) => chunks.push(c))
+        res.on('end', () => resolve({ status: res.statusCode, headers: res.headers, body: Buffer.concat(chunks).toString('utf8') }))
+      })
+      req.on('error', reject)
+      req.end()
+    })
+
+    // 预检与实际请求都必须回显该来源（否则桌面窗口的 fetch 会被浏览器拦下）
+    const preflight = await call('OPTIONS', DESKTOP_APP_ORIGIN)
+    assert.equal(preflight.status, 204)
+    assert.equal(preflight.headers['access-control-allow-origin'], DESKTOP_APP_ORIGIN)
+    const post = await call('POST', DESKTOP_APP_ORIGIN)
+    assert.equal(post.status, 200)
+    assert.equal(post.headers['access-control-allow-origin'], DESKTOP_APP_ORIGIN)
+    assert.equal(post.headers['cache-control'], 'no-store')
+    assert.equal(JSON.parse(post.body).adminToken, 'admin-token-xyz', '桌面来源应能读到令牌响应体')
+
+    // 对照组：opaque origin 与不在白名单的来源，不仅拿不到 ACAO，而且**直接 403 且不签发
+    // 令牌**（纵深防御，不再依赖浏览器 CORS 实现细节）——不得因放行桌面来源而放松 #62 防线
+    const nullPre = await call('OPTIONS', 'null')
+    assert.equal(nullPre.headers['access-control-allow-origin'], undefined)
+    assert.equal(nullPre.status, 403)
+    const nullPost = await call('POST', 'null')
+    assert.equal(nullPost.headers['access-control-allow-origin'], undefined)
+    assert.equal(nullPost.status, 403)
+    assert.equal(nullPost.body.includes('admin-token'), false, '未授权来源不得拿到令牌响应体')
+
+    const evilPre = await call('OPTIONS', 'http://evil.example')
+    assert.equal(evilPre.headers['access-control-allow-origin'], undefined)
+    assert.equal(evilPre.status, 403)
+    const evilPost = await call('POST', 'http://evil.example')
+    assert.equal(evilPost.headers['access-control-allow-origin'], undefined)
+    assert.equal(evilPost.status, 403)
+    assert.equal(evilPost.body.includes('admin-token'), false, '未授权来源不得拿到令牌响应体')
+
+    // 空 Origin 头（`Origin: `）：语义上同样是「浏览器给了来源但未获授权」→ 必须 fail-closed。
+    // 回归断言：判定若退回真值判断（空串为假 → 走免 CORS 分支），本组必须失败。
+    const emptyPre = await call('OPTIONS', '')
+    assert.equal(emptyPre.status, 403, '空 Origin 头的预检也必须拒绝')
+    assert.equal(emptyPre.headers['access-control-allow-origin'], undefined)
+    const emptyPost = await call('POST', '')
+    assert.equal(emptyPost.status, 403, '空 Origin 头不得签发令牌')
+    assert.equal(emptyPost.headers['access-control-allow-origin'], undefined)
+    assert.equal(emptyPost.body.includes('admin-token'), false, '空 Origin 头不得拿到令牌响应体')
+
+    // 反向对照：完全不带 Origin 头（curl / Electron 主进程）仍走免 CORS 签发路径，行为不变
+    const noOrigin = await call('POST', undefined)
+    assert.equal(noOrigin.status, 200, '无 Origin 头的非浏览器客户端应照常签发')
+    assert.equal(JSON.parse(noOrigin.body).adminToken, 'admin-token-xyz')
+  } finally {
+    await proxy.stop()
+  }
+})
+
+test('issue #76：WebSocket 升级同样放行 dsh-app://app、拒绝 null', async () => {
+  const { port, close } = await makeProxy({ allowedOrigins: () => [DESKTOP_APP_ORIGIN] })
+  try {
+    const ok = await rawUpgrade(port, { Origin: DESKTOP_APP_ORIGIN })
+    assert.match(ok, /^HTTP\/1\.1 101/, `桌面来源应放行，实际: ${ok}`)
+    const bad = await rawUpgrade(port, { Origin: 'null' })
+    assert.match(bad, /^HTTP\/1\.1 403/, `opaque origin 仍应拒绝，实际: ${bad}`)
   } finally { await close() }
 })
 
