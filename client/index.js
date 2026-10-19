@@ -23,6 +23,7 @@ import {
 } from './mobile-yield.js'
 import { registerSettingsNavIcon } from './settings-nav-icon.js'
 import { createTranslator } from './locales.mjs'
+import { needsTunnelPassword } from './tunnel-guard.js'
 // dsh-bridge 客户端插件：设置页「远程访问」面板
 
 // 兼容非 HTTPS 环境（如手机局域网 HTTP 访问）：为非安全上下文补齐 crypto.randomUUID
@@ -133,6 +134,10 @@ const RELEASES_URL = 'https://github.com/wenbin-wb/dsh-bridge/releases';
 const ISSUES_URL = 'https://github.com/wenbin-wb/dsh-bridge/issues/new';
 const TUNNEL_DOCS_URL = 'https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/custom-tunnel.md';
 const CLOUDFLARE_TUTORIAL_URL = 'https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/cloudflare-fixed-domain.md';
+
+// 隧道高危操作的前置条件文案（issue #75）：未设访问密码时服务端会拒绝 requireConfigured
+// 系列操作，客户端把它显式呈现出来（旧实现只写顶部横幅，卡片在长页下方时用户看不到）。
+const TUNNEL_PASSWORD_TEXT = '开启公网隧道前，请先在「安全认证」中设置访问密码'
 
 // 模块级翻译函数：apply() 里随 ctx.locale 初始化（跟随 DSH 主体语言），
 // 供 setupMobileExperience / setupComposerCollapse 等各函数读取（不通过参数传递）。
@@ -516,6 +521,34 @@ const CustomTunnelGuide = React.memo(function CustomTunnelGuide() {
 });
 
 // ── 公网入口总览卡：把"当前生效的访问地址"提到页面主角位置 ──────────────
+/**
+ * 隧道前置条件内联提示（issue #75）：按钮旁常驻说明 + 直达「安全认证」。
+ * 整行可点（与 QrBlock 的提示同一交互），保证用户在任何滚动位置都能看到反馈。
+ */
+const TunnelPasswordNotice = React.memo(function TunnelPasswordNotice({ onNavigateSecurity, compact = false }) {
+  return h('div', {
+    style: {
+      ...s.warn,
+      display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 6,
+      marginTop: compact ? 8 : 0, marginBottom: compact ? 0 : 10,
+      cursor: onNavigateSecurity ? 'pointer' : 'default',
+    },
+    onClick: onNavigateSecurity,
+    // 可键盘操作（与 QrBlock 的提示同款交互，但补上 a11y：焦点 + Enter/Space）
+    role: onNavigateSecurity ? 'button' : undefined,
+    tabIndex: onNavigateSecurity ? 0 : undefined,
+    onKeyDown: onNavigateSecurity
+      ? (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onNavigateSecurity(); } }
+      : undefined,
+    title: onNavigateSecurity ? '点击前往「安全认证」配置' : undefined,
+  },
+    h('span', { style: { flex: '1 1 auto' } }, localeT(TUNNEL_PASSWORD_TEXT)),
+    onNavigateSecurity && h('span', {
+      style: { fontWeight: 600, textDecoration: 'underline', fontSize: 12, color: 'var(--dsw-alias-brand-primary,#4f6ef7)', flexShrink: 0 },
+    }, localeT('去设置 ➔')),
+  );
+});
+
 const TunnelEntryCard = React.memo(function TunnelEntryCard({
   entry, onCopy, copied, autoStart, onToggleAutoStart, onStart, onStop, onReset,
 }) {
@@ -793,6 +826,8 @@ const TunnelCard = React.memo(function TunnelCard({
     (onStart || onStop) && h('div', {
       style: { ...s.block, display: 'flex', gap: 8, flexWrap: 'wrap' },
     },
+      !running && onStart && needsTunnelPassword(auth)
+        && h(TunnelPasswordNotice, { onNavigateSecurity, compact: true }),
       !running && onStart && h('button', {
         style: { ...s.btnPri, opacity: configured === false ? 0.4 : 1 },
         onClick: onStart,
@@ -3649,6 +3684,10 @@ function BridgePanel({ rpcCall, preferredTab }) {
     return () => clearInterval(t);
   }, [load, adminUnlocked, isLocalhost]);
 
+  // issue #75：隧道高危操作（服务端 requireConfigured）在"从未设置任何密码"时会被拒绝；
+  // 这里与服务端同源地提前判断，点击时立即给出可读原因，而不是只写顶部横幅。
+  const tunnelGate = needsTunnelPassword(status?.auth);
+
   const act = React.useCallback(async (endpoint, payload) => {
     try {
       const r = await authRpcCall(endpoint, payload ?? {});
@@ -3660,33 +3699,45 @@ function BridgePanel({ rpcCall, preferredTab }) {
     }
   }, [authRpcCall]);
 
-  const onStartCloudflared = React.useCallback(() => act(BRIDGE_ENDPOINTS.startCloudflared), [act]);
+  const onStartCloudflared = React.useCallback(() => {
+    if (tunnelGate) { setErr(TUNNEL_PASSWORD_TEXT); return; }
+    return act(BRIDGE_ENDPOINTS.startCloudflared);
+  }, [act, tunnelGate]);
   const onStopCloudflared  = React.useCallback(() => act(BRIDGE_ENDPOINTS.stopCloudflared), [act]);
-  const onResetCloudflared = React.useCallback(() =>
-    act(BRIDGE_ENDPOINTS.stopCloudflared).then(() => act(BRIDGE_ENDPOINTS.startCloudflared))
-  , [act]);
-  const onToggleCloudflaredAutoStart = React.useCallback((autoStart) =>
-    act(BRIDGE_ENDPOINTS.setTunnelAutoStart, { tunnel: 'cloudflared', autoStart })
-  , [act]);
+  const onResetCloudflared = React.useCallback(() => {
+    if (tunnelGate) { setErr(TUNNEL_PASSWORD_TEXT); return; }
+    return act(BRIDGE_ENDPOINTS.stopCloudflared).then(() => act(BRIDGE_ENDPOINTS.startCloudflared));
+  }, [act, tunnelGate]);
+  const onToggleCloudflaredAutoStart = React.useCallback((autoStart) => {
+    if (tunnelGate) { setErr(TUNNEL_PASSWORD_TEXT); return; }
+    return act(BRIDGE_ENDPOINTS.setTunnelAutoStart, { tunnel: 'cloudflared', autoStart });
+  }, [act, tunnelGate]);
   // patch 直通（token/hostname/protocol/edgeIpVersion/region；未出现的字段服务端保留现值）
-  const saveCloudflaredConfig = React.useCallback((patch) =>
-    act(BRIDGE_ENDPOINTS.saveCloudflaredConfig, patch || {})
-  , [act]);
+  const saveCloudflaredConfig = React.useCallback((patch) => {
+    if (tunnelGate) { setErr(TUNNEL_PASSWORD_TEXT); return; }
+    return act(BRIDGE_ENDPOINTS.saveCloudflaredConfig, patch || {});
+  }, [act, tunnelGate]);
 
   const onSelectLanIp = React.useCallback((ip) => act(BRIDGE_ENDPOINTS.setLanIp, { ip }), [act]);
 
-  const onStartCustom = React.useCallback(() => act(BRIDGE_ENDPOINTS.startCustomTunnel), [act]);
+  const onStartCustom = React.useCallback(() => {
+    if (tunnelGate) { setErr(TUNNEL_PASSWORD_TEXT); return; }
+    return act(BRIDGE_ENDPOINTS.startCustomTunnel);
+  }, [act, tunnelGate]);
   const onStopCustom  = React.useCallback(() => act(BRIDGE_ENDPOINTS.stopCustomTunnel), [act]);
-  const onToggleCustomAutoStart = React.useCallback((autoStart) =>
-    act(BRIDGE_ENDPOINTS.setTunnelAutoStart, { tunnel: 'customTunnel', autoStart })
-  , [act]);
-  const saveConfig = React.useCallback((serverUrl, accessToken) =>
-    act(BRIDGE_ENDPOINTS.saveCustomTunnelConfig, { serverUrl, accessToken })
-  , [act]);
+  const onToggleCustomAutoStart = React.useCallback((autoStart) => {
+    if (tunnelGate) { setErr(TUNNEL_PASSWORD_TEXT); return; }
+    return act(BRIDGE_ENDPOINTS.setTunnelAutoStart, { tunnel: 'customTunnel', autoStart });
+  }, [act, tunnelGate]);
+  const saveConfig = React.useCallback((serverUrl, accessToken) => {
+    if (tunnelGate) { setErr(TUNNEL_PASSWORD_TEXT); return; }
+    return act(BRIDGE_ENDPOINTS.saveCustomTunnelConfig, { serverUrl, accessToken });
+  }, [act, tunnelGate]);
 
-  const saveExternalTunnel = React.useCallback((url) =>
-    act(BRIDGE_ENDPOINTS.saveExternalTunnel, { url })
-  , [act]);
+  const saveExternalTunnel = React.useCallback((url) => {
+    if (tunnelGate) { setErr(TUNNEL_PASSWORD_TEXT); return; }
+    return act(BRIDGE_ENDPOINTS.saveExternalTunnel, { url });
+  }, [act, tunnelGate]);
 
   const navSecurity = React.useCallback(() => setActiveTab('security'), []);
 
@@ -3756,6 +3807,7 @@ function BridgePanel({ rpcCall, preferredTab }) {
     const otherCount = primary ? entries.length - 1 : entries.length;
 
     tabContent = h(React.Fragment, null,
+      tunnelGate && h(TunnelPasswordNotice, { onNavigateSecurity: navSecurity }),
       h(TunnelEntryCard, {
         entry: primary,
         onCopy: copyEntryUrl,

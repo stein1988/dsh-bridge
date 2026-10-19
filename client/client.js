@@ -2155,7 +2155,9 @@ var panelEn = {
   "IPv6\uFF086\uFF09": "IPv6 (6)",
   "${label}\uFF1A${reason}": "${label}: ${reason}",
   "cloudflared\uFF1A${path}\uFF08${version} \xB7 ${source}\uFF09": "cloudflared: ${path} (${version} \xB7 ${source})",
-  "\u26A1 \u81EA\u52A8\u63A8\u8350 (${ip} \xB7 ${label})": "\u26A1 Auto (recommended: ${ip} \xB7 ${label})"
+  "\u26A1 \u81EA\u52A8\u63A8\u8350 (${ip} \xB7 ${label})": "\u26A1 Auto (recommended: ${ip} \xB7 ${label})",
+  "\u5F00\u542F\u516C\u7F51\u96A7\u9053\u524D\uFF0C\u8BF7\u5148\u5728\u300C\u5B89\u5168\u8BA4\u8BC1\u300D\u4E2D\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801": "Before enabling the public tunnel, set an access password under \u201CSecurity\u201D",
+  "\u53BB\u8BBE\u7F6E \u2794": "Set up \u2794"
 };
 var serverEn = {
   "App ID \u4E0E App Secret \u672A\u914D\u7F6E": "App ID and App Secret are not configured",
@@ -2779,6 +2781,18 @@ function registerSettingsNavIcon(resolveLabel = () => t("\u8FDC\u7A0B\u8BBF\u95E
   };
 }
 
+// client/tunnel-guard.js
+function hasAnyPassword(auth) {
+  return Boolean(auth?.hasPassword || auth?.hasAdminPassword);
+}
+function needsTunnelPassword(auth) {
+  if (!auth || typeof auth !== "object") return false;
+  if (auth.adminPolicy === "local_only") return false;
+  if (auth.adminProtection === false) return false;
+  if (auth.adminPolicy === "open") return false;
+  return !hasAnyPassword(auth);
+}
+
 // lib/bridge-rpc-constants.js
 var BRIDGE_RPC_CHANNEL = "/dsh-bridge";
 var BRIDGE_ENDPOINTS = {
@@ -2976,6 +2990,7 @@ var RELEASES_URL = "https://github.com/wenbin-wb/dsh-bridge/releases";
 var ISSUES_URL = "https://github.com/wenbin-wb/dsh-bridge/issues/new";
 var TUNNEL_DOCS_URL = "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/custom-tunnel.md";
 var CLOUDFLARE_TUTORIAL_URL = "https://github.com/wenbin-wb/dsh-bridge/blob/main/docs/cloudflare-fixed-domain.md";
+var TUNNEL_PASSWORD_TEXT = "\u5F00\u542F\u516C\u7F51\u96A7\u9053\u524D\uFF0C\u8BF7\u5148\u5728\u300C\u5B89\u5168\u8BA4\u8BC1\u300D\u4E2D\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801";
 var localeT = (key) => key;
 var TRANSLATABLE_PROPS = ["title", "placeholder", "aria-label", "alt"];
 function translateChild(child) {
@@ -3364,6 +3379,39 @@ var CustomTunnelGuide = React.memo(function CustomTunnelGuide2() {
     }, "\u67E5\u770B\u81EA\u5EFA\u96A7\u9053\u670D\u52A1\u5668\u642D\u5EFA\u6559\u7A0B")
   );
 });
+var TunnelPasswordNotice = React.memo(function TunnelPasswordNotice2({ onNavigateSecurity, compact = false }) {
+  return h(
+    "div",
+    {
+      style: {
+        ...s.warn,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "space-between",
+        flexWrap: "wrap",
+        gap: 6,
+        marginTop: compact ? 8 : 0,
+        marginBottom: compact ? 0 : 10,
+        cursor: onNavigateSecurity ? "pointer" : "default"
+      },
+      onClick: onNavigateSecurity,
+      // 可键盘操作（与 QrBlock 的提示同款交互，但补上 a11y：焦点 + Enter/Space）
+      role: onNavigateSecurity ? "button" : void 0,
+      tabIndex: onNavigateSecurity ? 0 : void 0,
+      onKeyDown: onNavigateSecurity ? (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          onNavigateSecurity();
+        }
+      } : void 0,
+      title: onNavigateSecurity ? "\u70B9\u51FB\u524D\u5F80\u300C\u5B89\u5168\u8BA4\u8BC1\u300D\u914D\u7F6E" : void 0
+    },
+    h("span", { style: { flex: "1 1 auto" } }, localeT(TUNNEL_PASSWORD_TEXT)),
+    onNavigateSecurity && h("span", {
+      style: { fontWeight: 600, textDecoration: "underline", fontSize: 12, color: "var(--dsw-alias-brand-primary,#4f6ef7)", flexShrink: 0 }
+    }, localeT("\u53BB\u8BBE\u7F6E \u2794"))
+  );
+});
 var TunnelEntryCard = React.memo(function TunnelEntryCard2({
   entry,
   onCopy,
@@ -3701,6 +3749,7 @@ var TunnelCard = React.memo(function TunnelCard2({
       {
         style: { ...s.block, display: "flex", gap: 8, flexWrap: "wrap" }
       },
+      !running && onStart && needsTunnelPassword(auth) && h(TunnelPasswordNotice, { onNavigateSecurity, compact: true }),
       !running && onStart && h("button", {
         style: { ...s.btnPri, opacity: configured === false ? 0.4 : 1 },
         onClick: onStart,
@@ -6784,6 +6833,7 @@ function BridgePanel({ rpcCall, preferredTab }) {
     const t2 = setInterval(() => load(true), 3e3);
     return () => clearInterval(t2);
   }, [load, adminUnlocked, isLocalhost]);
+  const tunnelGate = needsTunnelPassword(status?.auth);
   const act = React.useCallback(async (endpoint, payload) => {
     try {
       const r = await authRpcCall(endpoint, payload ?? {});
@@ -6794,35 +6844,65 @@ function BridgePanel({ rpcCall, preferredTab }) {
       setErr(e.message);
     }
   }, [authRpcCall]);
-  const onStartCloudflared = React.useCallback(() => act(BRIDGE_ENDPOINTS.startCloudflared), [act]);
+  const onStartCloudflared = React.useCallback(() => {
+    if (tunnelGate) {
+      setErr(TUNNEL_PASSWORD_TEXT);
+      return;
+    }
+    return act(BRIDGE_ENDPOINTS.startCloudflared);
+  }, [act, tunnelGate]);
   const onStopCloudflared = React.useCallback(() => act(BRIDGE_ENDPOINTS.stopCloudflared), [act]);
-  const onResetCloudflared = React.useCallback(
-    () => act(BRIDGE_ENDPOINTS.stopCloudflared).then(() => act(BRIDGE_ENDPOINTS.startCloudflared)),
-    [act]
-  );
-  const onToggleCloudflaredAutoStart = React.useCallback(
-    (autoStart) => act(BRIDGE_ENDPOINTS.setTunnelAutoStart, { tunnel: "cloudflared", autoStart }),
-    [act]
-  );
-  const saveCloudflaredConfig = React.useCallback(
-    (patch) => act(BRIDGE_ENDPOINTS.saveCloudflaredConfig, patch || {}),
-    [act]
-  );
+  const onResetCloudflared = React.useCallback(() => {
+    if (tunnelGate) {
+      setErr(TUNNEL_PASSWORD_TEXT);
+      return;
+    }
+    return act(BRIDGE_ENDPOINTS.stopCloudflared).then(() => act(BRIDGE_ENDPOINTS.startCloudflared));
+  }, [act, tunnelGate]);
+  const onToggleCloudflaredAutoStart = React.useCallback((autoStart) => {
+    if (tunnelGate) {
+      setErr(TUNNEL_PASSWORD_TEXT);
+      return;
+    }
+    return act(BRIDGE_ENDPOINTS.setTunnelAutoStart, { tunnel: "cloudflared", autoStart });
+  }, [act, tunnelGate]);
+  const saveCloudflaredConfig = React.useCallback((patch) => {
+    if (tunnelGate) {
+      setErr(TUNNEL_PASSWORD_TEXT);
+      return;
+    }
+    return act(BRIDGE_ENDPOINTS.saveCloudflaredConfig, patch || {});
+  }, [act, tunnelGate]);
   const onSelectLanIp = React.useCallback((ip) => act(BRIDGE_ENDPOINTS.setLanIp, { ip }), [act]);
-  const onStartCustom = React.useCallback(() => act(BRIDGE_ENDPOINTS.startCustomTunnel), [act]);
+  const onStartCustom = React.useCallback(() => {
+    if (tunnelGate) {
+      setErr(TUNNEL_PASSWORD_TEXT);
+      return;
+    }
+    return act(BRIDGE_ENDPOINTS.startCustomTunnel);
+  }, [act, tunnelGate]);
   const onStopCustom = React.useCallback(() => act(BRIDGE_ENDPOINTS.stopCustomTunnel), [act]);
-  const onToggleCustomAutoStart = React.useCallback(
-    (autoStart) => act(BRIDGE_ENDPOINTS.setTunnelAutoStart, { tunnel: "customTunnel", autoStart }),
-    [act]
-  );
-  const saveConfig = React.useCallback(
-    (serverUrl, accessToken) => act(BRIDGE_ENDPOINTS.saveCustomTunnelConfig, { serverUrl, accessToken }),
-    [act]
-  );
-  const saveExternalTunnel = React.useCallback(
-    (url) => act(BRIDGE_ENDPOINTS.saveExternalTunnel, { url }),
-    [act]
-  );
+  const onToggleCustomAutoStart = React.useCallback((autoStart) => {
+    if (tunnelGate) {
+      setErr(TUNNEL_PASSWORD_TEXT);
+      return;
+    }
+    return act(BRIDGE_ENDPOINTS.setTunnelAutoStart, { tunnel: "customTunnel", autoStart });
+  }, [act, tunnelGate]);
+  const saveConfig = React.useCallback((serverUrl, accessToken) => {
+    if (tunnelGate) {
+      setErr(TUNNEL_PASSWORD_TEXT);
+      return;
+    }
+    return act(BRIDGE_ENDPOINTS.saveCustomTunnelConfig, { serverUrl, accessToken });
+  }, [act, tunnelGate]);
+  const saveExternalTunnel = React.useCallback((url) => {
+    if (tunnelGate) {
+      setErr(TUNNEL_PASSWORD_TEXT);
+      return;
+    }
+    return act(BRIDGE_ENDPOINTS.saveExternalTunnel, { url });
+  }, [act, tunnelGate]);
   const navSecurity = React.useCallback(() => setActiveTab("security"), []);
   if (!status && !err) {
     return h("div", {
@@ -6903,6 +6983,7 @@ function BridgePanel({ rpcCall, preferredTab }) {
     tabContent = h(
       React.Fragment,
       null,
+      tunnelGate && h(TunnelPasswordNotice, { onNavigateSecurity: navSecurity }),
       h(TunnelEntryCard, {
         entry: primary,
         onCopy: copyEntryUrl,
@@ -7109,11 +7190,11 @@ function BridgePanel({ rpcCall, preferredTab }) {
   }
   const auth = status?.auth;
   const policy = auth?.adminPolicy ?? "password_unlock";
-  const hasAnyPassword = !!(auth?.hasPassword || auth?.hasAdminPassword);
+  const hasAnyPassword2 = !!(auth?.hasPassword || auth?.hasAdminPassword);
   const unlockUsesAdmin = !!auth?.hasAdminPassword;
   const unlockPwdKind = unlockUsesAdmin ? localeT("\u7BA1\u7406\u5BC6\u7801") : localeT("\u8BBF\u95EE\u5BC6\u7801");
   const unlockPwdHint = unlockUsesAdmin ? localeT("\u8BF7\u8F93\u5165\u540E\u53F0\u7BA1\u7406\u5BC6\u7801\u89E3\u9501\u7BA1\u7406\u6743\u9650\u3002") : localeT("\u5F53\u524D\u672A\u8BBE\u7F6E\u72EC\u7ACB\u7BA1\u7406\u5BC6\u7801\uFF0C\u8F93\u5165\u60A8\u7684\u8BBF\u95EE\u5BC6\u7801\u5373\u53EF\u89E3\u9501\u3002");
-  const isLocked = !isLocalhost && auth?.adminProtection !== false && policy !== "open" && !adminUnlocked && (policy === "local_only" || hasAnyPassword);
+  const isLocked = !isLocalhost && auth?.adminProtection !== false && policy !== "open" && !adminUnlocked && (policy === "local_only" || hasAnyPassword2);
   if (isLocked) {
     return h(
       "div",
@@ -7336,9 +7417,9 @@ function BridgePanel({ rpcCall, preferredTab }) {
       h(
         "span",
         null,
-        hasAnyPassword ? "\u{1F512} \u540E\u53F0\u7BA1\u7406\u6743\u9650\u672A\u89E3\u9501\uFF08\u4FEE\u6539\u654F\u611F\u914D\u7F6E\u9700\u5148\u89E3\u9501\uFF09" : "\u26A0\uFE0F \u5C1A\u672A\u8BBE\u7F6E\u4EFB\u4F55\u8BBF\u95EE\u5BC6\u7801 / \u7BA1\u7406\u5BC6\u7801\uFF0C\u8FDC\u7A0B\u8BBF\u5BA2\u53EF\u514D\u5BC6\u8FDB\u5165\uFF01"
+        hasAnyPassword2 ? "\u{1F512} \u540E\u53F0\u7BA1\u7406\u6743\u9650\u672A\u89E3\u9501\uFF08\u4FEE\u6539\u654F\u611F\u914D\u7F6E\u9700\u5148\u89E3\u9501\uFF09" : "\u26A0\uFE0F \u5C1A\u672A\u8BBE\u7F6E\u4EFB\u4F55\u8BBF\u95EE\u5BC6\u7801 / \u7BA1\u7406\u5BC6\u7801\uFF0C\u8FDC\u7A0B\u8BBF\u5BA2\u53EF\u514D\u5BC6\u8FDB\u5165\uFF01"
       ),
-      hasAnyPassword ? h("button", {
+      hasAnyPassword2 ? h("button", {
         type: "button",
         style: { ...s.btnPri, ...s.btnWarn, height: 24, fontSize: 11, padding: "0 10px" },
         onClick: () => setShowUnlockModal(true)
