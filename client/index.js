@@ -1655,6 +1655,43 @@ function isPlatformStatusActive(status) {
   return status === 'connected' || status === 'starting' || status === 'reconnecting';
 }
 
+/**
+ * 更新提示里的 releaseNotes 归一化。
+ *
+ * 背景：`package.json` 的 releaseNotes 由 npm registry 原样带回（`lib/index.js` 的
+ * `checkVersion()`），旧版本写的是一整段长文（无换行、带【v2.14.0】前缀与 `**` 强调符），
+ * 在卡片的 `white-space: pre-line` 容器里会挤成一坨、和下方说明混在一起。这里统一归一：
+ *   ① 去掉开头的「【vX.Y.Z】」版本前缀（卡片标题已有版本号，避免重复）；
+ *   ② 按行拆分；单行过长（历史版本的整段写法）再按分号/句号拆成短句；
+ *   ③ 去掉 markdown 强调符与多余空白；④ 最多 8 条、每条最多 120 字（超出显示省略号）。
+ * 只用于渲染，不修改 registry 原始内容。
+ */
+function formatReleaseNotes(notes) {
+  if (typeof notes !== 'string') return [];
+  const text = notes.trim();
+  if (!text) return [];
+  const withoutVersion = text.replace(/^【\s*v?\d+(?:\.\d+)*\s*】\s*/i, '');
+  const lines = [];
+  for (const raw of withoutVersion.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line) continue;
+    if (line.length > 80) {
+      // 历史版本的"一整段"写法：按分号/句号拆句，避免在卡片里显示成一大坨
+      for (const part of line.split(/[；;]/)) {
+        const sentence = part.trim().replace(/[。.]$/, '');
+        if (sentence) lines.push(sentence);
+      }
+    } else {
+      lines.push(line.replace(/^[•·\-*]\s+/, ''));
+    }
+  }
+  return lines
+    .map((line) => line.replace(/\*\*/g, '').replace(/\s+/g, ' ').trim())
+    .filter(Boolean)
+    .slice(0, 8)
+    .map((line) => (line.length > 120 ? `${line.slice(0, 118)}…` : line));
+}
+
 // ---- 通用 IM 平台卡片 ----
 
 function PlatformCard({
@@ -3094,6 +3131,8 @@ function VersionBanner({ rpcCall }) {
 
   const hasUpdate = info?.latest && info?.current && !info.error && semverGt(info.latest, info.current);
   const isLatest = info?.latest && info?.current && !info.error && !semverGt(info.latest, info.current);
+  // 更新提示条目的归一化结果（见 formatReleaseNotes：去掉【vX】前缀、拆句、限条数与长度）
+  const releaseNoteLines = formatReleaseNotes(info?.releaseNotes);
   // DSH 宿主更新状态：有线上新版 + 当前版本可比较
   const dshHasUpdate = !!(info?.dshLatest && info?.dshVersion && !info.error && semverGt(info.dshLatest, info.dshVersion));
 
@@ -3301,8 +3340,8 @@ function VersionBanner({ rpcCall }) {
             ),
           ),
 
-          // 简短更新内容 / Release Notes 亮点展示
-          info?.releaseNotes && h('div', {
+          // 简短更新内容 / Release Notes 亮点展示（issue #79 后续：旧格式一坨长文 → 归一成要点列表）
+          releaseNoteLines.length > 0 && h('div', {
             style: {
               fontSize: 12,
               color: 'var(--dsw-alias-label-primary, #374151)',
@@ -3312,11 +3351,18 @@ function VersionBanner({ rpcCall }) {
               padding: '8px 12px',
               marginBottom: 10,
               lineHeight: 1.6,
-              whiteSpace: 'pre-line',
             },
           },
-            h('div', { style: { fontWeight: 600, color: 'var(--dsw-alias-label-primary, #0f1115)', marginBottom: 2 } }, '✨ 更新亮点：'),
-            info.releaseNotes
+            h('div', { style: { fontWeight: 600, color: 'var(--dsw-alias-label-primary, #0f1115)', marginBottom: 4 } }, '✨ 更新亮点：'),
+            h('div', { style: { display: 'flex', flexDirection: 'column', gap: 3 } },
+              releaseNoteLines.map((line, index) => h('div', {
+                key: index,
+                style: { display: 'flex', gap: 6, alignItems: 'flex-start' },
+              },
+                h('span', { style: { flexShrink: 0, color: 'var(--dsw-alias-brand-primary,#4f6ef7)', lineHeight: '18px' } }, '•'),
+                h('span', { style: { flex: '1 1 auto', minWidth: 0 } }, line),
+              )),
+            ),
           ),
 
           // 升级成功后：引导重启 DSH 操作卡片

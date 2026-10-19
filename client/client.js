@@ -4692,6 +4692,26 @@ function accountDisplayName(status, platformLabel, index) {
 function isPlatformStatusActive(status) {
   return status === "connected" || status === "starting" || status === "reconnecting";
 }
+function formatReleaseNotes(notes) {
+  if (typeof notes !== "string") return [];
+  const text = notes.trim();
+  if (!text) return [];
+  const withoutVersion = text.replace(/^【\s*v?\d+(?:\.\d+)*\s*】\s*/i, "");
+  const lines = [];
+  for (const raw of withoutVersion.split(/\r?\n/)) {
+    const line = raw.trim();
+    if (!line) continue;
+    if (line.length > 80) {
+      for (const part of line.split(/[；;]/)) {
+        const sentence = part.trim().replace(/[。.]$/, "");
+        if (sentence) lines.push(sentence);
+      }
+    } else {
+      lines.push(line.replace(/^[•·\-*]\s+/, ""));
+    }
+  }
+  return lines.map((line) => line.replace(/\*\*/g, "").replace(/\s+/g, " ").trim()).filter(Boolean).slice(0, 8).map((line) => line.length > 120 ? `${line.slice(0, 118)}\u2026` : line);
+}
 function PlatformCard({
   platformId,
   platformName,
@@ -6262,6 +6282,7 @@ function VersionBanner({ rpcCall }) {
   }, [check]);
   const hasUpdate = info?.latest && info?.current && !info.error && semverGt(info.latest, info.current);
   const isLatest = info?.latest && info?.current && !info.error && !semverGt(info.latest, info.current);
+  const releaseNoteLines = formatReleaseNotes(info?.releaseNotes);
   const dshHasUpdate = !!(info?.dshLatest && info?.dshVersion && !info.error && semverGt(info.dshLatest, info.dshVersion));
   const handleUpgrade = React.useCallback(async () => {
     if (!info?.latest || upgrading) return;
@@ -6474,8 +6495,8 @@ function VersionBanner({ rpcCall }) {
               ) : upgradeResult?.ok ? "\u2713 \u5347\u7EA7\u5B8C\u6210" : localeT("\u4E00\u952E\u5347\u7EA7\u5230 v${version}", { version: info.latest })
             )
           ),
-          // 简短更新内容 / Release Notes 亮点展示
-          info?.releaseNotes && h(
+          // 简短更新内容 / Release Notes 亮点展示（issue #79 后续：旧格式一坨长文 → 归一成要点列表）
+          releaseNoteLines.length > 0 && h(
             "div",
             {
               style: {
@@ -6486,12 +6507,23 @@ function VersionBanner({ rpcCall }) {
                 borderRadius: 8,
                 padding: "8px 12px",
                 marginBottom: 10,
-                lineHeight: 1.6,
-                whiteSpace: "pre-line"
+                lineHeight: 1.6
               }
             },
-            h("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, #0f1115)", marginBottom: 2 } }, "\u2728 \u66F4\u65B0\u4EAE\u70B9\uFF1A"),
-            info.releaseNotes
+            h("div", { style: { fontWeight: 600, color: "var(--dsw-alias-label-primary, #0f1115)", marginBottom: 4 } }, "\u2728 \u66F4\u65B0\u4EAE\u70B9\uFF1A"),
+            h(
+              "div",
+              { style: { display: "flex", flexDirection: "column", gap: 3 } },
+              releaseNoteLines.map((line, index) => h(
+                "div",
+                {
+                  key: index,
+                  style: { display: "flex", gap: 6, alignItems: "flex-start" }
+                },
+                h("span", { style: { flexShrink: 0, color: "var(--dsw-alias-brand-primary,#4f6ef7)", lineHeight: "18px" } }, "\u2022"),
+                h("span", { style: { flex: "1 1 auto", minWidth: 0 } }, line)
+              ))
+            )
           ),
           // 升级成功后：引导重启 DSH 操作卡片
           upgradeResult?.ok && !dismissRestart && h(
