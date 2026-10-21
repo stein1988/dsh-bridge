@@ -1753,6 +1753,8 @@ function PlatformCard({
         maxMessageChars:    String((platform.config.maxMessageChars >= 500 ? platform.config.maxMessageChars : null) ?? (platformId === 'telegram' ? 4096 : 2000)),
         sendChunkDelayMs:   String(platform.config.sendChunkDelayMs   ?? 1500),
         groupAutoApprove:   Boolean(platform.config.groupAutoApprove),
+        changesDigest:      platform.config.changesDigest !== false,
+        steerMode:          Boolean(platform.config.steerMode),
         appId: platform.config.appId ?? '',
         // Secret 不由后端回传；空值表示沿用已保存密钥
         clientSecret: '',
@@ -2239,6 +2241,23 @@ function PlatformCard({
           },
         }),
         h('span', null, '本轮改动摘要（每轮播报改动文件清单，默认开启）'),
+      ),
+      // 实时插话开关：默认关闭（保持既有排队行为，开启后 Agent 忙碌时发消息可直接打断）
+      h('label', {
+        style: { display: 'flex', alignItems: 'center', gap: 6, marginTop: 10, fontSize: 12, cursor: 'pointer', width: 'fit-content', color: 'var(--dsw-alias-label-secondary,#6b7280)' },
+        title: '开启后，在 Agent 执行任务期间发消息可实时插话打断；关闭后排队等待当前任务完成后再处理',
+      },
+        h('input', {
+          type: 'checkbox',
+          checked: Boolean(cfgDraft?.steerMode),
+          disabled: busy,
+          onChange: (e) => {
+            const checked = e.target.checked;
+            setCfgDraft(d => ({ ...(d ?? {}), steerMode: checked }));
+            act(BRIDGE_ENDPOINTS.platformSetConfig, { steerMode: checked });
+          },
+        }),
+        h('span', null, '实时插话模式（Agent 忙碌时发消息可实时打断，默认关闭）'),
       ),
       // 实时活动状态开关：仅"卡片可原地更新"的平台支持（飞书 / Telegram）。
       // 用户反馈（2026-10-17）希望"能自己关掉、不要这个状态"，故提供显式开关。
