@@ -233,7 +233,33 @@ export async function openSettings(page, families = null, { attempts = 6, timeou
       btn.click();
       return true;
     }, fams.SETTINGS);
-    if (!clicked) return false;
+    if (!clicked) {
+      // 宿主 0.2.1-rc.2 起把设置入口从左侧轨道按钮移进了「账号菜单 → 设置」：页面上已没有
+      // 任何 aria-label / 文本含「设置」的按钮可点，旧兜底必然落空，于是「宿主改了入口」
+      // 被误报成「插件的前缀定位坏了」（基线 f7a6ae0 在同一宿主上同样 14/16 失败，已实测）。
+      // 补第三条路：打开账号菜单 → 点菜单项「设置 / Settings」。
+      const viaMenu = await page.evaluate(() => {
+        const menuBtn = [...document.querySelectorAll('button')].find((x) => {
+          const label = (x.getAttribute('aria-label') || '').trim();
+          const cls = String(x.className || '');
+          return /账号菜单|账户菜单|Account menu|^Account$/i.test(label) || /accountMenu|accountButton/i.test(cls);
+        });
+        if (!menuBtn) return false;
+        menuBtn.click();
+        return true;
+      });
+      if (!viaMenu) return false;
+      // 菜单异步挂载：等 menuitem 出现再点
+      await waitForSelector(page, '[role="menuitem"]', 3000).catch(() => false);
+      const itemClicked = await page.evaluate(() => {
+        const item = [...document.querySelectorAll('[role="menuitem"], button, a')]
+          .find((e) => /^\s*(设置|Settings|設定)\s*$/.test((e.textContent || '').trim()));
+        if (!item) return false;
+        item.click();
+        return true;
+      });
+      if (!itemClicked) return false;
+    }
     if (!(await waitForSelector(page, overlaySel, timeoutMs))) continue;
     // 稳定复核：懒加载面板可能在挂载中途整窗重挂，等一小段再确认仍在
     await new Promise((r) => setTimeout(r, settleMs));

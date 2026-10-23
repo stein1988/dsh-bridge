@@ -196,7 +196,11 @@ await dismissHostNotices(page);
 await sleep(600);
 
 const titles = await openDrawerWithRows();
-const firstReal = titles.find((t) => !/^New Session/i.test(t)) ?? titles[0];
+// 宿主会话列表第一行是「新建会话」入口（中文界面为「新会话」），要跳过它；
+// 只认英文 New Session 会在中文宿主上把新建入口当成真会话点（点击后仍是空白会话、
+// 团队触发器不出现），被误报成「浮层收起按钮回归」。
+const NEW_SESSION_RE = /^(New Session|新会话|新しいセッション|새 세션)/i;
+const firstReal = titles.find((t) => !NEW_SESSION_RE.test(t)) ?? titles[0];
 const sessionTitle = firstReal ? await openSessionByTitle(firstReal) : null;
 if (!sessionTitle) {
   r.say('A 会话可打开（宿主有可点的会话行）', false, `抽屉会话行：${titles.length ? titles.join(' / ') : '（空）'}`);
@@ -301,7 +305,7 @@ await sleep(1200);
 // "浮层打不开"而误报。"撤残留"分支由 H 段在无重载的 DOM 上单独覆盖。
 if (!(await page.evaluate((sel) => !!document.querySelector(sel), TEAM_TRIGGER))) {
   const desktopTitles = await openDrawerWithRows();
-  const again = desktopTitles.find((t) => !/^New Session/i.test(t));
+  const again = desktopTitles.find((t) => !NEW_SESSION_RE.test(t));
   if (again) await openSessionByTitle(again);
   await sleep(600);
 }
