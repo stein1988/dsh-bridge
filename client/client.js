@@ -3864,7 +3864,7 @@ var CloudflareConfigForm = React.memo(function CloudflareConfigForm2({ token, ho
       edgeIpVersion: network?.edgeIpVersion || "",
       region: network?.region || ""
     });
-  }, [token, hostname, network]);
+  }, [token, hostname, network?.protocol, network?.edgeIpVersion, network?.region]);
   const handleSave = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -7149,6 +7149,15 @@ function BridgePanel({ rpcCall, preferredTab }) {
     return act(BRIDGE_ENDPOINTS.saveExternalTunnel, { url });
   }, [act, tunnelGate]);
   const navSecurity = React.useCallback(() => setActiveTab("security"), []);
+  const cfNetwork = React.useMemo(() => ({
+    protocol: status?.cloudflared?.protocol || "",
+    edgeIpVersion: status?.cloudflared?.edgeIpVersion || "",
+    region: status?.cloudflared?.region || ""
+  }), [
+    status?.cloudflared?.protocol,
+    status?.cloudflared?.edgeIpVersion,
+    status?.cloudflared?.region
+  ]);
   if (!status && !err) {
     return h("div", {
       style: { padding: 32, color: "var(--dsw-alias-label-tertiary,#9ca3af)", fontSize: 13 }
@@ -7272,11 +7281,8 @@ function BridgePanel({ rpcCall, preferredTab }) {
           h(CloudflareConfigForm, {
             token: cf && cf.token || "",
             hostname: cf && cf.hostname || "",
-            network: cf && {
-              protocol: cf.protocol || "",
-              edgeIpVersion: cf.edgeIpVersion || "",
-              region: cf.region || ""
-            },
+            // issue #83：用 useMemo 稳定后的引用，禁止在此处再写字面量对象
+            network: cf ? cfNetwork : void 0,
             onSave: saveCloudflaredConfig
           })
         ),

@@ -905,6 +905,11 @@ const CloudflareConfigForm = React.memo(function CloudflareConfigForm({ token, h
   const [saving, setSaving] = React.useState(false);
   const [msg, setMsg] = React.useState(null);
 
+  // issue #83：依赖必须全是标量。父组件此前传入每次渲染都新建的 network 字面量对象，
+  // 3s 轮询（load(true) → setStatus → 重渲染）会让本 effect 每 tick 重跑一次，
+  // 把用户正在输入的域名/Token 用服务端旧值覆盖回去（表现为「输入被自动清空」）。
+  // 这里只盯三个标量字段：值没变就不重跑，从根上断掉「轮询 → 覆盖输入」的链路。
+  // 父组件同时用 useMemo 稳定 network 引用（纵深防御），见 BridgePanel 的 cfNetwork。
   React.useEffect(() => {
     setTokenVal(token || '');
     setHostnameVal(hostname || '');
@@ -913,7 +918,7 @@ const CloudflareConfigForm = React.memo(function CloudflareConfigForm({ token, h
       edgeIpVersion: network?.edgeIpVersion || '',
       region: network?.region || '',
     });
-  }, [token, hostname, network]);
+  }, [token, hostname, network?.protocol, network?.edgeIpVersion, network?.region]);
 
   const handleSave = async (e) => {
     e.preventDefault();
@@ -4000,6 +4005,22 @@ function BridgePanel({ rpcCall, preferredTab }) {
 
   const navSecurity = React.useCallback(() => setActiveTab('security'), []);
 
+  // issue #83（纵深防御）：传给 CloudflareConfigForm 的 network 必须引用稳定。
+  // 原实现 `network: cf && { protocol: ..., edgeIpVersion: ..., region: ... }` 在每次渲染
+  // 都新建对象字面量；而面板每 3s load(true) → setStatus → 重渲染，于是「引用每 tick 变一次」。
+  // 子组件 effect 已改为只依赖三个标量字段（主修复，直接断掉覆盖输入的链路）；这里再把父侧
+  // 引用稳定住，避免将来任何以 network 为依赖的 effect 又踩同一个坑。
+  // 依赖取三个标量字段而不是 cf 对象：凭据/运行态对象整体换新引用时不该重算。
+  const cfNetwork = React.useMemo(() => ({
+    protocol: status?.cloudflared?.protocol || '',
+    edgeIpVersion: status?.cloudflared?.edgeIpVersion || '',
+    region: status?.cloudflared?.region || '',
+  }), [
+    status?.cloudflared?.protocol,
+    status?.cloudflared?.edgeIpVersion,
+    status?.cloudflared?.region,
+  ]);
+
   if (!status && !err) {
     return h('div', {
       style: { padding: 32, color: 'var(--dsw-alias-label-tertiary,#9ca3af)', fontSize: 13 },
@@ -4109,11 +4130,8 @@ function BridgePanel({ rpcCall, preferredTab }) {
           h(CloudflareConfigForm, {
             token: (cf && cf.token) || '',
             hostname: (cf && cf.hostname) || '',
-            network: cf && {
-              protocol: cf.protocol || '',
-              edgeIpVersion: cf.edgeIpVersion || '',
-              region: cf.region || '',
-            },
+            // issue #83：用 useMemo 稳定后的引用，禁止在此处再写字面量对象
+            network: cf ? cfNetwork : undefined,
             onSave: saveCloudflaredConfig,
           }),
         ),

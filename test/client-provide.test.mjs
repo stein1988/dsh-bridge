@@ -21,6 +21,8 @@ global.React = {
   memo: (fn) => fn,
   useState: (val) => [val, () => {}],
   useCallback: (fn) => fn,
+  // issue #83：BridgePanel 用 React.useMemo 稳定 network 引用，替身必须提供（惰性求值一次）
+  useMemo: (fn) => fn(),
   useEffect: () => {},
   useRef: () => ({ current: null }),
 };
