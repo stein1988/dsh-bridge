@@ -2247,10 +2247,12 @@ function PlatformCard({
         }),
         h('span', null, '本轮改动摘要（每轮播报改动文件清单，默认开启）'),
       ),
-      // 实时插话开关：默认关闭（保持既有排队行为，开启后 Agent 忙碌时发消息可直接打断）
+      // 实时插话开关：默认关闭（保持既有排队行为，开启后 Agent 忙碌时发消息可在下一步生效）
+      // 语义注意：DSH 的 steer 是「下一步边界注入」，不会中止正在执行的步骤/工具调用；
+      // 文案不得写成「打断」，否则长工具调用期间插话无效会被当成 bug（同 issue #77 的信任教训）。
       h('label', {
         style: { display: 'flex', alignItems: 'center', gap: 6, marginTop: 10, fontSize: 12, cursor: 'pointer', width: 'fit-content', color: 'var(--dsw-alias-label-secondary,#6b7280)' },
-        title: '开启后，在 Agent 执行任务期间发消息可实时插话打断；关闭后排队等待当前任务完成后再处理',
+        title: '开启后，Agent 执行任务期间发消息会插话注入到当前轮次的下一步（不打断正在运行的工具调用）；关闭后排队等待当前任务完成后处理',
       },
         h('input', {
           type: 'checkbox',
@@ -2262,7 +2264,7 @@ function PlatformCard({
             act(BRIDGE_ENDPOINTS.platformSetConfig, { steerMode: checked });
           },
         }),
-        h('span', null, '实时插话模式（Agent 忙碌时发消息可实时打断，默认关闭）'),
+        h('span', null, '实时插话模式（Agent 忙碌时发消息可在下一步生效，默认关闭）'),
       ),
       // 实时活动状态开关：仅"卡片可原地更新"的平台支持（飞书 / Telegram）。
       // 用户反馈（2026-10-17）希望"能自己关掉、不要这个状态"，故提供显式开关。
