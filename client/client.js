@@ -1887,6 +1887,8 @@ var panelEn = {
   "\u7FA4\u804A\u81EA\u52A8\u6388\u6743\uFF08\u65B0\u7FA4\u9996\u6B21 @\u673A\u5668\u4EBA \u81EA\u52A8\u52A0\u5165\u767D\u540D\u5355\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09": "Group auto-authorization (first @mention joins the allowlist; default off)",
   '\u5F00\u542F\u540E\uFF0C\u6BCF\u8F6E\u7ED3\u675F\u4F1A\u628A"\u6539\u4E86\u54EA\u4E9B\u6587\u4EF6\uFF08+\u589E/-\u5220\uFF09"\u64AD\u62A5\u5230\u5F53\u524D\u4F1A\u8BDD\uFF1B/diff \u53EF\u5BFC\u51FA .patch \u8865\u4E01': "When on, each turn ends with a summary of changed files (+added/-removed); /diff exports a .patch",
   "\u672C\u8F6E\u6539\u52A8\u6458\u8981\uFF08\u6BCF\u8F6E\u64AD\u62A5\u6539\u52A8\u6587\u4EF6\u6E05\u5355\uFF0C\u9ED8\u8BA4\u5F00\u542F\uFF09": "Turn change summary (broadcast changed files each turn; default on)",
+  "\u5F00\u542F\u540E\uFF0C\u5728 Agent \u6267\u884C\u4EFB\u52A1\u671F\u95F4\u53D1\u6D88\u606F\u53EF\u5B9E\u65F6\u63D2\u8BDD\u6253\u65AD\uFF1B\u5173\u95ED\u540E\u6392\u961F\u7B49\u5F85\u5F53\u524D\u4EFB\u52A1\u5B8C\u6210\u540E\u518D\u5904\u7406": "When on, incoming messages interrupt a busy Agent immediately; when off, messages wait until the current turn finishes",
+  "\u5B9E\u65F6\u63D2\u8BDD\u6A21\u5F0F\uFF08Agent \u5FD9\u788C\u65F6\u53D1\u6D88\u606F\u53EF\u5B9E\u65F6\u6253\u65AD\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09": "Realtime interruption (interrupt running Agent on new messages; default off)",
   "\u5F00\u542F\u540E Agent \u5E72\u6D3B\u65F6\u5361\u7247\u9876\u90E8\u4F1A\u5B9E\u65F6\u663E\u793A\u5F53\u524D\u52A8\u4F5C\uFF08\u5982\u300C\u6B63\u5728\u8FD0\u884C\u547D\u4EE4\u300D\uFF09\uFF1B\u5173\u95ED\u540E\u4E0D\u518D\u663E\u793A": "When on, the card header shows the agent's current action live (e.g. \u201CRunning command\u201D); when off it is hidden",
   "\u5B9E\u65F6\u6D3B\u52A8\u72B6\u6001\uFF08\u5361\u7247\u9876\u90E8\u663E\u793A\u300C\u6B63\u5728\u8FD0\u884C\u547D\u4EE4\u300D\u7B49\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09": "Live activity status (shows \u201CRunning command\u201D etc. atop the card; default off)",
   "\u6536\u8D77\u9AD8\u7EA7\u8BBE\u7F6E": "Hide advanced settings",
@@ -4763,6 +4765,8 @@ function PlatformCard({
         maxMessageChars: String((platform.config.maxMessageChars >= 500 ? platform.config.maxMessageChars : null) ?? (platformId === "telegram" ? 4096 : 2e3)),
         sendChunkDelayMs: String(platform.config.sendChunkDelayMs ?? 1500),
         groupAutoApprove: Boolean(platform.config.groupAutoApprove),
+        changesDigest: platform.config.changesDigest !== false,
+        steerMode: Boolean(platform.config.steerMode),
         appId: platform.config.appId ?? "",
         // Secret 不由后端回传；空值表示沿用已保存密钥
         clientSecret: "",
@@ -5253,6 +5257,25 @@ function PlatformCard({
           }
         }),
         h("span", null, "\u672C\u8F6E\u6539\u52A8\u6458\u8981\uFF08\u6BCF\u8F6E\u64AD\u62A5\u6539\u52A8\u6587\u4EF6\u6E05\u5355\uFF0C\u9ED8\u8BA4\u5F00\u542F\uFF09")
+      ),
+      // 实时插话开关：默认关闭（保持既有排队行为，开启后 Agent 忙碌时发消息可直接打断）
+      h(
+        "label",
+        {
+          style: { display: "flex", alignItems: "center", gap: 6, marginTop: 10, fontSize: 12, cursor: "pointer", width: "fit-content", color: "var(--dsw-alias-label-secondary,#6b7280)" },
+          title: "\u5F00\u542F\u540E\uFF0C\u5728 Agent \u6267\u884C\u4EFB\u52A1\u671F\u95F4\u53D1\u6D88\u606F\u53EF\u5B9E\u65F6\u63D2\u8BDD\u6253\u65AD\uFF1B\u5173\u95ED\u540E\u6392\u961F\u7B49\u5F85\u5F53\u524D\u4EFB\u52A1\u5B8C\u6210\u540E\u518D\u5904\u7406"
+        },
+        h("input", {
+          type: "checkbox",
+          checked: Boolean(cfgDraft?.steerMode),
+          disabled: busy,
+          onChange: (e) => {
+            const checked = e.target.checked;
+            setCfgDraft((d) => ({ ...d ?? {}, steerMode: checked }));
+            act(BRIDGE_ENDPOINTS.platformSetConfig, { steerMode: checked });
+          }
+        }),
+        h("span", null, "\u5B9E\u65F6\u63D2\u8BDD\u6A21\u5F0F\uFF08Agent \u5FD9\u788C\u65F6\u53D1\u6D88\u606F\u53EF\u5B9E\u65F6\u6253\u65AD\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09")
       ),
       // 实时活动状态开关：仅"卡片可原地更新"的平台支持（飞书 / Telegram）。
       // 用户反馈（2026-10-17）希望"能自己关掉、不要这个状态"，故提供显式开关。

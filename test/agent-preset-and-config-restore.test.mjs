@@ -92,6 +92,20 @@ test('applyRestoredPlatformConfig 保持原有数值/开关语义（回归）', 
   assert.equal(nodeConfig.groupAutoApprove, true)
 })
 
+test('applyRestoredPlatformConfig 支持 steerMode 开关恢复（显式 false 恢复为 false，true 恢复为 true）', () => {
+  const nodeConfig1 = {}
+  applyRestoredPlatformConfig(nodeConfig1, { steerMode: false })
+  assert.equal(nodeConfig1.steerMode, false)
+
+  const nodeConfig2 = {}
+  applyRestoredPlatformConfig(nodeConfig2, { steerMode: true })
+  assert.equal(nodeConfig2.steerMode, true)
+
+  const nodeConfig3 = {}
+  applyRestoredPlatformConfig(nodeConfig3, {})
+  assert.equal(nodeConfig3.steerMode, undefined, '未配置时不污染对象')
+})
+
 // ---------------------------------------------------------------------------
 // 测试脚手架
 // ---------------------------------------------------------------------------
