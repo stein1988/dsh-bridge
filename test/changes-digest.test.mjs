@@ -59,3 +59,65 @@ test('[patch] 文件名带轮次', () => {
   assert.equal(changesPatchFileName(7), 'changes-turn-7.patch')
   assert.equal(changesPatchFileName(undefined), 'changes-turn-0.patch')
 })
+
+// ---------------------------------------------------------------------------
+// 时序回归：宿主 append() 同步广播、之后才 records.set()
+//
+// 真机现象：改动摘要从来没出现过。根因是 dsh-workspace-changes 的顺序——
+//   const event = session.append('workspace/changes', ...)  // 同步通知我们
+//   records.set(event.seq, { summary })                     // 通知之后才登记
+// 我们的回调若「同步」调用 workspaceChanges.summary()，必然拿到 undefined，
+// 于是每轮都被 `!summary?.total` 静默跳过。
+//
+// 本用例锁死：必须让出微任务后再读，才能拿到摘要。
+// ---------------------------------------------------------------------------
+test('[改动摘要] 时序：宿主先广播后登记，必须延后一个微任务读取', async () => {
+  // 模拟宿主：records 在「广播返回之后」才写入
+  const records = new Map()
+  const workspaceChanges = { summary: (_sid, seq) => records.get(seq)?.summary }
+
+  const broadcast = async (listener, event, summary) => {
+    // 同步通知（宿主 commit 是同步的）
+    const p = listener(event)
+    // 通知返回后才登记
+    records.set(event.seq, { summary })
+    await p
+  }
+
+  const capturedSync = []
+  const capturedAsync = []
+  let announce = null
+  const mkBridge = (read) => ({
+    config: { changesDigest: true },
+    _changesSvc: workspaceChanges,
+    _lastChanges: new Map(),
+    _changesAnnounced: new Map(),
+    _rememberBounded(map, k, v) { map.set(k, v) },
+    platform: { id: 'qq' },
+    logger: { info() {}, debug() {} },
+    async sendText() {},
+    async _announceChanges(session, event) {
+      const svc = this._changesSvc
+      const seq = event?.seq
+      if (!svc?.summary || !session?.id || seq == null) return
+      if (read === 'defer') await Promise.resolve()   // 修复后的读法
+      const summary = svc.summary(session.id, seq)
+      if (!summary?.total) return
+      ;(read === 'defer' ? capturedAsync : capturedSync).push(summary)
+    },
+  })
+
+  const session = { id: 's1' }
+  const event = { type: 'workspace/changes', seq: 100 }
+
+  // 旧读法（同步）
+  const oldBridge = mkBridge('sync')
+  await broadcast((e) => oldBridge._announceChanges(session, e), event, { turn: 5, total: 2, files: [], added: 1, deleted: 0 })
+  assert.equal(capturedSync.length, 0, '同步读取必然拿不到（这正是历史 bug 的成因）')
+
+  // 新读法（延后一个微任务）
+  const newBridge = mkBridge('defer')
+  await broadcast((e) => newBridge._announceChanges(session, e), event, { turn: 5, total: 2, files: [], added: 1, deleted: 0 })
+  assert.equal(capturedAsync.length, 1, '延后微任务后必须能拿到摘要')
+  assert.equal(capturedAsync[0].turn, 5)
+})
