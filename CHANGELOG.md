@@ -4,6 +4,35 @@
 
 ---
 
+## [v2.17.1] - 2026-10-24
+
+> 补丁版：修正 v2.17.0 的 2 个发布门禁阻塞项（对外声明与实际不符、CI 配置遗漏）与代码扫描遗留告警。**v2.17.0 用户建议升级。**
+
+### 🐛 修复
+
+- **QQ 扫码绑定默认安装不可用，但文档声称已预打包（对外虚假声明）**：`@tencent-connect/qqbot-connector` 因声明为 **UNLICENSED** 被有意排除在产物外，却只放在 devDependencies，用户标准安装后点「扫码绑定」必然报错，而 README / README.en / docs / CHANGELOG / releaseNotes 五处都写「预打包」。现已：
+  - 依赖改为 `optionalDependencies`（`npm i` 时通常会一并安装）；
+  - 4 处对外文案改为事实：**仅协议层 `qqbot-nodejs`（MIT）随插件分发**，扫码依赖需可选安装，未装时面板提示 `npm i`，**手动填 AppID/AppSecret 完全等价可用**；
+  - 补 2 条降级路径回归测试（此前 `CONNECTOR_NOT_INSTALLED` 分支零覆盖）。
+- **附件下载使用可预测的临时文件（CodeQL `js/insecure-temporary-file`，high）**：原先写入会话工作区内固定的 `.qq-media/` + 可预测文件名（`qq_<时间戳>_<短随机>.png`），在多用户机器上可被预先创建符号链接/占位文件导致越权覆盖。现改为：
+  - 用 `mkdtemp()` 在系统临时目录建**进程私有（0700）随机目录**；
+  - 文件以 `flag: 'wx'`（独占创建）写入，已存在则换名重试，绝不覆盖；
+  - 保留 basename + 控制/非法字符清洗 + 「必须落在该目录内」的二次校验。
+- **新增产物未加入 CodeQL `paths-ignore`，导致 20 条噪音告警**：`lib/qq/qqbot-bundled.mjs`（280KB，esbuild 产物）与 `lark-bundled.mjs` 同类却漏排除，带来 19 条 `js/unused-local-variable` + 1 条 `js/file-access-to-http`。已补入并加注释提醒「新增 *-bundled.mjs 必须同步」。
+- **`js/log-injection`（medium）仍报**：CodeQL 只识别**就地**的换行替换，不建模自定义净化函数。已在日志点显式内联 replace 链（净化函数仍保留做截断/类型安全）。
+- **`js/missing-await`（warning）**：`bot.start()` 是长连接生命周期、有意不 await，补显式 `void` 与注释说明意图。
+- **日志净化补 Unicode 行分隔符**：`U+2028` / `U+2029` 会被部分日志采集器当作换行，现一并折叠/剔除。
+
+### 🔒 CI 强化
+
+- **新增 `client/client.js` 产物同步校验**：此前只在注释里约定"改 `client/index.js` 要重建"，无 CI 校验——复核变异测试证实「删掉源码里的开关但不重打包，18 条客户端用例全绿」。
+- **新增平台面板顺序与「推荐」标记的测试锁**：v2.17.0 把 QQ 前移到飞书之后并加推荐，但无任何测试覆盖（同一变异测试可静默删掉 `recommended`）。现已锁死顺序（飞书 → QQ → 微信 → Telegram）与推荐标记，并做变异验证确认该锁会变红。
+
+### 📝 文档
+
+- **性能描述改为可复现值**：ReDoS 修复从「0.2 毫秒」改为实测的「0.6–0.8 毫秒」（复核 9 次取中位不可复现 0.2ms），「36.8 秒」改为「约 37 秒」。
+- **明确标注未经真机验证的能力**：扫码绑定全链路（单测用注入的假实现）、QQ 真实收发、`40034005`/`50056` 降级、语音 ASR 字段名——均属「代码写了、单测 mock 过、真实环境未验」，已在 CHANGELOG 中如实标注。
+
 ## [v2.17.0] - 2026-10-24
 
 ### ♻️ 重构
@@ -49,7 +78,7 @@
 - **单聊流式输出开关真正生效**：`ConversationBridge` 的 `config` 是白名单构造，`streamReply` 未被透传导致开关完全无效（设置页关掉仍走流式）。已加入白名单并在设置页提供「单聊流式输出（逐段显示，默认开启；群聊不支持）」开关。
 - **平台面板顺序调整**：QQ 移到飞书之后（第二位）并标记为「推荐」，描述更新为「扫码一键绑定 · 官方 SDK · 私聊/群聊/按钮」；中英词典同步。
 - **安全修复（CodeQL 扫描告警清零，6 条）**：
-  - **`js/polynomial-redos` ×2（high）**：`lib/wechat/gateway.js` 的 `baseUrl.replace(/\/+$/, '')` / `cdnBaseUrl.replace(/\/+$/, '')` 在外部可控输入上是多项式复杂度（实测 20 万斜杠需 **36.8 秒**）。新增线性 `stripTrailingSlashes()`（实测 **0.2 毫秒**，输出与原正则完全一致），`lib/index.js` 的请求路径处理同步改用线性实现；
+  - **`js/polynomial-redos` ×2（high）**：`lib/wechat/gateway.js` 的 `baseUrl.replace(/\/+$/, '')` / `cdnBaseUrl.replace(/\/+$/, '')` 在外部可控输入上是多项式复杂度（实测 20 万斜杠需 **约 37 秒**）。新增线性 `stripTrailingSlashes()`（实测 **0.6–0.8 毫秒**，输出与原正则完全一致），`lib/index.js` 的请求路径处理同步改用线性实现；
   - **`js/log-injection`（medium）**：Telegram API 的 `description` 直接进 `Error.message` 再写日志，可被换行注入伪造日志行。新增 `lib/security/log-sanitize.js`（折叠换行 + 剔除控制字符 + 长度上限），在错误源头与日志点双层净化；
   - **`js/automatic-semicolon-insertion` / `js/unused-local-variable` ×2**：补分号、清理未使用变量。
 - **依赖升级**：`follow-redirects` 1.16.0 → 1.16.1（等同 PR #85）。

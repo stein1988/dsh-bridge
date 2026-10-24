@@ -37,12 +37,18 @@ jobs:
           languages: ${{ matrix.language }}
           queries: security-and-quality
           # 排除构建产物：client/client.js 由 esbuild 打包、lib/feishu/lark-bundled.mjs
-          # 由 scripts/bundle-lark.mjs 生成（6MB）。扫描生成代码既慢又只会产出无意义
-          # 告警（真正的问题在对应源码里），故一并排除。
+          # 由 scripts/bundle-lark.mjs 生成（6MB）、lib/qq/qqbot-bundled.mjs 由
+          # scripts/bundle-qq.mjs 生成（280KB）——均为第三方 SDK 的内联产物。
+          # 扫描生成代码既慢又只会产出无意义告警（真正的问题在对应源码里），故一并排除。
+          #
+          # ⚠️ 新增任何 *-bundled.mjs / 打包产物时，必须同步加进这个列表，
+          # 否则 v2.17.0 那种情况会重演：产物带来 19 条 unused-variable + 1 条
+          # file-access-to-http 噪音告警，把真实告警淹没。
           config: |
             paths-ignore:
               - client/client.js
               - lib/feishu/lark-bundled.mjs
+              - lib/qq/qqbot-bundled.mjs
               # docs/dev/ 是官方文档与 SDK 示例的本地留档（第三方原文，非本仓库维护代码），
               # 扫描它会产出与我们无关的告警（如官方示例里的未使用变量）
               - docs/dev/**

@@ -302,7 +302,9 @@ Scan QR code with personal WeChat account to chat, manage sessions, and approve 
 
 Official QQ Bot with direct/group @chat, C2C streaming output, Markdown rendering, interactive approval/question button keyboards, and rich media transfers.
 
-The transport is now **fully backed by Tencent's official SDKs** ([`@tencent-connect/qqbot-nodejs`](https://github.com/tencent-connect/qqbot-nodejs) + [`@tencent-connect/qqbot-connector`](https://www.npmjs.com/package/@tencent-connect/qqbot-connector), pre-bundled into the plugin): long connection/RESUME/reconnect, event normalization, quote resolution, dedup & rate limiting, chunked media upload and `stream_messages` streaming are all official implementations — this plugin only provides the session bridge and business mapping.
+The transport is now **fully backed by Tencent's official SDK**: the protocol layer [`@tencent-connect/qqbot-nodejs`](https://github.com/tencent-connect/qqbot-nodejs) (MIT) is **pre-bundled into the plugin** — long connection/RESUME/reconnect, event normalization, quote resolution, dedup & rate limiting, chunked media upload and `stream_messages` streaming are all official implementations; this plugin only provides the session bridge and business mapping.
+
+> **Scan-to-bind is optional**: it depends on [`@tencent-connect/qqbot-connector`](https://www.npmjs.com/package/@tencent-connect/qqbot-connector), which is declared **UNLICENSED** and therefore **cannot be redistributed with this plugin**. It is listed as an optionalDependency (usually installed by `npm i` automatically); if it is missing, the settings panel tells you — **entering AppID / AppSecret manually works just as well** (the transport layer is unaffected).
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/qq-bot-config.webp" width="600" alt="QQ Bot Config" />

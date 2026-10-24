@@ -140,7 +140,10 @@ test('stripTrailingSlashes：语义等价于 replace(/\\/+$/, "")，且对超长
   assert.equal(stripTrailingSlashes(undefined), '')
   assert.equal(stripTrailingSlashes(12345), '12345')
 
-  // ReDoS 回归：20 万斜杠必须毫秒级完成（旧正则实测 36 秒）
+  // ReDoS 回归：20 万斜杠必须毫秒级完成。
+  // 注意：本输入末位是 'x'，线性实现只会从尾部看一眼就返回（O(1)），
+  // 真正被它挡住的是**旧正则**——换回 replace(/\/+$/) 时本用例会跑到 30s+ 超时变红，
+  // 因此它仍是有效的回退守卫（只是"扫过 20 万字符"的措辞不准确）。
   const evil = `https://a.com/${'/'.repeat(200_000)}x`
   const started = process.hrtime.bigint()
   const out = stripTrailingSlashes(evil)

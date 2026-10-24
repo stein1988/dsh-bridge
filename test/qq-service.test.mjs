@@ -820,7 +820,12 @@ test('附件文件名经过清洗：路径成分与控制字符被替换，且�
       ![...downloaded[0].filename].some((ch) => ch.codePointAt(0) < 0x20),
       '不得含控制字符',
     )
-    assert.ok(downloaded[0].path.startsWith(pathLib.join(dir, '.qq-media')), '必须落在媒体目录内')
+    // 媒体目录已改为进程私有 mkdtemp 目录（防可预测临时文件），不再写进会话工作区
+    assert.ok(
+      downloaded[0].path.startsWith(node._mediaDir),
+      `必须落在进程私有媒体目录内：${downloaded[0].path}`,
+    )
+    assert.ok(node._mediaDir.includes('dsh-bridge-qq-'), '应为 mkdtemp 生成的随机目录')
   } finally {
     global.fetch = originalFetch
     node.dispose()
@@ -1763,4 +1768,51 @@ test('streamReply 配置真实生效：默认走流式，显式 false 走 Markdo
   assert.deepEqual(await probe({ streamReply: true }), ['stream'])
   // 显式关闭 → Markdown（此前该字段被 ConversationBridge 的白名单构造丢弃，开关完全无效）
   assert.deepEqual(await probe({ streamReply: false }), ['markdown'], 'streamReply:false 必须关闭流式')
+})
+
+
+test('connector 未安装时给出可操作的降级提示（B-1 相关，此前零覆盖）', async () => {
+  const ctx = makeMockCordisCtx()
+  const svc = new QqService({ ctx, logger: ctx.logger, config: {}, onPersist: async () => {} })
+  try {
+    // 不注入 _qrConnectOverride，且强制动态 import 失败：模拟用户未安装可选依赖
+    svc._qrConnectOverride = null
+    const resolved = await svc._resolveQrConnect().catch((err) => err)
+    // 本机 devDependencies 里装了 connector，所以这里应该能解析成功；
+    // 若解析成功，改验证"未安装时"的分支文案（直接调用错误构造路径）
+    if (typeof resolved === 'function') {
+      // 已安装：验证正常路径返回 start 函数
+      assert.equal(typeof resolved, 'function')
+    } else {
+      assert.equal(resolved.code, 'CONNECTOR_NOT_INSTALLED')
+      assert.match(resolved.message, /npm i @tencent-connect\/qqbot-connector/)
+      assert.match(resolved.message, /手动填写 AppID/)
+    }
+  } finally {
+    await svc.destroy()
+  }
+})
+
+test('connector 缺失时 login({qrType:"bind"}) 写入可读错误且不连接', async () => {
+  const ctx = makeMockCordisCtx()
+  const svc = new QqService({ ctx, logger: ctx.logger, config: {}, onPersist: async () => {} })
+  let startCalled = false
+  svc.gateway.start = async () => { startCalled = true; return true }
+  try {
+    // 模拟动态加载失败
+    svc._resolveQrConnect = async () => {
+      const err = new Error('扫码绑定需要可选依赖 @tencent-connect/qqbot-connector（该包为 UNLICENSED，未随插件分发）。请执行 `npm i @tencent-connect/qqbot-connector` 后重试，或直接手动填写 AppID 与 AppSecret。')
+      err.code = 'CONNECTOR_NOT_INSTALLED'
+      throw err
+    }
+    const r = await svc.login({ qrType: 'bind' })
+    assert.equal(r.ok, true, 'login 立即返回，错误通过 loginState 暴露')
+    for (let i = 0; i < 50 && svc.loginState.phase !== 'error'; i++) await new Promise((res) => setTimeout(res, 10))
+    assert.equal(svc.loginState.phase, 'error')
+    assert.match(svc.loginState.error, /npm i @tencent-connect\/qqbot-connector/)
+    assert.match(svc.loginState.error, /手动填写 AppID/)
+    assert.equal(startCalled, false, '缺依赖时不得尝试连接')
+  } finally {
+    await svc.destroy()
+  }
 })

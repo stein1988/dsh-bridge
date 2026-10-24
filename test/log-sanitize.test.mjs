@@ -48,6 +48,13 @@ test('超长输入截断并标注原始长度（防撑爆日志采集器）', ()
   assert.equal(sanitizeLogValue('abcdef', { maxLen: 3 }), 'abc…(6 chars)')
 })
 
+test('Unicode 行分隔符 U+2028 / U+2029 也被处理（部分日志采集器视为换行）', () => {
+  const out = sanitizeLogValue('a\u2028b\u2029c')
+  assert.ok(!out.includes('\u2028'), '不得残留 U+2028')
+  assert.ok(!out.includes('\u2029'), '不得残留 U+2029')
+  assert.equal(out, 'a b c')
+})
+
 test('净化是幂等的：重复处理不改变结果', () => {
   const once = sanitizeLogValue('a\nb\u0000c')
   assert.equal(sanitizeLogValue(once), once)

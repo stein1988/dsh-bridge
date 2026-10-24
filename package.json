@@ -1,8 +1,8 @@
 {
   "name": "@wenbin_wb/dsh-bridge",
-  "version": "2.17.0",
+  "version": "2.17.1",
   "description": "DSH 远程连接/远程控制插件（remote control）：手机扫码即可在移动端/公网继续用 DeepSeek Harness，人不在电脑前也能接着干。一键局域网二维码、Cloudflare 公网隧道、自建隧道与微信 / QQ / 飞书 / Telegram Bot（多工作区/会话持久化/媒体/卡片审批/流式输出），无需自己搭公网服务器。",
-  "releaseNotes": "【v2.17.0】\n• QQ 对接全面替换为腾讯官方 SDK（与飞书同模式），新增手机 QQ 扫码一键绑定机器人\n• QQ 新增按钮式审批/问答卡片、被动回复限额与降级、语音 ASR、群聊上下文\n• 平台面板：QQ 前移至飞书之后并标记「推荐」；新增单聊流式输出开关（真正生效）\n• 安全：修复 2 处 ReDoS 高危（20 万字符输入从 36 秒降到 0.2 毫秒）、1 处日志注入、SSRF 补 DNS 二次校验\n• 修复 QQ 流式收尾丢正文、审批/问答跨会话劫持、改凭证不重连、断线丢正文等问题\n• 依赖升级：follow-redirects 1.16.1",
+  "releaseNotes": "【v2.17.1】\n• 修复 QQ 扫码绑定：connector 改为 optionalDependency，安装即用；未装时面板给出明确提示，可改用手动填凭证\n• 修复附件下载临时文件安全告警（改为进程私有随机目录 + 独占创建）\n• 修正对外文档措辞：仅协议层 SDK 随插件分发，扫码依赖需可选安装（此前表述有误）\n• 代码扫描告警从 22 条降至 0 条（含 1 条 high）；排除第三方 SDK 打包产物\n• 新增客户端产物与平台面板顺序的 CI 校验，防止改源码忘打包\n• 日志净化补充 Unicode 行分隔符；ReDoS 性能描述改为可复现值",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -44,7 +44,6 @@
     "@eslint/js": "^10.0.1",
     "@larksuite/channel": "^0.7.1",
     "@larksuiteoapi/node-sdk": "^1.75.0",
-    "@tencent-connect/qqbot-connector": "^1.2.0",
     "@tencent-connect/qqbot-nodejs": "^1.0.5",
     "esbuild": "^0.28.2",
     "eslint": "^10.9.1",
@@ -134,5 +133,8 @@
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
+  },
+  "optionalDependencies": {
+    "@tencent-connect/qqbot-connector": "^1.2.0"
   }
 }

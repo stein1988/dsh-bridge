@@ -6,12 +6,12 @@
 
 > **底层已全面接入腾讯官方 SDK** —— 与飞书侧走官方 Channel SDK 的方式一致：
 >
-> | 官方包 | 作用 | 在插件中的位置 |
-> | --- | --- | --- |
-> | [`@tencent-connect/qqbot-nodejs`](https://github.com/tencent-connect/qqbot-nodejs) | 协议层：WebSocket 长连接 + RESUME、access_token 管理、消息/媒体/流式收发、Koa 式中间件链 | `lib/qq/gateway.js` |
-> | [`@tencent-connect/qqbot-connector`](https://www.npmjs.com/package/@tencent-connect/qqbot-connector) | 扫码绑定：手机 QQ 扫码后由开放平台回传 AppID + AppSecret | `lib/qq/index.js`（`qrType=bind`） |
+| 官方包 | 许可 | 作用 | 分发方式 |
+> | --- | --- | --- | --- |
+> | [`@tencent-connect/qqbot-nodejs`](https://github.com/tencent-connect/qqbot-nodejs) | **MIT** | 协议层：WebSocket 长连接 + RESUME、access_token 管理、消息/媒体/流式收发、Koa 式中间件链 | 由 `scripts/bundle-qq.mjs` **预打包**进 `lib/qq/qqbot-bundled.mjs`（发布物只含 `lib/`，不带 `node_modules`） |
+> | [`@tencent-connect/qqbot-connector`](https://www.npmjs.com/package/@tencent-connect/qqbot-connector) | **UNLICENSED** | 扫码绑定：手机 QQ 扫码后由开放平台回传 AppID + AppSecret | **不随插件分发**，声明为 optionalDependency，运行时按需从 `node_modules` 动态加载 |
 >
-> 两个包由 `scripts/bundle-qq.mjs` 预打包为 `lib/qq/qqbot-bundled.mjs`（发布物只含 `lib/`，不带 `node_modules`）。
+> ⚠️ **扫码绑定的前置条件**：`qqbot-connector` 声明为 UNLICENSED（无 LICENSE 文件），出于许可合规**不能内联进本插件的 MIT 产物**。它已列为 `optionalDependencies`，`npm i` 时通常会一并安装；若未被安装，点「扫码绑定」会提示执行 `npm i @tencent-connect/qqbot-connector`，**手动填写 AppID / AppSecret 完全等价可用**（协议层不依赖它）。
 > **本插件不再自研 QQ 协议栈**：心跳、重连退避、关闭码分类、事件归一化、去重、分片上传、流式序列全部由官方 SDK 实现。
 
 ## 前置准备

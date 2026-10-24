@@ -324,7 +324,9 @@ dsh plugin --profile desktop add @wenbin_wb/dsh-bridge
 
 接入 QQ 官方机器人，支持单聊与群聊（群聊需 @机器人），支持 C2C 流式输出、Markdown 渲染、审批/问答按钮键盘与富媒体文件直传。
 
-底层已**全面接入腾讯官方 SDK**（[`@tencent-connect/qqbot-nodejs`](https://github.com/tencent-connect/qqbot-nodejs) + [`@tencent-connect/qqbot-connector`](https://www.npmjs.com/package/@tencent-connect/qqbot-connector)，预打包进插件产物）：长连接/RESUME/重连、事件归一化、引用解析、去重限流、富媒体分片上传、`stream_messages` 流式全部由官方实现，本插件只做会话桥与业务映射。
+底层已**全面接入腾讯官方 SDK**：协议层 [`@tencent-connect/qqbot-nodejs`](https://github.com/tencent-connect/qqbot-nodejs)（MIT）已**预打包进插件产物**，长连接/RESUME/重连、事件归一化、引用解析、去重限流、富媒体分片上传、`stream_messages` 流式全部由官方实现，本插件只做会话桥与业务映射。
+
+> **扫码绑定为可选能力**：它依赖 [`@tencent-connect/qqbot-connector`](https://www.npmjs.com/package/@tencent-connect/qqbot-connector)（该包声明为 UNLICENSED，**不能随插件分发**）。插件已把它列为 optionalDependency，`npm i` 时通常会自动装上；若你的环境未装成功，面板会给出提示，**手动填写 AppID / AppSecret 同样可用**（协议层不受影响）。
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/qq-bot-config.webp" width="600" alt="QQ Bot 配置" />

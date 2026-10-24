@@ -251,3 +251,39 @@ test('client/client.js 打包产物同步包含多账号实现（忘记 npm run 
       `源码中应存在 ${JSON.stringify(marker)}`);
   }
 });
+
+
+// ---------------------------------------------------------------------------
+// 平台面板顺序与「推荐」标记（源码锁）
+//
+// 背景：v2.17.0 把 QQ 前移到飞书之后并加「推荐」，但当时没有任何测试覆盖；
+// 独立复核做过变异（删掉 recommended: true 且不重打包），18 条客户端用例全绿。
+// 这里直接锁源码里的 IM_PLATFORMS 顺序与 recommended 标记。
+// ---------------------------------------------------------------------------
+test('平台面板顺序固定为 飞书 → QQ → 微信 → Telegram，且飞书与 QQ 都标记推荐', async () => {
+  const { readFileSync } = await import('node:fs')
+  const src = readFileSync(new URL('../client/index.js', import.meta.url), 'utf8')
+  const start = src.indexOf('const IM_PLATFORMS = [')
+  assert.ok(start > 0, '应能定位 IM_PLATFORMS 定义')
+  const block = src.slice(start, src.indexOf('];', start))
+
+  // 顺序：按出现位置排序
+  const order = ['feishu', 'qq', 'wechat', 'telegram']
+    .map((id) => ({ id, at: block.indexOf(`id: '${id}'`) }))
+  for (const item of order) assert.ok(item.at > 0, `缺少平台 ${item.id}`)
+  const sorted = [...order].sort((a, b) => a.at - b.at).map((x) => x.id)
+  assert.deepEqual(sorted, ['feishu', 'qq', 'wechat', 'telegram'], '面板顺序必须是 飞书 → QQ → 微信 → Telegram')
+
+  // 推荐标记：飞书与 QQ
+  const feishuRec = /id: 'feishu'[^}]*recommended: true/.test(block)
+  const qqRec = /id: 'qq'[^}]*recommended: true/.test(block)
+  assert.ok(feishuRec, '飞书必须标记 recommended')
+  assert.ok(qqRec, 'QQ 必须标记 recommended')
+
+  // 微信与 Telegram 不标记推荐
+  assert.ok(!/id: 'wechat'[^}]*recommended: true/.test(block), '微信不应标记推荐')
+  assert.ok(!/id: 'telegram'[^}]*recommended: true/.test(block), 'Telegram 不应标记推荐')
+
+  // QQ 描述反映官方 SDK 化
+  assert.match(block, /扫码一键绑定 · 官方 SDK/, 'QQ 描述应体现扫码绑定与官方 SDK')
+})

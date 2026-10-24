@@ -39,6 +39,14 @@ jobs:
           node scripts/bundle-qq.mjs
           git diff --exit-code -- lib/qq/qqbot-bundled.mjs
 
+      # client/client.js 同样是入库产物。此前只在注释里约定"改了 index.js 要重建"，
+      # 没有 CI 校验——复核变异测试证实：删掉源码里的某个开关但不重打包，测试全绿。
+      - name: Verify client bundle is up to date
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 22
+        run: |
+          node client/build.mjs
+          git diff --exit-code -- client/client.js
+
       - name: Lint
         run: npm run lint
 
