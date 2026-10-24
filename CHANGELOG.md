@@ -4,6 +4,17 @@
 
 ---
 
+## [v2.17.2] - 2026-10-24
+
+> 补丁版：v2.17.1 修复过程中由 CI 扫描发现 3 条新告警（2 medium + 1 warning）+ 2 条测试文件告警，本版清零。
+
+### 🐛 修复
+
+- **`js/http-to-file-access`（medium ×2）**：附件下载把 HTTP 响应体直接写盘。这是功能本身的目的（把用户发来的附件落到本地供 agent 读），无法「不写」；改为把落盘收敛到**单一审计函数** `writeAttachmentExclusive()`，并显式记录三重约束（URL 白名单 → DNS 解析后 IP 校验 → 目录归属校验 + `wx` 独占 + `0600`）。
+- **`js/log-injection`（medium）**：CodeQL 不建模自定义净化函数，改用**对日志参数就地 `split/join`** 的写法（净化函数仍保留做截断/类型安全）。
+- **`js/missing-await`（warning）**：`start()` 的 `finally` 中带条件赋值的写法被静态分析误判为漏 await，改为显式 catch + 清理 + 重抛，语义等价且更易读。
+- **`js/automatic-semicolon-insertion`（note）**：新增测试文件末尾补分号。
+
 ## [v2.17.1] - 2026-10-24
 
 > 补丁版：修正 v2.17.0 的 2 个发布门禁阻塞项（对外声明与实际不符、CI 配置遗漏）与代码扫描遗留告警。**v2.17.0 用户建议升级。**

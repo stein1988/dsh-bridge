@@ -285,5 +285,5 @@ test('平台面板顺序固定为 飞书 → QQ → 微信 → Telegram，且飞
   assert.ok(!/id: 'telegram'[^}]*recommended: true/.test(block), 'Telegram 不应标记推荐')
 
   // QQ 描述反映官方 SDK 化
-  assert.match(block, /扫码一键绑定 · 官方 SDK/, 'QQ 描述应体现扫码绑定与官方 SDK')
-})
+  assert.match(block, /扫码一键绑定 · 官方 SDK/, 'QQ 描述应体现扫码绑定与官方 SDK');
+});
