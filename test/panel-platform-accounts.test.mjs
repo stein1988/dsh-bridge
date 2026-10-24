@@ -260,7 +260,7 @@ test('client/client.js 打包产物同步包含多账号实现（忘记 npm run 
 // 独立复核做过变异（删掉 recommended: true 且不重打包），18 条客户端用例全绿。
 // 这里直接锁源码里的 IM_PLATFORMS 顺序与 recommended 标记。
 // ---------------------------------------------------------------------------
-test('平台面板顺序固定为 飞书 → QQ → 微信 → Telegram，且飞书与 QQ 都标记推荐', async () => {
+test('平台面板顺序固定为 QQ → 飞书 → 微信 → Telegram，且仅 QQ 标记推荐', async () => {
   const { readFileSync } = await import('node:fs')
   const src = readFileSync(new URL('../client/index.js', import.meta.url), 'utf8')
   const start = src.indexOf('const IM_PLATFORMS = [')
@@ -272,13 +272,13 @@ test('平台面板顺序固定为 飞书 → QQ → 微信 → Telegram，且飞
     .map((id) => ({ id, at: block.indexOf(`id: '${id}'`) }))
   for (const item of order) assert.ok(item.at > 0, `缺少平台 ${item.id}`)
   const sorted = [...order].sort((a, b) => a.at - b.at).map((x) => x.id)
-  assert.deepEqual(sorted, ['feishu', 'qq', 'wechat', 'telegram'], '面板顺序必须是 飞书 → QQ → 微信 → Telegram')
+  assert.deepEqual(sorted, ['qq', 'feishu', 'wechat', 'telegram'], '面板顺序必须是 QQ → 飞书 → 微信 → Telegram')
 
   // 推荐标记：飞书与 QQ
   const feishuRec = /id: 'feishu'[^}]*recommended: true/.test(block)
   const qqRec = /id: 'qq'[^}]*recommended: true/.test(block)
-  assert.ok(feishuRec, '飞书必须标记 recommended')
   assert.ok(qqRec, 'QQ 必须标记 recommended')
+  assert.ok(!feishuRec, '飞书不应标记推荐（推荐位让给 QQ）')
 
   // 微信与 Telegram 不标记推荐
   assert.ok(!/id: 'wechat'[^}]*recommended: true/.test(block), '微信不应标记推荐')

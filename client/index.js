@@ -4247,12 +4247,12 @@ function BridgePanel({ rpcCall, preferredTab }) {
       h(RestartDshCard, { rpcCall: authRpcCall }),
     );
   } else if (activeTab === 'im') {
-    // 平台类型列表保持静态四项（顺序即面板顺序：飞书 / QQ 置顶——两者都支持扫码一键接入、
-    // 底层都走官方 SDK，接入门槛最低）。一个类型下可以有多个账号实例（issue #78），实例列表
+    // 平台类型列表保持静态四项（顺序即面板顺序：QQ 置顶——扫码一键绑定、底层官方 SDK、
+    // 私聊/群聊/按钮能力最完整；飞书次之）。一个类型下可以有多个账号实例（issue #78），实例列表
     // 来自 listPlatforms 的实时轮询；0 账号是合法状态（删光后显示空状态 +「＋ 添加账号」）。
     const IM_PLATFORMS = [
-      { id: 'feishu',   label: '飞书',     icon: Icons.feishu,   brandColor: '#00D6B9', desc: '扫码一键创建 · 斜杠指令 · 文档评论', recommended: true },
       { id: 'qq',       label: 'QQ',       icon: Icons.qq,       brandColor: '#12B7F5', desc: '扫码一键绑定 · 官方 SDK · 私聊/群聊/按钮', recommended: true },
+      { id: 'feishu',   label: '飞书',     icon: Icons.feishu,   brandColor: '#00D6B9', desc: '扫码一键创建 · 斜杠指令 · 文档评论' },
       { id: 'wechat',   label: '微信',     icon: Icons.wechat,   brandColor: '#07C160', desc: 'ClawBot 扫码直连 · 无需公网' },
       { id: 'telegram', label: 'Telegram', icon: Icons.telegram, brandColor: '#24A1DE', desc: '官方 Bot API' },
     ];

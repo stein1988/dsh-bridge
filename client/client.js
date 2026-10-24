@@ -7420,8 +7420,8 @@ function BridgePanel({ rpcCall, preferredTab }) {
     );
   } else if (activeTab === "im") {
     const IM_PLATFORMS = [
-      { id: "feishu", label: "\u98DE\u4E66", icon: Icons.feishu, brandColor: "#00D6B9", desc: "\u626B\u7801\u4E00\u952E\u521B\u5EFA \xB7 \u659C\u6760\u6307\u4EE4 \xB7 \u6587\u6863\u8BC4\u8BBA", recommended: true },
       { id: "qq", label: "QQ", icon: Icons.qq, brandColor: "#12B7F5", desc: "\u626B\u7801\u4E00\u952E\u7ED1\u5B9A \xB7 \u5B98\u65B9 SDK \xB7 \u79C1\u804A/\u7FA4\u804A/\u6309\u94AE", recommended: true },
+      { id: "feishu", label: "\u98DE\u4E66", icon: Icons.feishu, brandColor: "#00D6B9", desc: "\u626B\u7801\u4E00\u952E\u521B\u5EFA \xB7 \u659C\u6760\u6307\u4EE4 \xB7 \u6587\u6863\u8BC4\u8BBA" },
       { id: "wechat", label: "\u5FAE\u4FE1", icon: Icons.wechat, brandColor: "#07C160", desc: "ClawBot \u626B\u7801\u76F4\u8FDE \xB7 \u65E0\u9700\u516C\u7F51" },
       { id: "telegram", label: "Telegram", icon: Icons.telegram, brandColor: "#24A1DE", desc: "\u5B98\u65B9 Bot API" }
     ];
