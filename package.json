@@ -1,8 +1,8 @@
 {
   "name": "@wenbin_wb/dsh-bridge",
-  "version": "2.17.2",
+  "version": "2.17.3",
   "description": "DSH 远程连接/远程控制插件（remote control）：手机扫码即可在移动端/公网继续用 DeepSeek Harness，人不在电脑前也能接着干。一键局域网二维码、Cloudflare 公网隧道、自建隧道与微信 / QQ / 飞书 / Telegram Bot（多工作区/会话持久化/媒体/卡片审批/流式输出），无需自己搭公网服务器。",
-  "releaseNotes": "【v2.17.2】\n• 代码扫描告警降为 0：修复附件写入的路径校验与日志注入的静态分析告警\n• 附件落盘集中到单一审计函数（独占创建 + 目录归属校验 + 0600 权限）\n• 修复 QQ start() 在异常路径下的启动句柄清理\n• 补测试文件分号，消除 ASI 告警\n• v2.17.1 包含：QQ 扫码绑定改为 optionalDependency（安装即用）、附件临时文件安全加固\n• v2.17.1 包含：修正文档中「扫码依赖已预打包」的错误表述",
+  "releaseNotes": "【v2.17.3】\n• 附件落盘增加内容校验：非空、限长、扩展名白名单（不在清单统一 .bin）\n• 修复静态分析告警：启动流程改用代际计数（避免 promise 值比较）、日志注入就地 replace\n• v2.17.2：附件落盘收敛到单一审计函数；修复 start() 异常路径句柄清理\n• v2.17.1：QQ 扫码绑定改为 optionalDependency（安装即用）；附件临时文件安全加固\n• v2.17.1：修正文档中「扫码依赖已预打包」的错误表述",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
