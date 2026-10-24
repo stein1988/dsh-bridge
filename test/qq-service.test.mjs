@@ -17,6 +17,10 @@ import pathLib from 'node:path'
 import os from 'node:os'
 import fsSync from 'node:fs'
 import { readFileSync } from 'node:fs'
+
+/** 审批/问答决议返回 { ok, code, reason }；测试里统一用布尔视图断言。 */
+const ok = (r) => r === true || (r && r.ok === true)
+
 import { normalizePlatformConfig } from '../lib/platform/instances.js'
 import { ApiError, QQBot } from '../lib/qq/qqbot-bundled.mjs'
 
@@ -842,31 +846,31 @@ test('审批按钮归属：单聊限发起者、群聊限本群、无编号一�
     let outcome = null
     node.registerApproval(1, { number: 1, peerId: 'u1', timer: null, resolve: (value) => { outcome = value } })
     // 单聊：非发起者被拒
-    assert.equal(node._resolveApprovalByButton({ t: 'approval', n: 1, d: 'allow' }, 'u2', false), false)
+    assert.equal(ok(node._resolveApprovalByButton({ t: 'approval', n: 1, d: 'allow' }, 'u2', false)), false)
     assert.equal(outcome, null)
     // 单聊：发起者生效
-    assert.equal(node._resolveApprovalByButton({ t: 'approval', n: 1, d: 'allow' }, 'u1', false), true)
+    assert.equal(ok(node._resolveApprovalByButton({ t: 'approval', n: 1, d: 'allow' }, 'u1', false)), true)
     assert.equal(outcome, 'allowed-once')
 
     // 群聊：本群成员可决议
     let g1Outcome = null
     node.registerApproval(2, { number: 2, peerId: 'g1', timer: null, resolve: (v) => { g1Outcome = v } })
-    assert.equal(node._resolveApprovalByButton({ t: 'approval', n: 2, d: 'deny' }, 'member', true, 'g1'), true)
+    assert.equal(ok(node._resolveApprovalByButton({ t: 'approval', n: 2, d: 'deny' }, 'member', true, 'g1')), true)
     assert.equal(g1Outcome, 'rejected')
 
     // 群聊：**别的群**成员不得决议（此前取"最后一个 pending"导致跨群劫持）
     let g2Outcome = null
     node.registerApproval(3, { number: 3, peerId: 'g1', timer: null, resolve: (v) => { g2Outcome = v } })
-    assert.equal(node._resolveApprovalByButton({ t: 'approval', n: 3, d: 'allow' }, 'member', true, 'g2'), false)
+    assert.equal(ok(node._resolveApprovalByButton({ t: 'approval', n: 3, d: 'allow' }, 'member', true, 'g2')), false)
     assert.equal(g2Outcome, null, '跨群点击不得生效')
     assert.ok(node.pending.has(3), '被拒后审批仍在等待')
 
     // 无编号的旧卡片：一律拒绝，绝不猜测
     node.registerApproval(4, { number: 4, peerId: 'u1', timer: null, resolve: () => {} })
-    assert.equal(node._resolveApprovalByButton({ t: 'approval', d: 'allow' }, 'u1', false), false)
+    assert.equal(ok(node._resolveApprovalByButton({ t: 'approval', d: 'allow' }, 'u1', false)), false)
 
     // 编号不存在（已结束）：拒绝
-    assert.equal(node._resolveApprovalByButton({ t: 'approval', n: 999, d: 'allow' }, 'u1', false), false)
+    assert.equal(ok(node._resolveApprovalByButton({ t: 'approval', n: 999, d: 'allow' }, 'u1', false)), false)
   } finally {
     node.dispose()
   }
@@ -881,13 +885,13 @@ test('QqConversationNode 问答按钮：命中选项并解析为答案批次', a
     let payload = null
     const questions = [{ id: 'q1', question: '选哪个？', options: [{ label: 'A' }, { label: 'B' }] }]
     node.registerAsk(7, { number: 7, questions, peerId: 'u1', resolve: (value) => { payload = value } })
-    const ok = node._resolveAskByButton({ t: 'question', q: 7, i: 1 }, 'u1', false)
-    assert.equal(ok, true)
+    const askResult = node._resolveAskByButton({ t: 'question', q: 7, i: 1 }, 'u1', false)
+    assert.equal(ok(askResult), true)
     assert.deepEqual(payload, { answers: [{ id: 'q1', selected: ['B'] }] })
 
     // 越界下标不解析
     node.registerAsk(8, { number: 8, questions, peerId: 'u1', resolve: () => {} })
-    assert.equal(node._resolveAskByButton({ t: 'question', q: 8, i: 9 }, 'u1', false), false)
+    assert.equal(ok(node._resolveAskByButton({ t: 'question', q: 8, i: 9 }, 'u1', false)), false)
   } finally {
     node.dispose()
   }
@@ -1594,16 +1598,16 @@ test('C：问答按钮群归属校验 + 卡片不回退 _lastPeer', async () => 
     let payload = null
     node.registerAsk(1, { number: 1, questions, peerId: 'g1', isGroup: true, resolve: (v) => { payload = v } })
     // 别的群点击：必须拒绝
-    assert.equal(node._resolveAskByButton({ t: 'question', q: 1, i: 1 }, 'g2-member', true, 'g2'), false)
+    assert.equal(ok(node._resolveAskByButton({ t: 'question', q: 1, i: 1 }, 'g2-member', true, 'g2')), false)
     assert.equal(payload, null, '跨群点击不得产生决议')
     // 本群成员：允许
-    assert.equal(node._resolveAskByButton({ t: 'question', q: 1, i: 1 }, 'member', true, 'g1'), true)
+    assert.equal(ok(node._resolveAskByButton({ t: 'question', q: 1, i: 1 }, 'member', true, 'g1')), true)
     assert.deepEqual(payload?.answers, [{ id: 'q1', selected: ['B'] }])
 
     // 卡片：peer 缺失时不得回退到上一个会话
     node._lastPeer = { peerId: 'u2', scope: 'c2c', senderId: 'u2', messageId: 'msg-u2' }
-    const ok = await node.sendAskCard(null, questions[0], { number: 2, questions }, 'prompt')
-    assert.equal(ok, false, 'peer 缺失时必须拒绝发送，而不是打到 _lastPeer')
+    const cardSent = await node.sendAskCard(null, questions[0], { number: 2, questions }, 'prompt')
+    assert.equal(cardSent, false, 'peer 缺失时必须拒绝发送，而不是打到 _lastPeer')
     assert.equal(sent.length, 0, '不得向错误会话发卡片')
   } finally {
     node.dispose()
@@ -1619,10 +1623,10 @@ test('审批卡片带进程 nonce：重启前的旧卡片点击必须失效', as
     let outcome = null
     node.registerApproval(1, { number: 1, peerId: 'u1', timer: null, resolve: (v) => { outcome = v } })
     // 旧进程的卡片：nonce 不匹配
-    assert.equal(node._resolveApprovalByButton({ t: 'approval', n: 1, s: 'stale-nonce', d: 'allow' }, 'u1', false), false)
+    assert.equal(ok(node._resolveApprovalByButton({ t: 'approval', n: 1, s: 'stale-nonce', d: 'allow' }, 'u1', false)), false)
     assert.equal(outcome, null, '旧进程卡片不得决议')
     // 本进程卡片：nonce 匹配
-    assert.equal(node._resolveApprovalByButton({ t: 'approval', n: 1, s: node._approvalNonce, d: 'allow' }, 'u1', false), true)
+    assert.equal(ok(node._resolveApprovalByButton({ t: 'approval', n: 1, s: node._approvalNonce, d: 'allow' }, 'u1', false)), true)
     assert.equal(outcome, 'allowed-once')
   } finally {
     node.dispose()
@@ -1814,5 +1818,50 @@ test('connector 缺失时 login({qrType:"bind"}) 写入可读错误且不连接'
     assert.equal(startCalled, false, '缺依赖时不得尝试连接')
   } finally {
     await svc.destroy()
+  }
+})
+
+
+test('按钮应答码语义：未知/过期按钮不得返回 REPEAT(3)，否则用户看到「请勿重复操作」', async () => {
+  const ctx = makeMockCordisCtx()
+  const acks = []
+  const gateway = makeFakeBot()
+  gateway.status = 'connected'
+  gateway.acknowledgeInteraction = async (id, code) => { acks.push({ id, code }) }
+  const node = new QqConversationNode(ctx, { allowFrom: ['u1'] }, ctx.logger, { gateway })
+  try {
+    // 1) 未知按钮类型（例如人工测试按钮）
+    await node._handleAction({
+      instanceId: 'qq', scope: 'c2c', peerId: 'u1', senderId: 'u1',
+      interactionId: 'i-unknown', buttonData: { t: 'probe', n: 1 },
+    })
+    assert.equal(acks.at(-1).code, 1, '未知按钮类型应应答 FAILED(1)，不能是 REPEAT(3)')
+
+    // 2) 已过期的审批（编号不存在）
+    await node._handleAction({
+      instanceId: 'qq', scope: 'c2c', peerId: 'u1', senderId: 'u1',
+      interactionId: 'i-expired', buttonData: { t: 'approval', n: 999, d: 'allow' },
+    })
+    assert.equal(acks.at(-1).code, 1, '已过期审批应应答 FAILED(1)')
+
+    // 3) 非发起者点击 → NO_PERMISSION(4)
+    node.registerApproval(1, { number: 1, peerId: 'u1', timer: null, resolve: () => {} })
+    await node._handleAction({
+      instanceId: 'qq', scope: 'c2c', peerId: 'u2', senderId: 'u2',
+      interactionId: 'i-noperm', buttonData: { t: 'approval', n: 1, d: 'allow' },
+    })
+    assert.equal(acks.at(-1).code, 4, '非发起者应应答 NO_PERMISSION(4)')
+
+    // 4) 正常决议 → SUCCESS(0)
+    await node._handleAction({
+      instanceId: 'qq', scope: 'c2c', peerId: 'u1', senderId: 'u1',
+      interactionId: 'i-ok', buttonData: { t: 'approval', n: 1, d: 'allow' },
+    })
+    assert.equal(acks.at(-1).code, 0, '成功决议应应答 SUCCESS(0)')
+
+    // 全程不得出现 REPEAT(3)
+    assert.ok(acks.every((a) => a.code !== 3), `任何路径都不应返回 REPEAT(3)，实际：${JSON.stringify(acks)}`)
+  } finally {
+    node.dispose()
   }
 })
