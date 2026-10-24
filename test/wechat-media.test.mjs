@@ -123,3 +123,38 @@ test('md5 hashes correctly', () => {
   const hash = md5(Buffer.from('hello'))
   assert.equal(hash, '5d41402abc4b2a76b9719d911017c592')
 })
+
+
+// ---------------------------------------------------------------------------
+// CodeQL js/polynomial-redos 回归：尾部斜杠必须线性处理
+// ---------------------------------------------------------------------------
+test('stripTrailingSlashes：语义等价于 replace(/\\/+$/, "")，且对超长斜杠串是线性的', async () => {
+  const { stripTrailingSlashes } = await import('../lib/wechat/media.js')
+
+  // 语义等价
+  const samples = ['', '/', '///', 'https://a.com', 'https://a.com/', 'https://a.com////', 'a/b//', 'a/b']
+  for (const input of samples) {
+    assert.equal(stripTrailingSlashes(input), input.replace(/\/+$/, ''), `输入 ${JSON.stringify(input)}`)
+  }
+  assert.equal(stripTrailingSlashes(null), '')
+  assert.equal(stripTrailingSlashes(undefined), '')
+  assert.equal(stripTrailingSlashes(12345), '12345')
+
+  // ReDoS 回归：20 万斜杠必须毫秒级完成（旧正则实测 36 秒）
+  const evil = `https://a.com/${'/'.repeat(200_000)}x`
+  const started = process.hrtime.bigint()
+  const out = stripTrailingSlashes(evil)
+  const elapsedMs = Number(process.hrtime.bigint() - started) / 1e6
+  assert.equal(out, evil, '非法尾部（末位不是斜杠）应原样返回')
+  assert.ok(elapsedMs < 50, `必须在 50ms 内完成，实际 ${elapsedMs.toFixed(1)}ms`)
+})
+
+test('cdnDownloadUrl / cdnUploadUrl 使用线性去斜杠且结果正确', async () => {
+  const { cdnDownloadUrl, cdnUploadUrl } = await import('../lib/wechat/media.js')
+  assert.equal(cdnDownloadUrl('https://cdn.example.com/c2c///', 'p1'), 'https://cdn.example.com/c2c/download?encrypted_query_param=p1')
+  assert.equal(cdnUploadUrl('https://cdn.example.com/c2c/', 'p 1', 'fk'), 'https://cdn.example.com/c2c/upload?encrypted_query_param=p%201&filekey=fk')
+  // 超长斜杠不得拖慢
+  const started = process.hrtime.bigint()
+  cdnUploadUrl(`https://cdn.example.com/${'/'.repeat(100_000)}`, 'p', 'fk')
+  assert.ok(Number(process.hrtime.bigint() - started) / 1e6 < 50)
+})
