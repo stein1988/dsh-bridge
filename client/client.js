@@ -1888,6 +1888,8 @@ var panelEn = {
   '\u5F00\u542F\u540E\uFF0C\u6BCF\u8F6E\u7ED3\u675F\u4F1A\u628A"\u6539\u4E86\u54EA\u4E9B\u6587\u4EF6\uFF08+\u589E/-\u5220\uFF09"\u64AD\u62A5\u5230\u5F53\u524D\u4F1A\u8BDD\uFF1B/diff \u53EF\u5BFC\u51FA .patch \u8865\u4E01': "When on, each turn ends with a summary of changed files (+added/-removed); /diff exports a .patch",
   "\u672C\u8F6E\u6539\u52A8\u6458\u8981\uFF08\u6BCF\u8F6E\u64AD\u62A5\u6539\u52A8\u6587\u4EF6\u6E05\u5355\uFF0C\u9ED8\u8BA4\u5F00\u542F\uFF09": "Turn change summary (broadcast changed files each turn; default on)",
   "\u5F00\u542F\u540E\uFF0CAgent \u6267\u884C\u4EFB\u52A1\u671F\u95F4\u53D1\u6D88\u606F\u4F1A\u63D2\u8BDD\u6CE8\u5165\u5230\u5F53\u524D\u8F6E\u6B21\u7684\u4E0B\u4E00\u6B65\uFF08\u4E0D\u6253\u65AD\u6B63\u5728\u8FD0\u884C\u7684\u5DE5\u5177\u8C03\u7528\uFF09\uFF1B\u5173\u95ED\u540E\u6392\u961F\u7B49\u5F85\u5F53\u524D\u4EFB\u52A1\u5B8C\u6210\u540E\u5904\u7406": "When on, messages sent while the Agent is working are injected at its next step (running tool calls are not interrupted); when off, messages wait until the current turn finishes",
+  "\u5F00\u542F\u540E\u5355\u804A\u56DE\u590D\u4EE5\u6D41\u5F0F\u6D88\u606F\u9010\u6BB5\u8F93\u51FA\uFF08\u540C\u4E00\u6761\u6D88\u606F\u539F\u5730\u53D8\u957F\uFF09\uFF1B\u5173\u95ED\u540E\u7B49\u4E00\u8F6E\u7ED3\u675F\u518D\u4E00\u6B21\u6027\u53D1\u9001\u3002\u7FA4\u804A\u5E73\u53F0\u4E0D\u652F\u6301\u6D41\u5F0F\uFF0C\u59CB\u7EC8\u4E00\u6B21\u6027\u53D1\u9001\u3002": "When on, DM replies stream progressively (the same message grows in place); when off, the whole reply is sent once the turn ends. Group chats do not support streaming and are always sent at once.",
+  "\u5355\u804A\u6D41\u5F0F\u8F93\u51FA\uFF08\u9010\u6BB5\u663E\u793A\uFF0C\u9ED8\u8BA4\u5F00\u542F\uFF1B\u7FA4\u804A\u4E0D\u652F\u6301\uFF09": "Streaming replies in DMs (progressive display, on by default; groups not supported)",
   "\u5B9E\u65F6\u63D2\u8BDD\u6A21\u5F0F\uFF08Agent \u5FD9\u788C\u65F6\u53D1\u6D88\u606F\u53EF\u5728\u4E0B\u4E00\u6B65\u751F\u6548\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09": "Realtime steering (messages reach a busy Agent at its next step; default off)",
   "\u5F00\u542F\u540E Agent \u5E72\u6D3B\u65F6\u5361\u7247\u9876\u90E8\u4F1A\u5B9E\u65F6\u663E\u793A\u5F53\u524D\u52A8\u4F5C\uFF08\u5982\u300C\u6B63\u5728\u8FD0\u884C\u547D\u4EE4\u300D\uFF09\uFF1B\u5173\u95ED\u540E\u4E0D\u518D\u663E\u793A": "When on, the card header shows the agent's current action live (e.g. \u201CRunning command\u201D); when off it is hidden",
   "\u5B9E\u65F6\u6D3B\u52A8\u72B6\u6001\uFF08\u5361\u7247\u9876\u90E8\u663E\u793A\u300C\u6B63\u5728\u8FD0\u884C\u547D\u4EE4\u300D\u7B49\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09": "Live activity status (shows \u201CRunning command\u201D etc. atop the card; default off)",
@@ -1943,18 +1945,26 @@ var panelEn = {
   "App ID \u2014 \u98DE\u4E66\u5F00\u653E\u5E73\u53F0\u81EA\u5EFA\u5E94\u7528 ID (cli_xxx)": "App ID \u2014 Lark / Feishu Open Platform app ID (cli_xxx)",
   "\u8BF7\u8F93\u5165 AppID": "Enter the AppID",
   "\u8BF7\u8F93\u5165 App ID (\u5982 cli_a1b2c3d4...)": "Enter the App ID (e.g. cli_a1b2c3d4...)",
-  "ClientSecret \u2014 QQ \u5F00\u653E\u5E73\u53F0\u673A\u5668\u4EBA\u5BC6\u94A5": "ClientSecret \u2014 QQ Open Platform bot secret",
+  "AppSecret \u2014 QQ \u5F00\u653E\u5E73\u53F0\u673A\u5668\u4EBA\u5BC6\u94A5": "AppSecret \u2014 QQ Open Platform bot secret",
   "App Secret \u2014 \u98DE\u4E66\u5F00\u653E\u5E73\u53F0\u5E94\u7528\u5BC6\u94A5": "App Secret \u2014 Lark / Feishu Open Platform app secret",
-  "\u8BF7\u8F93\u5165 ClientSecret": "Enter the ClientSecret",
+  "\u8BF7\u8F93\u5165 AppSecret\uFF08\u626B\u7801\u7ED1\u5B9A\u65F6\u81EA\u52A8\u586B\u5165\uFF09": "Enter the AppSecret (auto-filled after QR binding)",
   "\u8BF7\u8F93\u5165 App Secret": "Enter the App Secret",
-  "\u{1F4D6} \u524D\u5F80 QQ \u5F00\u653E\u5E73\u53F0\u7533\u8BF7\u673A\u5668\u4EBA": "\u{1F4D6} Create a bot on the QQ Open Platform",
+  "\u{1F4D6} QQ \u673A\u5668\u4EBA\u5F00\u53D1\u6587\u6863": "\u{1F4D6} QQ bot developer docs",
+  "\u{1F4F1} \u626B\u7801\u7ED1\u5B9A QQ \u673A\u5668\u4EBA\uFF08\u63A8\u8350\uFF09": "\u{1F4F1} Scan to bind a QQ bot (recommended)",
+  "\u626B\u7801\u7ED1\u5B9A\u673A\u5668\u4EBA": "Scan to bind bot",
+  "\u5DF2\u521B\u5EFA\u8FC7\u673A\u5668\u4EBA\uFF1F": "Already created a bot?",
+  "\u5728\u4E0B\u65B9\u624B\u52A8\u586B\u5165 AppID \u4E0E AppSecret\uFF0C\u6216 ": "Enter the AppID and AppSecret below, or ",
+  "\u524D\u5F80 QQ \u5F00\u653E\u5E73\u53F0": "Go to the QQ Open Platform",
+  "\u70B9\u51FB\u540E\u7528\u624B\u673A QQ \u626B\u7801\uFF1A\u7531 QQ \u5F00\u653E\u5E73\u53F0\u5B98\u65B9\u63A5\u53E3\u76F4\u63A5\u56DE\u4F20\u673A\u5668\u4EBA\u7684 AppID \u4E0E AppSecret\uFF0C\u65E0\u9700\u624B\u5DE5\u590D\u5236\u7C98\u8D34\u3002": "Click and scan with mobile QQ: the official QQ Open Platform API returns the bot AppID and AppSecret directly \u2014 no manual copy-paste needed.",
+  "\u4F7F\u7528\u624B\u673A QQ \u626B\u7801\u7ED1\u5B9A\u673A\u5668\u4EBA\u5E76\u81EA\u52A8\u586B\u5165\u51ED\u8BC1": "Scan with mobile QQ to bind a bot and auto-fill credentials",
   "\u{1F4D6} \u524D\u5F80\u98DE\u4E66\u5F00\u653E\u5E73\u53F0\u521B\u5EFA\u4F01\u4E1A\u81EA\u5EFA\u5E94\u7528": "\u{1F4D6} Create an app on the Lark / Feishu Open Platform",
   "\u4FDD\u5B58\u5E76\u8FDE\u63A5": "Save and connect",
   "\u8FDE\u63A5\u5931\u8D25": "Connection failed",
   "\u626B\u7801\u767B\u5F55": "Scan to sign in",
   "\u767B\u5F55\u5931\u8D25": "Sign-in failed",
   "\u8BF4\u660E: \u626B\u7801\u6210\u529F\u540E\uFF0C\u5411\u8BE5\u5FAE\u4FE1 Bot \u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684\u5FAE\u4FE1\u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002\u4F7F\u7528\u4E13\u7528\u5FAE\u4FE1\u53F7\uFF0C\u907F\u514D\u5F71\u54CD\u4E3B\u53F7\u3002": "Note: after scanning, the first message you send to this WeChat bot authorizes you automatically. Only allowlisted WeChat users can drive the agent; other messages are ignored. Use a dedicated WeChat account to avoid affecting your main one.",
-  "\u8BF4\u660E: \u586B\u5165 QQ \u5F00\u653E\u5E73\u53F0\u673A\u5668\u4EBA\u7684 AppID \u4E0E ClientSecret \u540E\u4FDD\u5B58\u5373\u81EA\u52A8\u8FDE\u63A5\u3002\u7528\u6237\u5411 Bot \u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684 QQ \u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002": "Note: enter the QQ bot AppID and ClientSecret and save to connect automatically. The first message a user sends to the bot authorizes them. Only allowlisted QQ users can drive the agent; other messages are ignored.",
+  "\u8BF4\u660E: \u63A8\u8350\u7528\u624B\u673A QQ \u626B\u7801\u4E00\u952E\u7ED1\u5B9A\u673A\u5668\u4EBA\uFF1B\u4E5F\u53EF\u624B\u52A8\u586B\u5165 AppID \u4E0E AppSecret \u540E\u4FDD\u5B58\u5373\u81EA\u52A8\u8FDE\u63A5\uFF08\u5E95\u5C42\u8D70\u817E\u8BAF\u5B98\u65B9 QQ \u673A\u5668\u4EBA SDK\uFF09\u3002\u7528\u6237\u5411 Bot \u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684 QQ \u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002": "Note: scan with mobile QQ to bind a bot in one step, or enter the AppID and AppSecret manually and save to connect (powered by the official Tencent QQ Bot SDK). The first message a user sends to the bot authorizes them. Only allowlisted QQ users can drive the agent; other messages are ignored.",
+  "\u8BF7\u7528\u624B\u673A QQ \u626B\u7801\u7ED1\u5B9A\u673A\u5668\u4EBA\uFF08\u4E8C\u7EF4\u7801\u8FC7\u671F\u4F1A\u81EA\u52A8\u5237\u65B0\uFF09": "Scan with mobile QQ to bind a bot (the QR code refreshes automatically when it expires)",
   "\u8BF4\u660E: \u767B\u5F55\u6210\u529F\u540E\uFF0C\u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684\u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002": "Note: after signing in, the first message you send authorizes you automatically. Only allowlisted users can drive the agent; other messages are ignored.",
   "${days}\u5929 ${hrs}\u5C0F\u65F6 ${mins}\u5206": "${days}d ${hrs}h ${mins}m",
   "${hrs}\u5C0F\u65F6 ${mins}\u5206": "${hrs}h ${mins}m",
@@ -2073,7 +2083,7 @@ var panelEn = {
   "\u626B\u7801\u4E00\u952E\u521B\u5EFA \xB7 \u659C\u6760\u6307\u4EE4 \xB7 \u6587\u6863\u8BC4\u8BBA": "One-tap QR setup \xB7 slash commands \xB7 doc comments",
   "\u5FAE\u4FE1": "WeChat",
   "ClawBot \u626B\u7801\u76F4\u8FDE \xB7 \u65E0\u9700\u516C\u7F51": "ClawBot QR direct connect \xB7 no public server needed",
-  "\u5B98\u65B9\u673A\u5668\u4EBA \xB7 \u79C1\u804A/\u7FA4\u804A/\u6309\u94AE": "Official bot \xB7 DMs, groups and buttons",
+  "\u626B\u7801\u4E00\u952E\u7ED1\u5B9A \xB7 \u5B98\u65B9 SDK \xB7 \u79C1\u804A/\u7FA4\u804A/\u6309\u94AE": "One-tap QR binding \xB7 official SDK \xB7 DMs, groups and buttons",
   "\u5B98\u65B9 Bot API": "Official Bot API",
   "\u5E73\u53F0\u6E05\u5355\u52A0\u8F7D\u5931\u8D25\uFF1A${reason}": "Failed to load the platform list: ${reason}",
   "\u91CD\u8BD5": "Retry",
@@ -2188,7 +2198,7 @@ var serverEn = {
   "\u8BF7\u586B\u5199\u5B8C\u6574\u7684 App ID \u548C App Secret\uFF0C\u6216\u4F7F\u7528\u626B\u7801\u4E00\u952E\u521B\u5EFA\u5E94\u7528": "Enter a complete App ID and App Secret, or use one-tap QR app creation",
   "Telegram Bot Token \u672A\u914D\u7F6E": "Telegram Bot Token is not configured",
   "\u8BF7\u586B\u5199\u5B8C\u6574\u7684 Telegram Bot Token": "Enter a complete Telegram Bot Token",
-  "\u8BF7\u5148\u5728\u914D\u7F6E\u9762\u677F\u586B\u5199 QQ \u5F00\u653E\u5E73\u53F0\u7684 AppID \u4E0E ClientSecret": "Enter the QQ Open Platform AppID and ClientSecret in this panel first",
+  "\u8BF7\u586B\u5199 QQ \u673A\u5668\u4EBA AppID \u4E0E AppSecret\uFF0C\u6216\u4F7F\u7528\u626B\u7801\u4E00\u952E\u7ED1\u5B9A": "Enter the QQ bot AppID and AppSecret, or use scan-to-bind",
   "\u4E8C\u7EF4\u7801\u5DF2\u8FC7\u671F\uFF0C\u6B63\u5728\u5237\u65B0\u2026": "QR code expired, refreshing\u2026",
   "\u64CD\u4F5C\u5DF2\u88AB\u62E6\u622A\uFF1A\u5F53\u524D\u7B56\u7565\u4E3A\u4EC5\u9650\u7535\u8111\u672C\u673A\u7BA1\u7406": "Blocked: the current policy allows this computer only",
   "\u8BE5\u64CD\u4F5C\u6D89\u53CA\u654F\u611F\u914D\u7F6E\uFF1A\u8BF7\u5148\u5728\u300C\u5B89\u5168\u8BA4\u8BC1\u300D\u4E2D\u8BBE\u7F6E\u8BBF\u95EE\u5BC6\u7801\u6216\u7BA1\u7406\u5BC6\u7801\u540E\u518D\u6267\u884C": "This action touches sensitive configuration: set an access or admin password under \u201CSecurity\u201D first",
@@ -4767,9 +4777,9 @@ function PlatformCard({
         groupAutoApprove: Boolean(platform.config.groupAutoApprove),
         changesDigest: platform.config.changesDigest !== false,
         steerMode: Boolean(platform.config.steerMode),
+        streamReply: platform.config.streamReply !== false,
         appId: platform.config.appId ?? "",
         // Secret 不由后端回传；空值表示沿用已保存密钥
-        clientSecret: "",
         appSecret: "",
         domain: platform.config.domain ?? "feishu",
         botToken: "",
@@ -4838,7 +4848,11 @@ function PlatformCard({
   }, [rpcCall, load, instanceId]);
   const onLogin = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformLogin, {}), [act]);
   const onRegisterApp = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformLogin, { qrType: "register" }), [act]);
-  const onRefreshQr = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformLogin, { qrType: "register", refresh: true }), [act]);
+  const onBindQqBot = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformLogin, { qrType: "bind" }), [act]);
+  const onRefreshQr = React.useCallback(
+    () => act(BRIDGE_ENDPOINTS.platformLogin, { qrType: platformId === "qq" ? "bind" : "register", refresh: true }),
+    [act, platformId]
+  );
   const onStop = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformStop, {}), [act]);
   const onReconnect = React.useCallback(() => {
     if (platform?.configured) return act(BRIDGE_ENDPOINTS.platformStart, {});
@@ -4919,7 +4933,7 @@ function PlatformCard({
     };
     if (platformId === "qq") {
       payload.appId = cfgDraft.appId.trim();
-      payload.clientSecret = cfgDraft.clientSecret.trim();
+      payload.appSecret = cfgDraft.appSecret.trim();
     } else if (platformId === "feishu") {
       payload.appId = cfgDraft.appId.trim();
       payload.appSecret = cfgDraft.appSecret.trim();
@@ -4930,7 +4944,7 @@ function PlatformCard({
     }
     await act(BRIDGE_ENDPOINTS.platformSetConfig, payload);
   }, [act, cfgDraft, platformId]);
-  const cfgDirty = cfgDraft && platform?.config && (Number(cfgDraft.digestIntervalSec) !== platform.config.digestIntervalSec || Number(cfgDraft.approvalTimeoutSec) !== platform.config.approvalTimeoutSec || Number(cfgDraft.maxMessageChars) !== platform.config.maxMessageChars || Number(cfgDraft.sendChunkDelayMs) !== platform.config.sendChunkDelayMs || (cfgDraft.agentPreset ?? "") !== (platform.config.agentPreset ?? "") || (cfgDraft.cwd ?? "") !== (platform.config.cwd ?? "") || (cfgDraft.agentProvider ?? "") !== (platform.config.agentProvider ?? "") || (cfgDraft.agentModel ?? "") !== (platform.config.agentModel ?? "") || platformId === "qq" && (cfgDraft.appId !== (platform.config.appId ?? "") || cfgDraft.clientSecret !== (platform.config.clientSecret ?? "")) || platformId === "feishu" && (cfgDraft.appId !== (platform.config.appId ?? "") || cfgDraft.appSecret !== (platform.config.appSecret ?? "")) || platformId === "telegram" && (cfgDraft.botToken !== "" || cfgDraft.proxy !== (platform.config.proxy ?? "")));
+  const cfgDirty = cfgDraft && platform?.config && (Number(cfgDraft.digestIntervalSec) !== platform.config.digestIntervalSec || Number(cfgDraft.approvalTimeoutSec) !== platform.config.approvalTimeoutSec || Number(cfgDraft.maxMessageChars) !== platform.config.maxMessageChars || Number(cfgDraft.sendChunkDelayMs) !== platform.config.sendChunkDelayMs || (cfgDraft.agentPreset ?? "") !== (platform.config.agentPreset ?? "") || (cfgDraft.cwd ?? "") !== (platform.config.cwd ?? "") || (cfgDraft.agentProvider ?? "") !== (platform.config.agentProvider ?? "") || (cfgDraft.agentModel ?? "") !== (platform.config.agentModel ?? "") || platformId === "qq" && (cfgDraft.appId !== (platform.config.appId ?? "") || cfgDraft.appSecret !== (platform.config.appSecret ?? "")) || platformId === "feishu" && (cfgDraft.appId !== (platform.config.appId ?? "") || cfgDraft.appSecret !== (platform.config.appSecret ?? "")) || platformId === "telegram" && (cfgDraft.botToken !== "" || cfgDraft.proxy !== (platform.config.proxy ?? "")));
   if (!platform && !err) {
     return h(
       "div",
@@ -5279,6 +5293,26 @@ function PlatformCard({
         }),
         h("span", null, "\u5B9E\u65F6\u63D2\u8BDD\u6A21\u5F0F\uFF08Agent \u5FD9\u788C\u65F6\u53D1\u6D88\u606F\u53EF\u5728\u4E0B\u4E00\u6B65\u751F\u6548\uFF0C\u9ED8\u8BA4\u5173\u95ED\uFF09")
       ),
+      // 单聊流式输出开关：仅 QQ 支持（平台只对 C2C 开放 stream_messages；群聊始终为普通 Markdown）。
+      // 默认开启：回复逐字在同一条消息里长出来；关闭后整轮结束后一次性发送。
+      platformId === "qq" && h(
+        "label",
+        {
+          style: { display: "flex", alignItems: "center", gap: 6, marginTop: 10, fontSize: 12, cursor: "pointer", width: "fit-content", color: "var(--dsw-alias-label-secondary,#6b7280)" },
+          title: "\u5F00\u542F\u540E\u5355\u804A\u56DE\u590D\u4EE5\u6D41\u5F0F\u6D88\u606F\u9010\u6BB5\u8F93\u51FA\uFF08\u540C\u4E00\u6761\u6D88\u606F\u539F\u5730\u53D8\u957F\uFF09\uFF1B\u5173\u95ED\u540E\u7B49\u4E00\u8F6E\u7ED3\u675F\u518D\u4E00\u6B21\u6027\u53D1\u9001\u3002\u7FA4\u804A\u5E73\u53F0\u4E0D\u652F\u6301\u6D41\u5F0F\uFF0C\u59CB\u7EC8\u4E00\u6B21\u6027\u53D1\u9001\u3002"
+        },
+        h("input", {
+          type: "checkbox",
+          checked: cfgDraft?.streamReply !== false,
+          disabled: busy,
+          onChange: (e) => {
+            const checked = e.target.checked;
+            setCfgDraft((d) => ({ ...d ?? {}, streamReply: checked }));
+            act(BRIDGE_ENDPOINTS.platformSetConfig, { streamReply: checked });
+          }
+        }),
+        h("span", null, "\u5355\u804A\u6D41\u5F0F\u8F93\u51FA\uFF08\u9010\u6BB5\u663E\u793A\uFF0C\u9ED8\u8BA4\u5F00\u542F\uFF1B\u7FA4\u804A\u4E0D\u652F\u6301\uFF09")
+      ),
       // 实时活动状态开关：仅"卡片可原地更新"的平台支持（飞书 / Telegram）。
       // 用户反馈（2026-10-17）希望"能自己关掉、不要这个状态"，故提供显式开关。
       (platformId === "feishu" || platformId === "telegram") && h(
@@ -5471,10 +5505,10 @@ function PlatformCard({
         h(
           "div",
           { style: { ...s.muted, marginTop: 4 } },
-          login.phase === "scaned" ? "\u5DF2\u626B\u7801\uFF0C\u8BF7\u5728\u624B\u673A\u4E0A\u786E\u8BA4\u2026" : platformId === "wechat" ? "\u8BF7\u4F7F\u7528\u5FAE\u4FE1\u626B\u7801\u767B\u5F55\uFF08ClawBot\uFF09" : platformId === "feishu" ? "\u8BF7\u7528\u98DE\u4E66\u626B\u7801\u521B\u5EFA\u5E94\u7528\uFF08\u4E8C\u7EF4\u7801 10 \u5206\u949F\u5185\u6709\u6548\uFF09" : "\u8BF7\u626B\u7801\u767B\u5F55"
+          login.phase === "scaned" ? "\u5DF2\u626B\u7801\uFF0C\u8BF7\u5728\u624B\u673A\u4E0A\u786E\u8BA4\u2026" : platformId === "wechat" ? "\u8BF7\u4F7F\u7528\u5FAE\u4FE1\u626B\u7801\u767B\u5F55\uFF08ClawBot\uFF09" : platformId === "feishu" ? "\u8BF7\u7528\u98DE\u4E66\u626B\u7801\u521B\u5EFA\u5E94\u7528\uFF08\u4E8C\u7EF4\u7801 10 \u5206\u949F\u5185\u6709\u6548\uFF09" : platformId === "qq" ? "\u8BF7\u7528\u624B\u673A QQ \u626B\u7801\u7ED1\u5B9A\u673A\u5668\u4EBA\uFF08\u4E8C\u7EF4\u7801\u8FC7\u671F\u4F1A\u81EA\u52A8\u5237\u65B0\uFF09" : "\u8BF7\u626B\u7801\u767B\u5F55"
         ),
         login.error && h("div", { style: { ...s.muted, marginTop: 4, color: "var(--dsw-alias-label-primary, #0f1115)" } }, login.error),
-        platformId === "feishu" && h(
+        (platformId === "feishu" || platformId === "qq") && h(
           "div",
           { style: { display: "flex", gap: 8, marginTop: 10, flexWrap: "wrap", alignItems: "center" } },
           h("button", {
@@ -5488,7 +5522,7 @@ function PlatformCard({
       ) : platformId === "qq" || platformId === "feishu" || platformId === "telegram" ? h(
         "div",
         { style: { display: "flex", flexDirection: "column", gap: 10, marginTop: 4 } },
-        platformId === "feishu" && h(
+        (platformId === "feishu" || platformId === "qq") && h(
           "div",
           {
             style: {
@@ -5500,23 +5534,44 @@ function PlatformCard({
               lineHeight: 1.5
             }
           },
-          h("div", { style: { ...s.label, marginBottom: 4 } }, "\u{1F4F1} \u4E00\u952E\u521B\u5EFA\u98DE\u4E66\u5E94\u7528\uFF08\u63A8\u8350\uFF09"),
+          h(
+            "div",
+            { style: { ...s.label, marginBottom: 4 } },
+            platformId === "qq" ? "\u{1F4F1} \u626B\u7801\u7ED1\u5B9A QQ \u673A\u5668\u4EBA\uFF08\u63A8\u8350\uFF09" : "\u{1F4F1} \u4E00\u952E\u521B\u5EFA\u98DE\u4E66\u5E94\u7528\uFF08\u63A8\u8350\uFF09"
+          ),
           h(
             "div",
             { style: { ...s.muted, marginBottom: 8 } },
-            "\u70B9\u51FB\u540E\u7528\u98DE\u4E66\u626B\u7801\uFF1A\u81EA\u52A8\u521B\u5EFA\u673A\u5668\u4EBA\u5E94\u7528\u5E76\u9884\u7F6E\u6240\u9700\u6743\u9650\u3001\u4E8B\u4EF6\u8BA2\u9605\u4E0E\u5361\u7247\u56DE\u8C03\uFF0C\u65E0\u9700\u8FDB\u5F00\u53D1\u8005\u540E\u53F0\u624B\u5DE5\u914D\u7F6E\u3002"
+            platformId === "qq" ? "\u70B9\u51FB\u540E\u7528\u624B\u673A QQ \u626B\u7801\uFF1A\u7531 QQ \u5F00\u653E\u5E73\u53F0\u5B98\u65B9\u63A5\u53E3\u76F4\u63A5\u56DE\u4F20\u673A\u5668\u4EBA\u7684 AppID \u4E0E AppSecret\uFF0C\u65E0\u9700\u624B\u5DE5\u590D\u5236\u7C98\u8D34\u3002" : "\u70B9\u51FB\u540E\u7528\u98DE\u4E66\u626B\u7801\uFF1A\u81EA\u52A8\u521B\u5EFA\u673A\u5668\u4EBA\u5E94\u7528\u5E76\u9884\u7F6E\u6240\u9700\u6743\u9650\u3001\u4E8B\u4EF6\u8BA2\u9605\u4E0E\u5361\u7247\u56DE\u8C03\uFF0C\u65E0\u9700\u8FDB\u5F00\u53D1\u8005\u540E\u53F0\u624B\u5DE5\u914D\u7F6E\u3002"
           ),
           h("button", {
             style: { ...s.btnPri, opacity: busy ? 0.5 : 1 },
-            onClick: onRegisterApp,
+            onClick: platformId === "qq" ? onBindQqBot : onRegisterApp,
             disabled: busy,
-            title: "\u4F7F\u7528\u98DE\u4E66\u626B\u7801\u521B\u5EFA\u5E94\u7528\u5E76\u81EA\u52A8\u586B\u5165\u51ED\u8BC1"
-          }, busy ? "\u5904\u7406\u4E2D\u2026" : "\u626B\u7801\u4E00\u952E\u521B\u5EFA\u5E94\u7528"),
-          h(
+            title: platformId === "qq" ? "\u4F7F\u7528\u624B\u673A QQ \u626B\u7801\u7ED1\u5B9A\u673A\u5668\u4EBA\u5E76\u81EA\u52A8\u586B\u5165\u51ED\u8BC1" : "\u4F7F\u7528\u98DE\u4E66\u626B\u7801\u521B\u5EFA\u5E94\u7528\u5E76\u81EA\u52A8\u586B\u5165\u51ED\u8BC1"
+          }, busy ? "\u5904\u7406\u4E2D\u2026" : platformId === "qq" ? "\u626B\u7801\u7ED1\u5B9A\u673A\u5668\u4EBA" : "\u626B\u7801\u4E00\u952E\u521B\u5EFA\u5E94\u7528"),
+          platformId === "qq" ? h(
+            "div",
+            { style: { ...s.muted, marginTop: 8, fontSize: 11 } },
+            "\u5DF2\u521B\u5EFA\u8FC7\u673A\u5668\u4EBA\uFF1F",
+            "\u5728\u4E0B\u65B9\u624B\u52A8\u586B\u5165 AppID \u4E0E AppSecret\uFF0C\u6216 ",
+            h("a", {
+              href: "https://q.qq.com/",
+              target: "_blank",
+              rel: "noopener noreferrer",
+              style: s.btnLink
+            }, "\u524D\u5F80 QQ \u5F00\u653E\u5E73\u53F0"),
+            " \u521B\u5EFA\u540E\u586B\u5165\u3002"
+          ) : h(
             "div",
             { style: { ...s.muted, marginTop: 8, fontSize: 11 } },
             "\u5DF2\u6709\u5E94\u7528\uFF1F\u5728\u4E0B\u65B9\u624B\u52A8\u586B\u5165 App ID \u4E0E App Secret\uFF0C\u6216 ",
-            h("a", { href: "https://open.feishu.cn/app", target: "_blank", rel: "noopener noreferrer", style: s.btnLink }, "\u524D\u5F80\u98DE\u4E66\u5F00\u653E\u5E73\u53F0"),
+            h("a", {
+              href: "https://open.feishu.cn/app",
+              target: "_blank",
+              rel: "noopener noreferrer",
+              style: s.btnLink
+            }, "\u524D\u5F80\u98DE\u4E66\u5F00\u653E\u5E73\u53F0"),
             " \u521B\u5EFA\u540E\u586B\u5165\u3002"
           )
         ),
@@ -5580,7 +5635,7 @@ function PlatformCard({
             h(
               "div",
               { style: { ...s.muted, marginBottom: 4 } },
-              platformId === "qq" ? "ClientSecret \u2014 QQ \u5F00\u653E\u5E73\u53F0\u673A\u5668\u4EBA\u5BC6\u94A5" : "App Secret \u2014 \u98DE\u4E66\u5F00\u653E\u5E73\u53F0\u5E94\u7528\u5BC6\u94A5"
+              platformId === "qq" ? "AppSecret \u2014 QQ \u5F00\u653E\u5E73\u53F0\u673A\u5668\u4EBA\u5BC6\u94A5" : "App Secret \u2014 \u98DE\u4E66\u5F00\u653E\u5E73\u53F0\u5E94\u7528\u5BC6\u94A5"
             ),
             h(
               "div",
@@ -5588,9 +5643,9 @@ function PlatformCard({
               h("input", {
                 style: { ...s.input, flex: 1 },
                 type: showSecret ? "text" : "password",
-                placeholder: platformId === "qq" ? "\u8BF7\u8F93\u5165 ClientSecret" : "\u8BF7\u8F93\u5165 App Secret",
-                value: platformId === "qq" ? cfgDraft?.clientSecret ?? "" : cfgDraft?.appSecret ?? "",
-                onChange: (e) => setCfgDraft((d) => platformId === "qq" ? { ...d, clientSecret: e.target.value } : { ...d, appSecret: e.target.value })
+                placeholder: platformId === "qq" ? "\u8BF7\u8F93\u5165 AppSecret\uFF08\u626B\u7801\u7ED1\u5B9A\u65F6\u81EA\u52A8\u586B\u5165\uFF09" : "\u8BF7\u8F93\u5165 App Secret",
+                value: platformId === "qq" ? cfgDraft?.appSecret ?? "" : cfgDraft?.appSecret ?? "",
+                onChange: (e) => setCfgDraft((d) => ({ ...d, appSecret: e.target.value }))
               }),
               h("button", {
                 style: { ...s.btnGhost, height: 32, padding: "0 10px", fontSize: 13, flexShrink: 0 },
@@ -5609,7 +5664,7 @@ function PlatformCard({
             target: "_blank",
             rel: "noopener noreferrer",
             style: s.btnLink
-          }, platformId === "qq" ? "\u{1F4D6} \u524D\u5F80 QQ \u5F00\u653E\u5E73\u53F0\u7533\u8BF7\u673A\u5668\u4EBA" : "\u{1F4D6} \u524D\u5F80\u98DE\u4E66\u5F00\u653E\u5E73\u53F0\u521B\u5EFA\u4F01\u4E1A\u81EA\u5EFA\u5E94\u7528")
+          }, platformId === "qq" ? "\u{1F4D6} QQ \u673A\u5668\u4EBA\u5F00\u53D1\u6587\u6863" : "\u{1F4D6} \u524D\u5F80\u98DE\u4E66\u5F00\u653E\u5E73\u53F0\u521B\u5EFA\u4F01\u4E1A\u81EA\u5EFA\u5E94\u7528")
         ),
         h(
           "div",
@@ -5617,7 +5672,7 @@ function PlatformCard({
           h("button", {
             style: { ...s.btnPri, opacity: busy ? 0.5 : 1 },
             onClick: saveConfig,
-            disabled: busy || (platformId === "telegram" ? !cfgDraft?.botToken?.trim() : !cfgDraft?.appId?.trim() || (platformId === "qq" ? !cfgDraft?.clientSecret?.trim() : !cfgDraft?.appSecret?.trim()))
+            disabled: busy || (platformId === "telegram" ? !cfgDraft?.botToken?.trim() : !cfgDraft?.appId?.trim() || !cfgDraft?.appSecret?.trim())
           }, busy ? "\u4FDD\u5B58\u4E2D\u2026" : "\u4FDD\u5B58\u5E76\u8FDE\u63A5"),
           login.phase === "error" && h("div", { style: { ...s.muted, fontSize: 12 } }, login.error ?? "\u8FDE\u63A5\u5931\u8D25")
         )
@@ -5638,7 +5693,7 @@ function PlatformCard({
       h(
         "div",
         { style: { ...s.tip, fontSize: 12 } },
-        platformId === "wechat" ? "\u8BF4\u660E: \u626B\u7801\u6210\u529F\u540E\uFF0C\u5411\u8BE5\u5FAE\u4FE1 Bot \u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684\u5FAE\u4FE1\u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002\u4F7F\u7528\u4E13\u7528\u5FAE\u4FE1\u53F7\uFF0C\u907F\u514D\u5F71\u54CD\u4E3B\u53F7\u3002" : platformId === "qq" ? "\u8BF4\u660E: \u586B\u5165 QQ \u5F00\u653E\u5E73\u53F0\u673A\u5668\u4EBA\u7684 AppID \u4E0E ClientSecret \u540E\u4FDD\u5B58\u5373\u81EA\u52A8\u8FDE\u63A5\u3002\u7528\u6237\u5411 Bot \u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684 QQ \u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002" : "\u8BF4\u660E: \u767B\u5F55\u6210\u529F\u540E\uFF0C\u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684\u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002"
+        platformId === "wechat" ? "\u8BF4\u660E: \u626B\u7801\u6210\u529F\u540E\uFF0C\u5411\u8BE5\u5FAE\u4FE1 Bot \u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684\u5FAE\u4FE1\u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002\u4F7F\u7528\u4E13\u7528\u5FAE\u4FE1\u53F7\uFF0C\u907F\u514D\u5F71\u54CD\u4E3B\u53F7\u3002" : platformId === "qq" ? "\u8BF4\u660E: \u63A8\u8350\u7528\u624B\u673A QQ \u626B\u7801\u4E00\u952E\u7ED1\u5B9A\u673A\u5668\u4EBA\uFF1B\u4E5F\u53EF\u624B\u52A8\u586B\u5165 AppID \u4E0E AppSecret \u540E\u4FDD\u5B58\u5373\u81EA\u52A8\u8FDE\u63A5\uFF08\u5E95\u5C42\u8D70\u817E\u8BAF\u5B98\u65B9 QQ \u673A\u5668\u4EBA SDK\uFF09\u3002\u7528\u6237\u5411 Bot \u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684 QQ \u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002" : "\u8BF4\u660E: \u767B\u5F55\u6210\u529F\u540E\uFF0C\u53D1\u9001\u7B2C\u4E00\u6761\u6D88\u606F\u5373\u81EA\u52A8\u5B8C\u6210\u767D\u540D\u5355\u6388\u6743\u3002\u4EC5\u767D\u540D\u5355\u5185\u7684\u7528\u6237\u80FD\u9A71\u52A8 agent\uFF0C\u5176\u4ED6\u4EBA\u6D88\u606F\u4F1A\u88AB\u5FFD\u7565\u3002"
       )
     )
   );
@@ -7366,8 +7421,8 @@ function BridgePanel({ rpcCall, preferredTab }) {
   } else if (activeTab === "im") {
     const IM_PLATFORMS = [
       { id: "feishu", label: "\u98DE\u4E66", icon: Icons.feishu, brandColor: "#00D6B9", desc: "\u626B\u7801\u4E00\u952E\u521B\u5EFA \xB7 \u659C\u6760\u6307\u4EE4 \xB7 \u6587\u6863\u8BC4\u8BBA", recommended: true },
+      { id: "qq", label: "QQ", icon: Icons.qq, brandColor: "#12B7F5", desc: "\u626B\u7801\u4E00\u952E\u7ED1\u5B9A \xB7 \u5B98\u65B9 SDK \xB7 \u79C1\u804A/\u7FA4\u804A/\u6309\u94AE", recommended: true },
       { id: "wechat", label: "\u5FAE\u4FE1", icon: Icons.wechat, brandColor: "#07C160", desc: "ClawBot \u626B\u7801\u76F4\u8FDE \xB7 \u65E0\u9700\u516C\u7F51" },
-      { id: "qq", label: "QQ", icon: Icons.qq, brandColor: "#12B7F5", desc: "\u5B98\u65B9\u673A\u5668\u4EBA \xB7 \u79C1\u804A/\u7FA4\u804A/\u6309\u94AE" },
       { id: "telegram", label: "Telegram", icon: Icons.telegram, brandColor: "#24A1DE", desc: "\u5B98\u65B9 Bot API" }
     ];
     const RecommendedTag = () => h("span", {

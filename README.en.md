@@ -16,7 +16,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Security-Access%20Auth%20%2B%20PBKDF2-6366f1?style=flat-square&logo=security" alt="Security" />
   <img src="https://img.shields.io/badge/WeChat-ClawBot%20%7C%20iLink-07C160?style=flat-square&logo=wechat" alt="WeChat" />
-  <img src="https://img.shields.io/badge/QQ%20Bot-OpenAPI%20v2-12B7F5?style=flat-square&logo=tencentqq" alt="QQ" />
+  <img src="https://img.shields.io/badge/QQ%20Bot-Official%20SDK-12B7F5?style=flat-square&logo=tencentqq" alt="QQ" />
   <img src="https://img.shields.io/badge/Feishu-Channel%20SDK-00D6B9?style=flat-square&logo=lark" alt="Feishu" />
   <img src="https://img.shields.io/badge/Telegram-Bot%20API-24A1DE?style=flat-square&logo=telegram" alt="Telegram" />
   <img src="https://img.shields.io/badge/Cloudflare-Tunnel-F38020?style=flat-square&logo=cloudflare" alt="Cloudflare" />
@@ -298,9 +298,11 @@ Scan QR code with personal WeChat account to chat, manage sessions, and approve 
 
 ---
 
-#### 🐧 QQ Bot (OpenAPI v2)
+#### 🐧 QQ Bot (official QQ Bot SDK)
 
-Official QQ Bot with direct/group @chat, Markdown rendering, interactive button keyboards, and rich media transfers.
+Official QQ Bot with direct/group @chat, C2C streaming output, Markdown rendering, interactive approval/question button keyboards, and rich media transfers.
+
+The transport is now **fully backed by Tencent's official SDKs** ([`@tencent-connect/qqbot-nodejs`](https://github.com/tencent-connect/qqbot-nodejs) + [`@tencent-connect/qqbot-connector`](https://www.npmjs.com/package/@tencent-connect/qqbot-connector), pre-bundled into the plugin): long connection/RESUME/reconnect, event normalization, quote resolution, dedup & rate limiting, chunked media upload and `stream_messages` streaming are all official implementations — this plugin only provides the session bridge and business mapping.
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/qq-bot-config.webp" width="600" alt="QQ Bot Config" />
@@ -315,7 +317,7 @@ Official QQ Bot with direct/group @chat, Markdown rendering, interactive button 
   </p>
 </details>
 
-* **Quick Setup**: Create bot on [QQ Open Platform](https://q.qq.com), fill AppID & Secret > Send first message to auto-authorize. See [QQ Guide](docs/qq-usage.md).
+* **Quick Setup**: click **"📱 Scan to bind bot"** in the settings panel and scan with mobile QQ — credentials come back from the official open-platform API; or create a bot on [QQ Open Platform](https://q.qq.com) and fill AppID / AppSecret manually. Send the first message to auto-authorize. See [QQ Guide](docs/qq-usage.md).
 
 ---
 

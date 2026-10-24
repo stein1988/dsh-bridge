@@ -137,7 +137,7 @@ const CLOUDFLARE_TUTORIAL_URL = 'https://github.com/wenbin-wb/dsh-bridge/blob/ma
 
 // 隧道高危操作的前置条件文案（issue #75）：未设访问密码时服务端会拒绝 requireConfigured
 // 系列操作，客户端把它显式呈现出来（旧实现只写顶部横幅，卡片在长页下方时用户看不到）。
-const TUNNEL_PASSWORD_TEXT = '开启公网隧道前，请先在「安全认证」中设置访问密码'
+const TUNNEL_PASSWORD_TEXT = '开启公网隧道前，请先在「安全认证」中设置访问密码';
 
 // 模块级翻译函数：apply() 里随 ctx.locale 初始化（跟随 DSH 主体语言），
 // 供 setupMobileExperience / setupComposerCollapse 等各函数读取（不通过参数传递）。
@@ -1760,9 +1760,9 @@ function PlatformCard({
         groupAutoApprove:   Boolean(platform.config.groupAutoApprove),
         changesDigest:      platform.config.changesDigest !== false,
         steerMode:          Boolean(platform.config.steerMode),
+        streamReply:        platform.config.streamReply !== false,
         appId: platform.config.appId ?? '',
         // Secret 不由后端回传；空值表示沿用已保存密钥
-        clientSecret: '',
         appSecret: '',
         domain: platform.config.domain ?? 'feishu',
         botToken: '',
@@ -1840,8 +1840,14 @@ function PlatformCard({
   const onLogin = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformLogin, {}), [act]);
   // 飞书一键创建应用：官方 registerApp 扫码流程（返回后由轮询刷新二维码与结果）
   const onRegisterApp = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformLogin, { qrType: 'register' }), [act]);
-  // 重新生成二维码：作废旧设备码并立即换新码
-  const onRefreshQr = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformLogin, { qrType: 'register', refresh: true }), [act]);
+  // QQ 扫码绑定机器人：官方 @tencent-connect/qqbot-connector 流程
+  // （手机 QQ 扫码后由开放平台回传 AppID/AppSecret，无需手工填）
+  const onBindQqBot = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformLogin, { qrType: 'bind' }), [act]);
+  // 重新生成二维码：飞书作废旧设备码 / QQ 中止当前绑定任务并换新码
+  const onRefreshQr = React.useCallback(
+    () => act(BRIDGE_ENDPOINTS.platformLogin, { qrType: platformId === 'qq' ? 'bind' : 'register', refresh: true }),
+    [act, platformId],
+  );
   const onStop  = React.useCallback(() => act(BRIDGE_ENDPOINTS.platformStop, {}), [act]);
   // 断开后重连：凭证仍在（configured）时直接用已存凭证重启网关，无需重新扫码；
   // 只有解绑后（无凭证）才走扫码/绑定流程
@@ -1941,7 +1947,8 @@ function PlatformCard({
     // QQ / 飞书 / Telegram 平台额外携带凭证
     if (platformId === 'qq') {
       payload.appId = cfgDraft.appId.trim();
-      payload.clientSecret = cfgDraft.clientSecret.trim();
+      // QQ 对接改为官方 SDK 后字段名统一为 appSecret（与飞书一致）
+      payload.appSecret = cfgDraft.appSecret.trim();
     } else if (platformId === 'feishu') {
       payload.appId = cfgDraft.appId.trim();
       payload.appSecret = cfgDraft.appSecret.trim();
@@ -1963,7 +1970,7 @@ function PlatformCard({
     (cfgDraft.agentModel ?? '')    !== (platform.config.agentModel ?? '')      ||
     (platformId === 'qq' && (
       cfgDraft.appId !== (platform.config.appId ?? '') ||
-      cfgDraft.clientSecret !== (platform.config.clientSecret ?? '')
+      cfgDraft.appSecret !== (platform.config.appSecret ?? '')
     )) ||
     (platformId === 'feishu' && (
       cfgDraft.appId !== (platform.config.appId ?? '') ||
@@ -2266,6 +2273,24 @@ function PlatformCard({
         }),
         h('span', null, '实时插话模式（Agent 忙碌时发消息可在下一步生效，默认关闭）'),
       ),
+      // 单聊流式输出开关：仅 QQ 支持（平台只对 C2C 开放 stream_messages；群聊始终为普通 Markdown）。
+      // 默认开启：回复逐字在同一条消息里长出来；关闭后整轮结束后一次性发送。
+      platformId === 'qq' && h('label', {
+        style: { display: 'flex', alignItems: 'center', gap: 6, marginTop: 10, fontSize: 12, cursor: 'pointer', width: 'fit-content', color: 'var(--dsw-alias-label-secondary,#6b7280)' },
+        title: '开启后单聊回复以流式消息逐段输出（同一条消息原地变长）；关闭后等一轮结束再一次性发送。群聊平台不支持流式，始终一次性发送。',
+      },
+        h('input', {
+          type: 'checkbox',
+          checked: cfgDraft?.streamReply !== false,
+          disabled: busy,
+          onChange: (e) => {
+            const checked = e.target.checked;
+            setCfgDraft(d => ({ ...(d ?? {}), streamReply: checked }));
+            act(BRIDGE_ENDPOINTS.platformSetConfig, { streamReply: checked });
+          },
+        }),
+        h('span', null, '单聊流式输出（逐段显示，默认开启；群聊不支持）'),
+      ),
       // 实时活动状态开关：仅"卡片可原地更新"的平台支持（飞书 / Telegram）。
       // 用户反馈（2026-10-17）希望"能自己关掉、不要这个状态"，故提供显式开关。
       (platformId === 'feishu' || platformId === 'telegram') && h('label', {
@@ -2425,10 +2450,12 @@ function PlatformCard({
                     ? '请使用微信扫码登录（ClawBot）'
                     : platformId === 'feishu'
                       ? '请用飞书扫码创建应用（二维码 10 分钟内有效）'
-                      : '请扫码登录')
+                      : platformId === 'qq'
+                        ? '请用手机 QQ 扫码绑定机器人（二维码过期会自动刷新）'
+                        : '请扫码登录')
             ),
             login.error && h('div', { style: { ...s.muted, marginTop: 4, color: 'var(--dsw-alias-label-primary, #0f1115)' } }, login.error),
-            platformId === 'feishu' && h('div', { style: { display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', alignItems: 'center' } },
+            (platformId === 'feishu' || platformId === 'qq') && h('div', { style: { display: 'flex', gap: 8, marginTop: 10, flexWrap: 'wrap', alignItems: 'center' } },
               h('button', {
                 style: { ...s.btnGhost, opacity: busy ? 0.5 : 1 },
                 onClick: onRefreshQr,
@@ -2440,7 +2467,7 @@ function PlatformCard({
           )
         : (platformId === 'qq' || platformId === 'feishu' || platformId === 'telegram')
           ? h('div', { style: { display: 'flex', flexDirection: 'column', gap: 10, marginTop: 4 } },
-              platformId === 'feishu' && h('div', {
+              (platformId === 'feishu' || platformId === 'qq') && h('div', {
                 style: {
                   background: 'var(--dsw-alias-bg-layer-1,#ffffff)',
                   border: '1px dashed var(--dsw-alias-border-l2,#e5e7eb)',
@@ -2450,19 +2477,34 @@ function PlatformCard({
                   lineHeight: 1.5,
                 },
               },
-                h('div', { style: { ...s.label, marginBottom: 4 } }, '📱 一键创建飞书应用（推荐）'),
+                h('div', { style: { ...s.label, marginBottom: 4 } },
+                  platformId === 'qq' ? '📱 扫码绑定 QQ 机器人（推荐）' : '📱 一键创建飞书应用（推荐）'),
                 h('div', { style: { ...s.muted, marginBottom: 8 } },
-                  '点击后用飞书扫码：自动创建机器人应用并预置所需权限、事件订阅与卡片回调，无需进开发者后台手工配置。'),
+                  platformId === 'qq'
+                    ? '点击后用手机 QQ 扫码：由 QQ 开放平台官方接口直接回传机器人的 AppID 与 AppSecret，无需手工复制粘贴。'
+                    : '点击后用飞书扫码：自动创建机器人应用并预置所需权限、事件订阅与卡片回调，无需进开发者后台手工配置。'),
                 h('button', {
                   style: { ...s.btnPri, opacity: busy ? 0.5 : 1 },
-                  onClick: onRegisterApp,
+                  onClick: platformId === 'qq' ? onBindQqBot : onRegisterApp,
                   disabled: busy,
-                  title: '使用飞书扫码创建应用并自动填入凭证',
-                }, busy ? '处理中…' : '扫码一键创建应用'),
-                h('div', { style: { ...s.muted, marginTop: 8, fontSize: 11 } },
-                  '已有应用？在下方手动填入 App ID 与 App Secret，或 ',
-                  h('a', { href: 'https://open.feishu.cn/app', target: '_blank', rel: 'noopener noreferrer', style: s.btnLink }, '前往飞书开放平台'),
-                  ' 创建后填入。'),
+                  title: platformId === 'qq' ? '使用手机 QQ 扫码绑定机器人并自动填入凭证' : '使用飞书扫码创建应用并自动填入凭证',
+                }, busy ? '处理中…' : (platformId === 'qq' ? '扫码绑定机器人' : '扫码一键创建应用')),
+                platformId === 'qq'
+                  ? h('div', { style: { ...s.muted, marginTop: 8, fontSize: 11 } },
+                      '已创建过机器人？',
+                      '在下方手动填入 AppID 与 AppSecret，或 ',
+                      h('a', {
+                        href: 'https://q.qq.com/',
+                        target: '_blank', rel: 'noopener noreferrer', style: s.btnLink,
+                      }, '前往 QQ 开放平台'),
+                      ' 创建后填入。')
+                  : h('div', { style: { ...s.muted, marginTop: 8, fontSize: 11 } },
+                      '已有应用？在下方手动填入 App ID 与 App Secret，或 ',
+                      h('a', {
+                        href: 'https://open.feishu.cn/app',
+                        target: '_blank', rel: 'noopener noreferrer', style: s.btnLink,
+                      }, '前往飞书开放平台'),
+                      ' 创建后填入。'),
               ),
               platformId === 'telegram'
                 ? h(React.Fragment, null,
@@ -2508,15 +2550,15 @@ function PlatformCard({
                     ),
                     h('div', null,
                       h('div', { style: { ...s.muted, marginBottom: 4 } },
-                        platformId === 'qq' ? 'ClientSecret — QQ 开放平台机器人密钥' : 'App Secret — 飞书开放平台应用密钥'
+                        platformId === 'qq' ? 'AppSecret — QQ 开放平台机器人密钥' : 'App Secret — 飞书开放平台应用密钥'
                       ),
                       h('div', { style: { display: 'flex', gap: 6, alignItems: 'center' } },
                         h('input', {
                           style: { ...s.input, flex: 1 },
                           type: showSecret ? 'text' : 'password',
-                          placeholder: platformId === 'qq' ? '请输入 ClientSecret' : '请输入 App Secret',
-                          value: platformId === 'qq' ? (cfgDraft?.clientSecret ?? '') : (cfgDraft?.appSecret ?? ''),
-                          onChange: (e) => setCfgDraft(d => platformId === 'qq' ? ({ ...d, clientSecret: e.target.value }) : ({ ...d, appSecret: e.target.value })),
+                          placeholder: platformId === 'qq' ? '请输入 AppSecret（扫码绑定时自动填入）' : '请输入 App Secret',
+                          value: platformId === 'qq' ? (cfgDraft?.appSecret ?? '') : (cfgDraft?.appSecret ?? ''),
+                          onChange: (e) => setCfgDraft(d => ({ ...d, appSecret: e.target.value })),
                         }),
                         h('button', {
                           style: { ...s.btnGhost, height: 32, padding: '0 10px', fontSize: 13, flexShrink: 0 },
@@ -2536,7 +2578,7 @@ function PlatformCard({
                       : 'https://t.me/BotFather',
                   target: '_blank', rel: 'noopener noreferrer',
                   style: s.btnLink,
-                }, platformId === 'qq' ? '📖 前往 QQ 开放平台申请机器人' : '📖 前往飞书开放平台创建企业自建应用'),
+                }, platformId === 'qq' ? '📖 QQ 机器人开发文档' : '📖 前往飞书开放平台创建企业自建应用'),
               ),
               h('div', { style: { display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' } },
                 h('button', {
@@ -2544,7 +2586,7 @@ function PlatformCard({
                   onClick: saveConfig,
                   disabled: busy || (platformId === 'telegram'
                     ? !cfgDraft?.botToken?.trim()
-                    : (!cfgDraft?.appId?.trim() || (platformId === 'qq' ? !cfgDraft?.clientSecret?.trim() : !cfgDraft?.appSecret?.trim()))),
+                    : (!cfgDraft?.appId?.trim() || !cfgDraft?.appSecret?.trim())),
                 }, busy ? '保存中…' : '保存并连接'),
                 login.phase === 'error' && h('div', { style: { ...s.muted, fontSize: 12 } }, login.error ?? '连接失败'),
               ),
@@ -2563,7 +2605,7 @@ function PlatformCard({
         platformId === 'wechat'
           ? '说明: 扫码成功后，向该微信 Bot 发送第一条消息即自动完成白名单授权。仅白名单内的微信用户能驱动 agent，其他人消息会被忽略。使用专用微信号，避免影响主号。'
           : platformId === 'qq'
-            ? '说明: 填入 QQ 开放平台机器人的 AppID 与 ClientSecret 后保存即自动连接。用户向 Bot 发送第一条消息即自动完成白名单授权。仅白名单内的 QQ 用户能驱动 agent，其他人消息会被忽略。'
+            ? '说明: 推荐用手机 QQ 扫码一键绑定机器人；也可手动填入 AppID 与 AppSecret 后保存即自动连接（底层走腾讯官方 QQ 机器人 SDK）。用户向 Bot 发送第一条消息即自动完成白名单授权。仅白名单内的 QQ 用户能驱动 agent，其他人消息会被忽略。'
             : '说明: 登录成功后，发送第一条消息即自动完成白名单授权。仅白名单内的用户能驱动 agent，其他人消息会被忽略。'
       ),
     ),
@@ -4205,13 +4247,13 @@ function BridgePanel({ rpcCall, preferredTab }) {
       h(RestartDshCard, { rpcCall: authRpcCall }),
     );
   } else if (activeTab === 'im') {
-    // 平台类型列表保持静态四项（顺序即面板顺序：飞书置顶——扫码一键创建 + 原生斜杠指令 +
-    // 云文档评论，接入门槛最低）。一个类型下可以有多个账号实例（issue #78），实例列表来自
-    // listPlatforms 的实时轮询；0 账号是合法状态（删光后显示空状态 +「＋ 添加账号」）。
+    // 平台类型列表保持静态四项（顺序即面板顺序：飞书 / QQ 置顶——两者都支持扫码一键接入、
+    // 底层都走官方 SDK，接入门槛最低）。一个类型下可以有多个账号实例（issue #78），实例列表
+    // 来自 listPlatforms 的实时轮询；0 账号是合法状态（删光后显示空状态 +「＋ 添加账号」）。
     const IM_PLATFORMS = [
       { id: 'feishu',   label: '飞书',     icon: Icons.feishu,   brandColor: '#00D6B9', desc: '扫码一键创建 · 斜杠指令 · 文档评论', recommended: true },
+      { id: 'qq',       label: 'QQ',       icon: Icons.qq,       brandColor: '#12B7F5', desc: '扫码一键绑定 · 官方 SDK · 私聊/群聊/按钮', recommended: true },
       { id: 'wechat',   label: '微信',     icon: Icons.wechat,   brandColor: '#07C160', desc: 'ClawBot 扫码直连 · 无需公网' },
-      { id: 'qq',       label: 'QQ',       icon: Icons.qq,       brandColor: '#12B7F5', desc: '官方机器人 · 私聊/群聊/按钮' },
       { id: 'telegram', label: 'Telegram', icon: Icons.telegram, brandColor: '#24A1DE', desc: '官方 Bot API' },
     ];
     /** 「推荐」小标签（品牌色描边胶囊） */

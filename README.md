@@ -16,7 +16,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Security-Access%20Auth%20%2B%20PBKDF2-6366f1?style=flat-square&logo=security" alt="Security" />
   <img src="https://img.shields.io/badge/WeChat-ClawBot%20%7C%20iLink-07C160?style=flat-square&logo=wechat" alt="WeChat" />
-  <img src="https://img.shields.io/badge/QQ%20Bot-OpenAPI%20v2-12B7F5?style=flat-square&logo=tencentqq" alt="QQ" />
+  <img src="https://img.shields.io/badge/QQ%20Bot-Official%20SDK-12B7F5?style=flat-square&logo=tencentqq" alt="QQ" />
   <img src="https://img.shields.io/badge/Feishu-Channel%20SDK-00D6B9?style=flat-square&logo=lark" alt="Feishu" />
   <img src="https://img.shields.io/badge/Telegram-Bot%20API-24A1DE?style=flat-square&logo=telegram" alt="Telegram" />
   <img src="https://img.shields.io/badge/Cloudflare-Tunnel-F38020?style=flat-square&logo=cloudflare" alt="Cloudflare" />
@@ -320,9 +320,11 @@ dsh plugin --profile desktop add @wenbin_wb/dsh-bridge
 
 ---
 
-#### 🐧 QQ Bot（OpenAPI v2）
+#### 🐧 QQ Bot（官方 QQ 机器人 SDK）
 
-接入 QQ 官方机器人，支持单聊与群聊（群聊需 @机器人），支持 Markdown 渲染、快捷按钮键盘与富媒体文件直传。
+接入 QQ 官方机器人，支持单聊与群聊（群聊需 @机器人），支持 C2C 流式输出、Markdown 渲染、审批/问答按钮键盘与富媒体文件直传。
+
+底层已**全面接入腾讯官方 SDK**（[`@tencent-connect/qqbot-nodejs`](https://github.com/tencent-connect/qqbot-nodejs) + [`@tencent-connect/qqbot-connector`](https://www.npmjs.com/package/@tencent-connect/qqbot-connector)，预打包进插件产物）：长连接/RESUME/重连、事件归一化、引用解析、去重限流、富媒体分片上传、`stream_messages` 流式全部由官方实现，本插件只做会话桥与业务映射。
 
 <p align="center">
   <img src="https://raw.githubusercontent.com/wenbin-wb/dsh-bridge/main/docs/screenshots/qq-bot-config.webp" width="600" alt="QQ Bot 配置" />
@@ -337,7 +339,7 @@ dsh plugin --profile desktop add @wenbin_wb/dsh-bridge
   </p>
 </details>
 
-* **使用步骤**：在 [QQ 开放平台](https://q.qq.com) 创建机器人获取 AppID 和 ClientSecret → 填入并保存连接 → 添加机器人好友发送首条消息（或群聊首次 @机器人）自动加白名单。完整文档见 [QQ Bot 使用说明](docs/qq-usage.md)。
+* **使用步骤**：推荐在设置页点 **「📱 扫码绑定机器人」** 用手机 QQ 扫码，凭证由开放平台官方接口自动回传；也可在 [QQ 开放平台](https://q.qq.com) 创建机器人后手动填 AppID / AppSecret → 保存并连接 → 添加机器人好友发送首条消息（或群聊首次 @机器人）自动加白名单。完整文档见 [QQ Bot 使用说明](docs/qq-usage.md)。
 
 ---
 
