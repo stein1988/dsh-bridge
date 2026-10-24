@@ -1722,6 +1722,11 @@ test('stop() 有等待上限：SDK start() 永不 settle 时不会无限阻塞�
     start: () => new Promise(() => {}),
     api: {},
   })
+  // withTimeout 的定时器是 unref 的（生产代码正确：不该阻止进程退出）。
+  // 纯 unref 定时器在**没有其它活动句柄**时会让事件循环提前结束，Node 22 会因此把
+  // 本用例判成 cancelledByParent。这里挂一个 ref 的定时器撑住事件循环，模拟真实运行
+  // 场景（DSH 进程里始终有 server/会话等句柄）。
+  const keepLoopAlive = setInterval(() => {}, 1_000)
   try {
     await gw.start()
     const begin = Date.now()
@@ -1730,6 +1735,7 @@ test('stop() 有等待上限：SDK start() 永不 settle 时不会无限阻塞�
     assert.ok(elapsed < 8_000, `stop() 必须在有界时间内返回（实际 ${elapsed}ms，上限 5s + 余量）`)
     assert.equal(gw.status, 'idle')
   } finally {
+    clearInterval(keepLoopAlive)
     gw.dispose()
   }
 })
