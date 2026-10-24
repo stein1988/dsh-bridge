@@ -4,7 +4,58 @@
 
 ---
 
-## [Unreleased]
+## [v2.17.0] - 2026-10-24
+
+### ♻️ 重构
+
+- **QQ 对接全面替换为腾讯官方 SDK（与飞书走官方 Channel SDK 同一模式）**：删除自研 QQ 协议栈（`lib/qq/gateway.js` 里手写的 WebSocket 心跳/RESUME/关闭码重连、token 刷新、事件归一化、流式分片序列、媒体上传、面板/菜单 REST 调用全部移除），改由官方 `@tencent-connect/qqbot-nodejs@1.0.5` 承担：
+  - **连接与鉴权**：HELLO/IDENTIFY/RESUME、心跳、握手超时 30s、按关闭码分类重连（4004 清 token、4006-4009 重新 IDENTIFY、4008 等 60s、4914/4915 终态）、退避 `1s→2s→5s→10s→30s→60s`、access_token 缓存+提前 5 分钟刷新；
+  - **入站**：C2C / 群@ / 群全量 / 频道 / 频道私信 / `INTERACTION_CREATE` 统一归一化为 `InboundMessage`，消息引用由 `quoteRef` 从 `msg_elements` 还原（插件消费范围仍是**单聊 + 群聊**：SDK facade 不为 guild/dm 派生 replyTarget）；
+  - **中间件链**（全部用 SDK 内置实现）：`errorHandler` / `messageFilter`（回声过滤+去重）/ `contentSanitizer`（去 @提及与表情标记）/ `rateLimiter`（sender/group/global 三层）/ `quoteRef` / `historyBuffer`（群历史缓冲）/ `mentionGate`（群 @门控）/ `concurrencyGuard`（同会话串行）/ `typingIndicator`；
+  - **出站**：文本（`msg_type=0`）/ Markdown（`msg_type=2`）/ Ark / Embed / 按钮键盘 / 富媒体（<5MB 直传、≥5MB 自动 `upload_prepare → PUT COS → upload_part_finish → complete_upload` 分片）/ 输入状态（`msg_type=6`）/ 撤回；
+  - **流式**：C2C `stream_messages` 改用 SDK 的 `StreamSession`（`input_mode=replace`、节流 ≥300ms、`index` 自增、同一流共享 `msg_seq`、`input_state=1/10`）；
+  - **会话恢复**：`sessionPersistence` + `FileKVStore` 把 `sessionId`/`seq` 落到 `$DSH_HOME/dsh-bridge/qq-session-<instanceId>.json`，重启后优先 RESUME；
+  - **发布形态**：与飞书一致，官方 SDK 由 `scripts/bundle-qq.mjs` 预打包为 `lib/qq/qqbot-bundled.mjs`（发布物只含 `lib/`，不带 `node_modules`）；eslint 与 inject-safety 扫描同步排除该产物。
+- **新增手机 QQ 扫码绑定机器人（官方 `@tencent-connect/qqbot-connector@1.2.0`）**：设置页「扫码绑定机器人」→ 面板渲染二维码 → 手机 QQ 扫码选机器人 → 开放平台官方接口直接回传 AppID + AppSecret 并落盘、自动连接；二维码过期自动刷新，支持「🔄 重新生成二维码」（旧流程结果一律丢弃，不覆盖新流程）；`login({qrType:'bind'})` 与飞书的 `qrType='register'` 走同一套 RPC/轮询链路。
+- **凭证字段名统一为 `appSecret`**（与 SDK、飞书一致）：旧配置里的 `clientSecret` 在读取时自动迁移为 `appSecret`，并丢弃自研时期的 `accessToken` / `accessTokenExpiresAt` / `gatewayUrl` 残留；`setConfig` 与设置面板同步改名（`clientSecret` 入参仍被网关兼容，避免老客户端报错）。
+- **新增能力**：审批改为 **Markdown + 两个回调按钮**（`✅ 允许一次` / `❌ 拒绝`，`button_data={"t":"approval","d":...}`，单聊限发起者、群聊允许群成员，超时自动拒绝，卡片发失败自动回退 /yes /no 文字）；`ask_user_question` 单问单选改为 **按钮卡片**（选项全文在正文、按钮只放短标签，`{"t":"question","q":..,"i":..}`）；被动回复限额（单聊 4 次/群聊 5 次）超出后自动降级主动消息；语音消息优先用 QQ 自带 ASR 文本作为正文；群聊与消息引用上下文标注发送者昵称。
+### 🐛 独立复核修复（QQ SDK 化专项）
+
+- **`stop()`/`start()` 竞态导致入站永久静默丢弃**：启动窗口内点「断开」后，`_stopRequested` 被置位却不会再重置，而状态仍是 connected（`start()` 短路返回），此后所有消息被静默丢弃。现在 `start()` 在 `_teardownBot()` 之后再判一次停止标志，`stop()` 会等待启动流程收尾。
+- **流式收尾丢正文**：`sendStream({done:true})` 原实现不先 `update(全文)` 就 `complete()`——而 SDK 的 `complete()` 用的是内部 `pendingText`（上一次 update 的内容），导致最终正文丢失；且在无在途流时会新建空流式会话发出 `content_raw=""` 的空白消息。现在 done 前先 update 全量，无在途流则直接单条 Markdown。
+- **审批按钮跨群/跨会话劫持**：原实现取「最后一个 pending 审批」且群聊分支不做归属校验，A 群成员可批准 B 群的审批。现在 `button_data` 携带审批编号（`{"t":"approval","n":<编号>,"d":...}`），按编号精确取并校验「审批只在所属会话内决议」。
+- **审批卡片串用他人 msg_id**：卡片目标不再回退 `_lastPeer`，被动回复锚点只取本审批所属会话。
+- **改凭证不重连却谎报已连接**：`start()` 在 connected 时短路返回 true，导致「保存并连接」静默失效。现在比较运行中 bot 的 `getCredentials()`，不一致即重建连接。
+- **被动回复额度耗尽后刷屏**：流式降级时原先「每来一片就发一条递增全文」（3 片段 → 4 条重复全文）。现在标记本轮断流，中途片段丢弃、`turn/end` 只发一次最终全文。
+- **`40034005`（msg_id 已过期）不降级**：文档承诺「自动降级主动消息」但实现缺失。现在识别该码后去掉锚点重试一次，并把过期锚点加入黑名单不再复用。
+- **SSRF 绕过**：`http://[::]`（IPv6 未指定地址）等形态可访问本机服务。现在覆盖 `::`/`::1`/fe80::/10/fc00::/7/ff00::/8/NAT64 64:ff9b::/96/6to4 2002::/16/IPv4-mapped 及变体、`localhost.` 末尾点、整数/十六进制 IPv4；36 项矩阵用例全过。
+- **群聊 typing 打到 users 端点**：platform 适配层丢掉了 scope，群聊 typing 发到 `/v2/users/{group_openid}/messages` 必报错（且被降级成 debug）。现在按最近入站 peer 的 scope 传递。
+- **`event_id` 被动回复能力补齐**：按钮点击后的确认消息原会退化成主动消息；现在按官方文档用 `bot.send({extra:{event_id}})` 锚定 `INTERACTION_CREATE`。
+- **Markdown 降级收窄到 50056**：官方错误码表中 50055/50057 是内容/参数非法（非权限），一并降级会掩盖真正的语法 bug。
+- **群聊被动回复上限**：单聊 4 次 / 群聊 5 次按 scope 分别记账（此前统一 4）。
+- **测试补强**：新增真实 SDK 线格式校验（拦截 `fetch` 断言请求体）、`ApiError` 降级、`40034005` 重试、`FATAL_CLOSE`/`RETRY_EXHAUSTED`、`_teardownBot`、stop/start 竞态、done 帧内容、审批归属、SSRF 矩阵等用例；并把两条会真实打外网的用例 mock 掉（CI 无网可过）。
+
+- **第三轮复核修复（发布前阻塞项）**：
+  - **构建产物未入库**：`lib/qq/qqbot-bundled.mjs` 与 `scripts/bundle-qq.mjs` 加入版本库（与飞书产物同模式），CI 新增「重建产物并 `git diff --exit-code` 比对」，避免改了源码忘打包；
+  - **UNLICENSED 包混入 MIT 产物**：`@tencent-connect/qqbot-connector` 声明为 UNLICENSED，已从产物中移除，改为运行时 `import()` 可选加载（未安装时提示手动填凭证）；产物内补 MIT 版权声明并保留 legal comments；
+  - **问答按钮跨群劫持**：`_resolveAskByButton` 补群归属校验（此前群聊分支完全不校验，g2 成员可回答 g1 的提问）；`sendAskCard` 删除 `_lastPeer` 回退（peer 缺失时拒绝发送，不再把卡片打到错误会话）；
+  - **DONE 帧失败导致整轮正文丢失**：done 帧失败时降级补发一次普通 Markdown（此前只标记断流返回 skipped，而 node 侧已清空 `_turnText`，正文彻底丢失）；
+  - **断线清空正文**：`_abortStream` 不再清空 `_turnText`（旧实现直接丢弃，比重连后补发半截还差）；
+  - **审批编号跨进程冲突**：按钮 data 增加进程 nonce `s`，重启前发出的旧卡片点击一律失效；
+  - **`stop()` 无上限阻塞**：等待 SDK `start()` 收尾加 5 秒上限；
+  - **群聊 typing 走错端点**（详见上文）；**`_teardownBot` 清空被动回复锚点**（重建后不复用旧 bot 的 msg_id）；**空响应体不再写成 0 字节附件**；
+  - **SSRF 补 DNS 二次校验**：新增 `isHostResolvableToPublic()`（`dns.lookup` 后校验解析 IP）+ 腾讯媒体域名白名单，闭合 `127.0.0.1.nip.io` 这类「字符串合法但解析到内网」的绕过；文档同步声明字符串判定的边界；
+  - **中间件顺序断言改为运行期**：按函数源码特征识别真实装配顺序（此前的「读源码文本」断言是空断言，倒序后仍会全绿）。
+- **单聊流式输出开关真正生效**：`ConversationBridge` 的 `config` 是白名单构造，`streamReply` 未被透传导致开关完全无效（设置页关掉仍走流式）。已加入白名单并在设置页提供「单聊流式输出（逐段显示，默认开启；群聊不支持）」开关。
+- **平台面板顺序调整**：QQ 移到飞书之后（第二位）并标记为「推荐」，描述更新为「扫码一键绑定 · 官方 SDK · 私聊/群聊/按钮」；中英词典同步。
+- **安全修复（CodeQL 扫描告警清零，6 条）**：
+  - **`js/polynomial-redos` ×2（high）**：`lib/wechat/gateway.js` 的 `baseUrl.replace(/\/+$/, '')` / `cdnBaseUrl.replace(/\/+$/, '')` 在外部可控输入上是多项式复杂度（实测 20 万斜杠需 **36.8 秒**）。新增线性 `stripTrailingSlashes()`（实测 **0.2 毫秒**，输出与原正则完全一致），`lib/index.js` 的请求路径处理同步改用线性实现；
+  - **`js/log-injection`（medium）**：Telegram API 的 `description` 直接进 `Error.message` 再写日志，可被换行注入伪造日志行。新增 `lib/security/log-sanitize.js`（折叠换行 + 剔除控制字符 + 长度上限），在错误源头与日志点双层净化；
+  - **`js/automatic-semicolon-insertion` / `js/unused-local-variable` ×2**：补分号、清理未使用变量。
+- **依赖升级**：`follow-redirects` 1.16.0 → 1.16.1（等同 PR #85）。
+
+- **设置页**：QQ 面板新增「📱 扫码绑定机器人（推荐）」卡片；密钥输入框 `ClientSecret` → `AppSecret`；说明文案与二维码提示同步更新；中英文词典同步。
+- **测试**：`test/qq-service.test.mjs` 重写为 50+ 个用例（凭证迁移、SDK 装配、出站各类型、被动回复限额、流式会话、入站归一化、按钮审批/问答、扫码绑定成功/失败/刷新、SSRF 防护、配置读写）；`test/media-and-heartbeat.test.mjs` 的旧心跳/RESUME 用例替换为「会话持久化交给 SDK」与「状态映射」两条。
 
 ## [v2.16.0] - 2026-10-23
 

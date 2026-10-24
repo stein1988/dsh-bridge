@@ -26,6 +26,19 @@ jobs:
       - name: Install dependencies
         run: npm ci --no-audit --no-fund
 
+      # lib/qq/qqbot-bundled.mjs 是入库的构建产物（发布物只带 lib/，不带 node_modules）。
+      # 重建一次并比对：产物与源码不同步时直接失败，避免"改了源码忘了重新打包"
+      # 导致用户装到的版本行为与仓库源码不一致。
+      #
+      # 只在 ubuntu + node 22 上做：esbuild 产物在极端情况下可能带平台相关差异，
+      # 四个矩阵全跑会让"构建产物字节一致性"变成跨平台赌注（误报即红灯）。
+      # 校验的目的是"源码改了要记得重新打包"，一个稳定组合足够，Windows/Node 24 只跑功能测试。
+      - name: Verify QQ SDK bundle is up to date
+        if: matrix.os == 'ubuntu-latest' && matrix.node-version == 22
+        run: |
+          node scripts/bundle-qq.mjs
+          git diff --exit-code -- lib/qq/qqbot-bundled.mjs
+
       - name: Lint
         run: npm run lint
 

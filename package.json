@@ -1,8 +1,8 @@
 {
   "name": "@wenbin_wb/dsh-bridge",
-  "version": "2.16.0",
+  "version": "2.17.0",
   "description": "DSH 远程连接/远程控制插件（remote control）：手机扫码即可在移动端/公网继续用 DeepSeek Harness，人不在电脑前也能接着干。一键局域网二维码、Cloudflare 公网隧道、自建隧道与微信 / QQ / 飞书 / Telegram Bot（多工作区/会话持久化/媒体/卡片审批/流式输出），无需自己搭公网服务器。",
-  "releaseNotes": "【v2.16.0】\n• IM 机器人新增「实时插话模式」：Agent 忙碌时发消息可在下一步生效，默认关闭\n• 修复上游连接被重置时整个 dsh 进程退出的问题，手机远程不再莫名断连\n• 修复固定域名 / Tunnel Token 输入框被定时刷新清空，首次配置可正常完成\n• 修复 QQ / 微信机器人设置面板的开关状态回显不准确\n• 稳定性改进与文档更新",
+  "releaseNotes": "【v2.17.0】\n• QQ 对接全面替换为腾讯官方 SDK（与飞书同模式），新增手机 QQ 扫码一键绑定机器人\n• QQ 新增按钮式审批/问答卡片、被动回复限额与降级、语音 ASR、群聊上下文\n• 平台面板：QQ 前移至飞书之后并标记「推荐」；新增单聊流式输出开关（真正生效）\n• 安全：修复 2 处 ReDoS 高危（20 万字符输入从 36 秒降到 0.2 毫秒）、1 处日志注入、SSRF 补 DNS 二次校验\n• 修复 QQ 流式收尾丢正文、审批/问答跨会话劫持、改凭证不重连、断线丢正文等问题\n• 依赖升级：follow-redirects 1.16.1",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
@@ -27,8 +27,9 @@
   "scripts": {
     "build:client": "node client/build.mjs",
     "build:lark": "node scripts/bundle-lark.mjs",
+    "build:qq": "node scripts/bundle-qq.mjs",
     "build:banner": "node scripts/generate-banner.mjs",
-    "prepack": "npm run build:client",
+    "prepack": "npm run build:client && npm run build:qq",
     "release:github": "node scripts/create-github-release.mjs",
     "lint": "eslint .",
     "test": "node --test test/*.test.mjs",
@@ -43,9 +44,12 @@
     "@eslint/js": "^10.0.1",
     "@larksuite/channel": "^0.7.1",
     "@larksuiteoapi/node-sdk": "^1.75.0",
+    "@tencent-connect/qqbot-connector": "^1.2.0",
+    "@tencent-connect/qqbot-nodejs": "^1.0.5",
     "esbuild": "^0.28.2",
     "eslint": "^10.9.1",
     "espree": "^11.2.0",
+    "follow-redirects": "^1.16.1",
     "globals": "^17.11.0",
     "puppeteer-core": "^25.8.0"
   },

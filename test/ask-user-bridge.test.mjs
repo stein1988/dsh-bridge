@@ -193,7 +193,7 @@ test('[ask-bridge] 多选/多问不走卡片（卡片表达不了），退回文
 })
 
 test('[ask-bridge] 非发起者不得代为作答（单聊严格限定本人）', async () => {
-  const { root, bridge, platform } = setupAskEnv()
+  const { root, bridge } = setupAskEnv()
   bridge.activeSessionId = 'sess-1'
   const agent = bindImTurn(bridge, { senderId: 'user-1' })
   const { promise } = fireAsk(root, { agent, questions: QUESTIONS() })
@@ -221,7 +221,7 @@ test('[ask-bridge] 群聊允许群内成员作答（与审批同一模型）', a
 })
 
 test('[ask-bridge] 调用被中止（stop）时把等待交还宿主，条目保留待补答', async () => {
-  const { root, bridge, platform } = setupAskEnv()
+  const { root, bridge } = setupAskEnv()
   bridge.activeSessionId = 'sess-1'
   const agent = bindImTurn(bridge)
   const ac = new AbortController()
