@@ -9,6 +9,7 @@ export default [
       // 生成产物，不做手工检查
       'client/client.js',
       'lib/feishu/lark-bundled.mjs',
+      'lib/qq/qqbot-bundled.mjs',
       'coverage/**',
       'scratch/**',
     ],

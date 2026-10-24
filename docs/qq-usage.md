@@ -1,389 +1,203 @@
 # QQ Bot 使用指南
 
-本文档介绍如何接入 QQ Bot OpenAPI v2，实现私聊、群聊、流式输出、按钮交互、消息引用和富媒体消息。
+本文档介绍如何把 QQ 机器人接入 dsh-bridge：单聊、群聊、C2C 流式输出、按钮交互（审批 / 决策问答）、消息引用与富媒体收发。
 
-## ✨ v2.1.1 新特性
+> **能力范围**：仅 **单聊 + 群聊**。QQ 频道（guild）与频道私信（dm）不在支持范围——官方 SDK 的高层 facade 不为这两类消息派生 `replyTarget`，`bot.on('message')` 收不到（详见 SDK `USAGE.md` §15.2）；需要时可自行用 `bot.messageApi.sendChannelMessage` 扩展。
 
-- **🚀 流式消息输出**：长文本自动分段推送（200字符/段），实时看到 AI 输出
-- **💬 消息引用交互**：直接回复机器人消息即可继续对话，无需输入命令
-- **🔘 按钮快捷操作**：无活动会话时自动显示快捷按钮（新建会话/列表/帮助）
-- **⚡ 互动事件支持**：按钮点击自动映射到对应命令
+> **底层已全面接入腾讯官方 SDK** —— 与飞书侧走官方 Channel SDK 的方式一致：
+>
+> | 官方包 | 作用 | 在插件中的位置 |
+> | --- | --- | --- |
+> | [`@tencent-connect/qqbot-nodejs`](https://github.com/tencent-connect/qqbot-nodejs) | 协议层：WebSocket 长连接 + RESUME、access_token 管理、消息/媒体/流式收发、Koa 式中间件链 | `lib/qq/gateway.js` |
+> | [`@tencent-connect/qqbot-connector`](https://www.npmjs.com/package/@tencent-connect/qqbot-connector) | 扫码绑定：手机 QQ 扫码后由开放平台回传 AppID + AppSecret | `lib/qq/index.js`（`qrType=bind`） |
+>
+> 两个包由 `scripts/bundle-qq.mjs` 预打包为 `lib/qq/qqbot-bundled.mjs`（发布物只含 `lib/`，不带 `node_modules`）。
+> **本插件不再自研 QQ 协议栈**：心跳、重连退避、关闭码分类、事件归一化、去重、分片上传、流式序列全部由官方 SDK 实现。
 
 ## 前置准备
 
-### 1. 创建 QQ 机器人
+### 方式一：扫码绑定（推荐，免手工复制）
 
-访问 [QQ 开放平台](https://q.qq.com/) 创建机器人应用：
+设置页「远程访问」→「IM 机器人」→ 选中「QQ」→ 点 **「扫码绑定机器人」**：
 
-1. 登录并进入"机器人管理"
-2. 点击"创建机器人"，填写基本信息
-3. 创建完成后获取 **AppID** 和 **ClientSecret**（开发设置 → 开发信息）
-4. 配置机器人权限：
-   - 私域机器人：可接收私聊和群聊消息
-   - 需要开通"发送消息"、"接收消息"等基础权限
+1. 面板渲染二维码（底层是官方 `create_bind_task` 任务）；
+2. 手机 QQ 扫码 → 选择要绑定的机器人 → 确认；
+3. 插件自动拿到该机器人的 **AppID + AppSecret** 并落盘，随后自动连接；
+4. 二维码过期会自动刷新，也可点「🔄 重新生成二维码」立即换新码。
 
-### 2. 配置事件订阅
+> 扫码页面默认把接入方显示为「第三方机器人」；若希望显示自己的平台名，需联系腾讯 `qq_bot_api@tencent.com`（官方文档：<https://bot.q.qq.com/wiki/agent-qqbot/#第三方-agent-接入>）。
 
-QQ Bot 使用 WebSocket 接收事件，需要配置 Intents（事件订阅）：
+### 方式二：手动填写已有机器人
 
-- **C2C_MESSAGE_CREATE**（私聊消息）：`1 << 25`
-- **GROUP_AT_MESSAGE_CREATE**（群聊 @提及）：`1 << 25`（与私聊同属 `GROUP_AND_C2C_EVENT`）
-- **INTERACTION_CREATE**（互动事件）：`1 << 26`
+1. 访问 [QQ 开放平台](https://q.qq.com/) →「机器人管理」→ 创建机器人；
+2. 在「开发设置 → 开发信息」取到 **AppID** 与 **AppSecret**；
+3. 在设置页填入这两项，点「保存并连接」。
 
-> dsh-bridge 默认已开启以上三个 intents，支持私聊、群聊和按钮交互，无需额外配置。
+> 旧版本把密钥字段叫 `ClientSecret`，本版已与官方 SDK 统一为 `AppSecret`。
+> **旧配置无需手动迁移**：读取时会把 `clientSecret` 自动搬成 `appSecret`，并丢弃自研协议栈时期的
+> `accessToken` / `accessTokenExpiresAt` / `gatewayUrl` 残留字段（它们现在由 SDK 内部维护）。
+
+### 机器人权限
+
+- **单聊**：用户加机器人好友即可对话；
+- **群聊**：群主把机器人拉进群；默认只处理 `@机器人` 的消息（`GROUP_AT_MESSAGE_CREATE`）；
+- **消息类型**：文本 / Markdown / 按钮键盘 / 图片 / 视频 / 语音 / 文件；
+- **Markdown 权限**：`msg_type=2` 需要机器人通过内容审核。没有该权限时接口会被平台拒绝，
+  插件会自动降级为纯文本（去掉 Markdown 语法），消息仍然可达；
+- **IP 白名单**：部分账号要求开放平台后台配置公网 IP 白名单，否则接口调用失败。
 
 ## 快速开始
 
-### 1. 启动 dsh-bridge
-
 ```bash
-# 安装最新版本
 npm install -g @wenbin_wb/dsh-bridge@latest
-
-# 启动服务
 dsh web
 ```
 
-访问 `http://127.0.0.1:3080`，在平台选择器中选择"QQ"。
+访问 `http://127.0.0.1:3080` → 设置 →「远程访问」→「IM 机器人」→「QQ」→ 扫码绑定或填凭证 → 保存并连接。
 
-### 2. 配置 QQ Bot 凭证
+连接成功后日志形如：
 
-在"未配置"区域填写：
-
-- **AppID**：QQ 开放平台应用的 AppID
-- **ClientSecret**：应用的 ClientSecret（密钥不会回传浏览器，留空表示沿用已保存密钥）
-
-点击"保存并连接"，系统会自动：
-1. 保存凭证到 `$DSH_HOME/dsh-bridge/config.json`
-2. 获取 Access Token（自动刷新，TTL 7200s）
-3. 连接 WebSocket Gateway
-4. 开始接收消息事件
-
-### 3. 配置白名单
-
-保存凭证后，在"高级设置"中添加允许的用户/群组 ID：
-
-- **私聊**：用户的 `user_openid`（形如 `11112222333344445555AAAAAAAAAAAA`）
-- **群聊**：群组的 `group_openid`（形如 `1A2B3C4D5E6F7890ABCDEFABCDEFABCD`）
-
-> **如何获取 OpenID**：
-> 1. 先不设置白名单，用户/群组发送消息后查看日志
-> 2. 日志中会显示"未在白名单中，已忽略"，复制其中的 OpenID
-> 3. 将 OpenID 添加到白名单并保存
-
-### 4. 开始对话
-
-#### 私聊场景
-
-1. 在 QQ 中搜索并添加你的机器人为好友
-2. 发送任意消息，机器人会回复带按钮的欢迎提示：
-   - 🆕 **新建会话**：创建新的 AI 对话
-   - 📋 **会话列表**：查看所有可用会话
-   - ❓ **帮助**：显示命令帮助
-3. 点击「新建会话」按钮开始对话
-4. 或者直接回复机器人的任何消息，自动创建新会话并继续对话
-
-#### 群聊场景
-
-1. 将机器人拉入 QQ 群
-2. 在群内 @机器人 并发送消息（例如：`@机器人 你好`）
-3. 机器人会响应并提供快捷按钮
-4. 后续可以：
-   - 点击按钮快捷操作
-   - 回复机器人的消息继续对话
-   - @机器人 发送新消息
-
-### 5. 流式输出与输入状态
-
-#### 流式输出（单聊全回复流式 Markdown）
-
-**单聊中所有 AI 回复统一走流式接口**，手机端实时看到消息逐段增长，且 Markdown 正常渲染：
-
-- **流式**：使用官方 `/stream_messages`（下划线）接口 + `replace` 覆盖模式（官方推荐），每片是全量前缀，服务端逐片覆盖 → 一条消息逐渐变长
-- **Markdown**：流式内容用 `content_type: markdown`，手机端正常渲染粗体/代码块/列表等，不再显示原始语法
-- **分段**：按段落边界切分，短消息自动拆两片保证"生成中→生成结束"过渡；每片带递增 `msg_seq` 避免去重
-- **安全转换**：QQ 不支持的表格自动降级为纯文本，`![图片]()` 转成链接，代码块内容原样保留
-- **回退**：流式失败时补发完整内容 replace 收尾，再失败降级「主动 Markdown」，确保消息必达
-- **群聊**：官方不支持群消息流式，群聊回复直接发送 Markdown
-
-#### 输入状态指示
-
-AI 生成过程中，QQ 会显示机器人的"正在输入"状态：
-
-- **实现方式**：普通消息接口 `msg_type: 6` + `input_notify`
-- **参数**：`input_notify: { input_type: 1, input_second: 8 }`（最长 60 秒）
-- **自动管理**：收到用户消息后、发送回复前自动显示"正在输入"
-- **API 文档**：[发送单聊消息](https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_users_user_openid_messages.post.html)
-
-### 6. 指令面板与自定义菜单（v2.2.0）
-
-连接成功后，dsh-bridge 会自动为你的机器人配置：
-
-> **⚠️ 重要提示**（2026-08-20 确认）：
-> - **自定义菜单、指令面板、消息按钮是 2026-08-12 刚上线的新功能**（[官方变更记录](https://bot.qq.com/wiki/develop/api-v2/changelog.html)）
-> - **需要最新版 QQ 客户端**才能显示（手机版 QQ 优先支持新功能，桌面版可能延后）
-> - 若 API 配置成功（`PUT /v2/menu` 返回 version、`GET /v2/panels` 有 records）但客户端不显示，是**正常现象**——更新 QQ 到最新版再试
-> - 功能可能在**灰度期**，未全量开放；无权限时纯文字命令（`/new` `/sessions` `/help`）仍完全可用
-
-#### 指令面板（单聊 + 群聊常驻）
-
-在单聊窗口和群聊中常驻显示命令面板，点击即可填入命令：
-
-| 面板项 | 说明 |
-|--------|------|
-| `/new` | 新建对话 |
-| `/list` | 查看会话列表 |
-| `/resume` | 恢复会话 |
-| `/sessions` | 切换会话 |
-| `/help` | 命令帮助 |
-
-面板按 `c2c`（单聊）和 `group`（群聊）两个场景各创建一个全局面板，幂等创建（不会重复）。
-
-#### 自定义菜单（单聊底部）
-
-单聊窗口底部常驻菜单，点击自动填入命令：
-
-- **新建** → 自动填入 `/new`
-- **列表** → 自动填入 `/list`
-- **帮助** → 自动填入 `/help`
-
-> 相关 API 文档：
-> - [自定义菜单与指令面板](https://bot.q.qq.com/wiki/develop/api-v2/server-inter/menu-panel/)
-> - [创建指令面板](https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_panels.post.html)
-> - [修改全局自定义菜单](https://bot.q.qq.com/wiki/develop/api-v2/autogen/api/v2_menu.put.html)
-
-## 功能特性
-
-### 交互方式
-
-#### 1. 快捷按钮（推荐）
-
-当没有活动会话时，机器人会自动发送带按钮的提示：
-
-- **🆕 新建会话**：点击后立即创建新的 AI 对话
-- **📋 会话列表**：查看所有可用会话及其编号
-- **❓ 帮助**：显示所有可用命令
-
-按钮点击会触发 `INTERACTION_CREATE` 事件，自动映射到对应命令。
-
-#### 2. 消息引用（最便捷）
-
-直接回复机器人的任何消息，自动关联到对应会话：
-
-1. 机器人发送回复
-2. 你使用 QQ 的"引用回复"功能回复该消息
-3. 如果没有活动会话，自动创建新会话
-4. 你的消息会发送到 AI，无需输入 `/new` 等命令
-
-> **提示**：这是最自然的交互方式，就像正常聊天一样。
-
-#### 3. 文本命令（兼容性）
-
-所有操作都支持传统文本命令：
-
-- `/new <提示词>` - 新建会话并开始
-- `/sessions`（或 `/list`）- 列出所有会话（按工作区分组）
-- `/use N`（或 `/resume N`）- 切换到/恢复会话 N
-- `/rename <新标题>` - 重命名当前活动会话
-- `/end` - 结束当前会话（清除活动会话并触发快捷按钮）
-- `/stop` - 停止当前任务
-- `/status` - 查看状态与会话摘要
-- `/diff` - 把本轮改动的文件导出为 `.patch` 补丁附件
-- `/ask 1`（或 `/ask 1,3` 多选、`/ask =自由输入`）- 回答 Agent 的提问；裸 `/ask` 重新查看问题
-- `/workspaces` - 列出可用工作区
-- `/addworkspace <路径>` - 注册添加新的电脑工作区目录
-- `/help` - 显示帮助
-
-### 支持的消息类型
-
-| 类型 | 方法 | 说明 |
-|------|------|------|
-| 文本消息 | `sendText(scope, text)` | 纯文本消息 |
-| 流式消息 | `sendStream(scope, text, opts)` | 长文本自动分段推送（200字符/段） |
-| Markdown | `sendMarkdown(scope, markdown, keyboard)` | 支持 Markdown 格式 + 可选按钮 |
-| 按钮键盘 | `sendKeyboard(scope, text, keyboard)` | 文本 + 按钮组（行内按钮） |
-| 富媒体 | `sendMedia(scope, type, buffer, filename)` | 图片/视频/音频/文件上传 |
-
-### 流式消息示例
-
-```javascript
-// 发送长文本，自动分段推送
-await gateway.sendStream(
-  'u_11112222333344445555AAAAAAAAAAAA',  // user_openid
-  '这是一段很长的 AI 回复内容...',
-  { msgId: 'parent_msg_id' }  // 可选：关联到某条消息
-)
-// 自动分段为 200 字符/段，每段间隔 100ms
+```
+[dsh-bridge qq] 已连接 QQ 开放平台：<bot openid>
+[dsh-bridge qq] created c2c command panel: <panel_id>
+[dsh-bridge qq] custom menu configured
 ```
 
-### Markdown 示例
+## 白名单
 
-```javascript
-await gateway.sendMarkdown(
-  'u_11112222333344445555AAAAAAAAAAAA',  // user_openid
-  '# 标题\n**粗体** *斜体* `代码`\n[链接](https://example.com)',
-  {
-    content: {
-      rows: [
-        {
-          buttons: [
-            { id: '1', render_data: { label: '选项 A', style: 1 }, action: { type: 2, data: '/cmd_a' } },
-            { id: '2', render_data: { label: '选项 B', style: 0 }, action: { type: 2, data: '/cmd_b' } }
-          ]
-        }
-      ]
-    }
-  }
-)
-```
+首次对话自动授权：用户私聊发第一条消息，或群聊首次 `@机器人`，该用户/群会自动加入白名单并持久化。
 
-### 按钮交互
+- **私聊**：按 `user_openid` 授权；
+- **群聊**：按 `group_openid` 授权（群内任意成员 @机器人 都可驱动 agent）；
+- 白名单非空后，白名单外的私聊消息会被忽略（日志 `ignore message from non-allowlisted sender`）。
 
-按钮类型（`action.type`）：
-- `0` — 跳转按钮（`action.data` 为 URL）
-- `1` — 回调按钮（触发 `INTERACTION_CREATE` 事件）✅ dsh-bridge 快捷按钮使用此类型
-- `2` — 指令按钮（用户点击后自动发送 `action.data` 作为消息）
+> `openid` 是**按 AppID 隔离**的：同一用户在两个不同机器人下 openid 不同。换机器人需要重新授权。
 
-按钮样式（`render_data.style`）：
-- `0` — 灰色线框（次要操作）
-- `1` — 蓝色线框（主要操作）
+## 能力清单与平台限制
 
-> **按钮结构（v2.2.4 对齐官方）**：`keyboard.content.rows`（含 `content` 包裹层），按钮必填 `render_data.style` / `action.data` / `action.unsupport_tips`。快捷按钮基于 `msg_type=2`（Markdown）挂载。
+| 能力 | 单聊（C2C） | 群聊 |
+| --- | --- | --- |
+| 文本 / Markdown | ✅ | ✅ |
+| 流式输出（`stream_messages`） | ✅ 一条消息原地增长 | ❌ 平台未开放 → 直接发 Markdown |
+| 输入状态（`msg_type=6`） | ✅ | ❌ 平台不支持 |
+| 按钮键盘（审批 / 问答） | ✅ | ✅ |
+| 图片 / 视频 / 语音 / 文件 | ✅ | ✅（≥5MB 自动分片上传） |
+| 消息引用上下文 | ✅ | ✅ |
+| 被动回复限额 | 每条入站消息 5 次 / 60 分钟 | 5 次 / 5 分钟 |
 
-> **v2.2.4 互动事件处理**：仅消息按钮（type=11）与快捷菜单（type=12）需要调用 `PUT /interactions/{id}` 回应；其他类型（消息反馈/清空会话/授权等）无需回应。点击快捷按钮会自动映射到对应命令（如 `/new`、`/list`、`/help`）。
+> 插件按 scope 分别记账（`passiveReplyLimit` 默认 4、`passiveReplyLimitGroup` 默认 5）。
+> 注：官方文档对单聊上限的表述不一致——`send.md` 写 5 次，`overview` 与 FAQ 写 4 次；插件默认取**更保守的 4 次**避免触发平台报错，可通过 `passiveReplyLimit` 配置调整。
 
-### 富媒体上传
+插件侧行为：
 
-```javascript
-// 发送图片
-const imageBuffer = fs.readFileSync('image.png')
-await gateway.sendMedia(
-  'g_1A2B3C4D5E6F7890ABCDEFABCDEFABCD',  // group_openid
-  'image',  // image | video | audio | file
-  imageBuffer,
-  'screenshot.png'
-)
-```
+- **被动回复优先**：能挂 `msg_id` 就挂（用户看到的是"回复某条消息"）；超限/过期自动降级为**主动消息**；
+- **主动消息有额度**：官方文档写「单聊/群聊每用户（群）**每月 4 条**」，且部分文档标注 **2025-04-21 起主动推送不再提供**（两处表述互相矛盾，以开放平台实际返回为准）。用户也可在 QQ 客户端关闭「允许主动发送」。因此插件的降级路径（被动→主动）**不保证一定送达**；
+- **单条上限**：平台约 5000 字符；插件默认按 2000 字符分块（设置页「单条消息上限」可调，最小 200）；
+- **撤回**：机器人只能撤回自己发送 2 分钟内的消息。
 
-支持的媒体类型：
-- `image` — 图片（PNG/JPG/GIF，< 10MB）
-- `video` — 视频（MP4，< 50MB）
-- `audio` — 音频（MP3/WAV，< 10MB）
-- `file` — 文件（任意类型，< 20MB）
+## 指令与交互
 
-## 高级配置
+### 指令面板 / 自定义菜单
 
-### 会话管理
+连接成功后插件自动配置（幂等，已存在则跳过）：
 
-在 UI 的"高级设置"中配置：
+- **指令面板**：c2c 与 group 各一个，含 `/new` `/list` `/resume` `/sessions` `/help`；
+- **自定义菜单**：单聊底部三个按钮（新建 / 列表 / 帮助），点击等价于发送对应命令。
 
-- **摘要间隔**（`digestIntervalSec`，默认 300s）：多久向 Agent 发送一次历史消息摘要
-  - ✅ **微信**：生效
-  - ✅ **QQ**：生效
-- **审批超时**（`approvalTimeoutSec`，默认 600s）：等待用户审批的最长时间
-  - ✅ **微信**：生效
-  - ✅ **QQ**：生效
-- **每条最大字数**（`maxMessageChars`，默认 2000）：单条流式消息最大字符数，超出会拆成多条
-  - ✅ **微信**：生效（超出拆分为多条普通文本消息，间隔 `sendChunkDelayMs`）
-  - ✅ **QQ**：生效（v2.2.2+ 修复，超出拆分为多片流式消息，每片按此配置切分）
-- **分块延迟**（`sendChunkDelayMs`，默认 1500ms）：多条消息之间的延迟，避免刷屏
-  - ✅ **微信**：生效（拆分的多条普通文本消息间隔）
-  - ✅ **QQ**：生效（v2.2.2+ 修复，流式消息多片间隔）
+> 这两个能力是 QQ 平台 2026-08-12 上线的接口（`/v2/menu`、`/v2/panels`）。官方 SDK 未封装，
+> 插件通过 SDK 提供的 REST escape hatch（`bot.api`）调用。若返回成功但客户端不显示，通常是
+> **QQ 客户端版本过低**或功能处于灰度阶段——纯文字命令不受影响。
 
-### Token 自动刷新
+### 斜杠命令
 
-Access Token 有效期为 7200 秒（2 小时），dsh-bridge 会在过期前 5 分钟自动刷新，无需手动处理。
+`/new` `/list` `/sessions` `/resume` `/help` `/status` `/model` `/preset` `/diff` `/ask` `/yes` `/no` 等，
+与微信 / 飞书 / Telegram 完全一致（见 README 命令速查）。
 
-### 消息去重
+### 审批按钮
 
-WebSocket 可能收到重复消息（如网络抖动、重连），Gateway 使用 `msg_id` 去重（TTL 300s），确保同一消息不会被处理多次。
+Agent 需要执行敏感工具时，插件发一条 **Markdown + 两个回调按钮**的消息：
 
-### 断线重连
+- `✅ 允许一次` / `❌ 拒绝`（`button_data` 为 `{"t":"approval","n":<审批编号>,"s":<进程 nonce>,"d":"allow"|"deny"}`）；
+  - **`n` 必填**：插件按编号精确定位审批，没有 `n` 的点击一律拒绝（防跨会话误批）；
+  - **`s` 为进程 nonce**：进程重启后审批编号会从 1 重来，带 nonce 的旧卡片会失效；
+- 归属校验：**单聊**只有发起者本人能点；**群聊**允许群内成员点（与飞书同一模型）；
+- 超时（默认 600 秒）自动拒绝；
+- 按钮不可用（旧客户端）时，仍可文字回复 `/yes` 或 `/no`。
 
-Gateway 实现指数退避重连策略：
-- 初始延迟：1s
-- 最大延迟：60s
-- 每次失败后延迟翻倍（1s → 2s → 4s → 8s → ...）
-- 心跳超时（40s 未收到 `HEARTBEAT_ACK`）自动重连
+### 决策问答按钮
 
-## 故障排查
+`ask_user_question` 单问单选时发卡片：选项全文写进正文，按钮只放短标签（QQ 按钮文字有长度限制），
+按钮 `button_data` 为 `{"t":"question","q":<题号>,"i":<选项下标>}`。多选 / 多问 / 自由输入走文字（`/ask`）。
 
-### 1. 连接失败
+### 消息引用
 
-**症状**：UI 显示"未配置"或"已停止"
+用户「回复」机器人的某条消息时，官方 SDK 的 `quoteRef` 中间件会从 `msg_elements` 还原被引用原文，
+插件把它作为 `[引用消息] …` 前缀交给 agent —— 无需手打命令即可继续上下文。
 
-**排查**：
-1. 检查 AppID 和 ClientSecret 是否正确
-2. 查看浏览器控制台 Network 面板，检查 `platformLogin` 请求是否返回错误
-3. 检查 DSH 终端日志，搜索"QQ"关键词
+### 语音消息
 
-### 2. 收不到消息
+QQ 服务端自带语音转文字（ASR）。插件优先用 `asr_refer_text` 作为正文（形如 `[语音] 帮我看看这个报错`），
+同时把语音文件下载到会话工作目录。
 
-**症状**：用户发送消息后机器人无响应
+## 技术实现
 
-**排查**：
-1. 确认用户/群组 OpenID 已添加到白名单
-2. 群聊消息需要 @机器人 才会触发
-3. 检查机器人权限是否开通"接收消息"
-4. 查看 DSH 终端日志，确认是否收到 `C2C_MESSAGE_CREATE` 或 `GROUP_AT_MESSAGE_CREATE` 事件
+### 官方 SDK 承担的部分
 
-### 3. 发送消息失败
+| 场景 | 由 SDK 实现 |
+| --- | --- |
+| 长连接 | HELLO / IDENTIFY / RESUME / 心跳 / 握手超时（30s） |
+| 重连 | 按关闭码分类（4004 清 token、4006-4009 重新 IDENTIFY、4008 等 60s、4914/4915 终态不重连）+ 退避 `1s→2s→5s→10s→30s→60s` |
+| 鉴权 | `bots.qq.com/app/getAppAccessToken`，缓存 + 提前 5 分钟刷新 + 失效重取 |
+| 事件 | C2C / 群@ / 群全量 / 频道 / 频道私信 / INTERACTION_CREATE → 统一 `InboundMessage`（插件只消费前两类 + 互动，见上文「能力范围」） |
+| 中间件 | `errorHandler` / `messageFilter`（回声+去重）/ `contentSanitizer` / `rateLimiter` / `quoteRef` / `historyBuffer` / `mentionGate` / `concurrencyGuard` / `typingIndicator` |
+| 出站 | 文本 / Markdown / Ark / Embed / 键盘 / 富媒体（<5MB 直传，≥5MB 自动 `upload_prepare → PUT COS → upload_part_finish → complete_upload`） |
+| 流式 | `stream_messages`（`input_mode=replace`，节流 ≥300ms，`index` 自增、同一流共享 `msg_seq`） |
+| 会话恢复 | `sessionPersistence` 把 `sessionId` + `seq` 落盘，重启后优先 RESUME |
 
-**症状**：DSH Agent 回复后，QQ 不显示消息
+### 插件自己保留的部分
 
-**排查**：
-1. 检查机器人权限是否开通"发送消息"
-2. 查看终端日志中的 API 请求错误（状态码、错误信息）
-3. 确认消息内容符合 QQ 限制（文本 < 4096 字符，媒体文件大小限制）
+- **会话桥**（`lib/platform/conversation-bridge.js`）：DSH 会话管理、命令路由、审批/问答桥、改动摘要、`[SEND_FILE]` 直发；
+- **业务映射**（`lib/qq/gateway.js` + `lib/qq/node.js`）：scope/授权主体映射、被动回复候选与限额、
+  附件下载（含 SSRF 防护）、语音 ASR 兜底、流式开关、面板/菜单配置、错误文案；
+- **凭证与 UI**：扫码绑定流程、持久化、设置面板、多账号隔离。
 
-### 4. Token 过期
+### 会话持久化文件
 
-**症状**：运行一段时间后突然无法发送消息
+`$DSH_HOME/dsh-bridge/qq-session-<instanceId>.json`（官方 SDK 的 `FileKVStore`）。
+删除它不影响凭证，只会让下次启动走一次完整 IDENTIFY 而非 RESUME。
 
-**排查**：
-1. 正常情况下 Token 会自动刷新，如果频繁过期可能是 ClientSecret 错误
-2. 检查终端日志中的"刷新 Access Token"记录
-3. 手动重新保存凭证触发立即刷新
+## 排障
 
-## 参考资料
+| 现象 | 排查点 |
+| --- | --- |
+| 面板显示「错误」+ `机器人被下线或封禁` | 关闭码 4914/4915：机器人被下线或仅沙箱可用，需到开放平台处理，重启无效 |
+| 连不上且日志报 token 失败 | AppID/AppSecret 错误、IP 未加白名单、机器人未上线 |
+| 私聊无响应 | 该用户不在白名单（看日志 `ignore message from non-allowlisted sender`）；或用户关闭了主动消息开关 |
+| 群聊无响应 | 未 `@机器人`；或群主未授予机器人"接收消息"权限（机器人进群能力需最新版 QQ） |
+| 消息发不出、报 markdown 相关错误 | 机器人无 Markdown 权限：插件会自动降级纯文本；若仍失败请看日志中的 `code=` |
+| 流式输出变成一条普通消息 | 群聊本来就不支持流式；或本轮的 `msg_id` 已过期（被动回复窗口用完） |
+| 按钮点了没反应 | 客户端版本过低（需最新版手机 QQ）；或按钮所属的审批/提问已超时结束 |
+| 改了机器人凭证后收不到消息 | 保存后会自动重连；若仍异常，点「重新连接」或检查是否同时开着别的 QQ 插件占用同一 AppID |
 
-- [QQ Bot API v2 官方文档](https://bot.q.qq.com/wiki/develop/api-v2/)
-- [获取访问凭证](https://bot.q.qq.com/wiki/develop/api-v2/dev-prepare/access-token.html)
-- [WebSocket 事件](https://bot.q.qq.com/wiki/develop/api-v2/dev-prepare/event-emit/websocket.html)
-- [消息收发](https://bot.q.qq.com/wiki/develop/api-v2/server-inter/message/overview.html)
-- [流式消息](https://bot.q.qq.com/wiki/develop/api-v2/server-inter/message/send-receive/passive.html#%E6%B6%88%E6%81%AF%E6%B5%81%E5%BC%8F%E6%8E%A8%E9%80%81)
-- [Markdown 消息](https://bot.q.qq.com/wiki/develop/api-v2/server-inter/message/type/markdown.html)
-- [消息按钮](https://bot.q.qq.com/wiki/develop/api-v2/server-inter/message/trans/msg-btn.html)
-- [富媒体消息](https://bot.q.qq.com/wiki/develop/api-v2/server-inter/message/send-receive/rich-media.html)
+日志前缀统一为 `[dsh-bridge qq]`，SDK 内部日志前缀为 `[qq]`。
 
-## 版本历史
+## 常见错误码
 
-### v2.2.0
-- 🔧 API 域名统一为 `api.bot.qq.com`（官方 2026-08-10 变更）
-- 🔧 修复流式消息：路径 `stream_messages`（下划线）、参数对齐官方、改用 `append` 追加模式
-- 🔧 输入状态改用 `msg_type: 6` + `input_notify`
-- 🔧 键盘消息改用 `msg_type: 0` + `content` + `keyboard`
-- 🔧 修复被动回复 msg_id（用用户消息事件 ID）
-- 🔧 修复群聊 scope 传递 bug
-- ✨ 新增指令面板全套 API，连接后自动创建单聊/群聊命令面板
-- ✨ 新增自定义菜单 API，自动配置单聊底部菜单
+| err_code | 含义 | 处理 |
+| --- | --- | --- |
+| 40034005 | 回复的 `msg_id` 已过期 | 插件自动降级主动消息，无需处理 |
+| 22009 | 消息发送超频 | 降低推送频率 / 等被动窗口恢复 |
+| 50056 | 不允许发送 markdown content（**权限**类） | 插件自动降级纯文本后重发，**消息仍可达**；到开放平台申请 Markdown 权限即可恢复富文本 |
+| 50055 / 50057 | Markdown **内容/参数**非法（非权限） | **不降级**、原样报错——避免掩盖真正的语法问题；此时消息**不可达**，需修正内容 |
+| 304036 / 11253 | 模板权限 / 接口权限缺失 | **不降级**、原样报错；需到开放平台申请对应权限 |
+| 304082 / 304083 | 富媒体资源拉取失败 | 重试；检查图片是否可公开访问 |
+| 11253 | 应用未获得接口权限 | 到开放平台申请对应接口权限 |
+| 11265 | 机器人已被封禁 | 联系平台 |
 
-### v2.1.1
-- ✨ 流式消息输出：长文本自动分段推送
-- ✨ 消息引用：检测 `message_reference`，用户回复消息时自动创建会话
-- ✨ 按钮交互：无活动会话时发送快捷按钮（新建会话/列表/帮助）
-- ✨ 事件增强：启用 `INTERACTION_CREATE` intent，支持按钮点击映射到命令
+## 参考
 
-### v2.1.0
-- 🎉 初始版本：QQ Bot OpenAPI v2 完整实现
-- ✨ 私聊、群聊、Markdown、按钮、富媒体
-- ✨ 平台抽象层集成
-- ✨ Web UI 自动适配
-
-## 示例项目
-
-完整示例代码见仓库：
-- Gateway 实现：`lib/qq/gateway.js`
-- Platform 适配器：`lib/qq/index.js`
-- ConversationBridge 适配：`lib/qq/node.js`
-- 单元测试：`test/qq-service.test.mjs`
+- [QQ 机器人官方文档（API v2）](https://bot.q.qq.com/wiki/develop/api-v2/)
+- [Agent 接入（扫码绑定说明）](https://bot.q.qq.com/wiki/agent-qqbot/)
+- [官方 Node.js SDK 源码与文档](https://github.com/tencent-connect/qqbot-nodejs)
+- [官方扫码绑定包](https://www.npmjs.com/package/@tencent-connect/qqbot-connector)
+- [变更记录（域名统一为 api.bot.qq.com 等）](https://bot.q.qq.com/wiki/develop/api-v2/changelog.html)

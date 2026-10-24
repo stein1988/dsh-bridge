@@ -1,10 +1,13 @@
 import test from 'node:test'
 import assert from 'node:assert/strict'
 import { resolve } from 'node:path'
+import { createRequire } from 'node:module'
 import { QqGateway } from '../lib/qq/gateway.js'
 import { QqConversationNode } from '../lib/qq/node.js'
 import { FeishuConversationNode } from '../lib/feishu/node.js'
 import { ConversationBridge } from '../lib/platform/conversation-bridge.js'
+
+const require = createRequire(import.meta.url)
 
 function makeMockCordisCtx() {
   const events = {}
@@ -23,42 +26,59 @@ function makeMockCordisCtx() {
   return ctx
 }
 
-test('QQ Gateway OpCode 10 sends OpCode 6 RESUME when sessionId exists', async () => {
+test('QQ Gateway 把 RESUME 会话持久化交给官方 SDK（不再自管心跳/续连）', () => {
   const ctx = makeMockCordisCtx()
-  const gw = new QqGateway({ ctx, logger: ctx.logger(), config: { appId: '123', clientSecret: 'abc' } })
-  gw.sessionId = 'test-session-123'
-  gw.sequence = 42
-
-  const sent = []
-  const mockWs = {
-    readyState: 1,
-    send(data) { sent.push(JSON.parse(data)) },
+  const os = require('node:os')
+  const path = require('node:path')
+  const fs = require('node:fs')
+  const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dsh-qq-session-'))
+  const gw = new QqGateway({
+    ctx,
+    logger: ctx.logger(),
+    config: { appId: '123', appSecret: 'abc' },
+    dataDir: dir,
+  })
+  try {
+    // 会话持久化：SDK 的 kvSessionPersistence 落盘到 <dataDir>/qq-session-<instance>.json
+    const persistence = gw._sessionPersistence()
+    assert.equal(typeof persistence?.load, 'function')
+    assert.equal(typeof persistence?.save, 'function')
+    assert.equal(typeof persistence?.clear, 'function')
+    // 未写过时 load() 返回 null（SDK 会回退到 IDENTIFY 全量鉴权）
+    assert.equal(persistence.load(), null)
+    persistence.save({ sessionId: 'sess-1', lastSeq: 42 })
+    const restored = persistence.load()
+    assert.equal(restored?.sessionId, 'sess-1')
+    assert.equal(restored?.lastSeq, 42)
+  } finally {
+    gw.dispose()
+    fs.rmSync(dir, { recursive: true, force: true })
   }
-
-  await gw.handlePayload({ op: 10, d: { heartbeat_interval: 1000 } }, 'mock-token', mockWs)
-  
-  assert.equal(sent.length, 2)
-  assert.equal(sent[0].op, 1) // Heartbeat
-  assert.equal(sent[1].op, 6) // Resume
-  assert.equal(sent[1].d.session_id, 'test-session-123')
-  assert.equal(sent[1].d.seq, 42)
-
-  gw.clearHeartbeat()
 })
 
-test('QQ Gateway OpCode 11 resets unackedHeartbeats counter', async () => {
+test('QQ Gateway 状态映射：SDK 的状态值覆盖桥的在线判定集合', () => {
   const ctx = makeMockCordisCtx()
-  const gw = new QqGateway({ ctx, logger: ctx.logger(), config: { appId: '123', clientSecret: 'abc' } })
-  gw.unackedHeartbeats = 2
-
-  await gw.handlePayload({ op: 11 }, 'mock-token', {})
-  assert.equal(gw.unackedHeartbeats, 0)
+  const gw = new QqGateway({ ctx, logger: ctx.logger(), config: { appId: '123', appSecret: 'abc' } })
+  try {
+    // 桥的离线守卫认 idle/offline；连接中/已连/重连中都必须放行
+    const statuses = []
+    ctx.on('qq/status', (event) => { statuses.push(event) })
+    gw.setStatus('starting')
+    gw.setStatus('connected')
+    gw.setStatus('reconnecting')
+    assert.deepEqual(statuses.map((s) => s.status), ['starting', 'connected', 'reconnecting'])
+    assert.ok(statuses.every((s) => s.instanceId === 'qq'), '状态事件必须带 instanceId（多账号隔离）')
+    assert.ok(!['idle', 'offline'].includes(gw.status), '连接中不得被判为离线')
+  } finally {
+    gw.dispose()
+  }
 })
 
 test('QQ Node processes attachments and appends file path', async () => {
   const ctx = makeMockCordisCtx()
-  ctx.qq = new QqGateway({ ctx, logger: ctx.logger(), config: { appId: '123', clientSecret: 'abc' } })
-  
+  ctx.qq = new QqGateway({ ctx, logger: ctx.logger(), config: { appId: '123', appSecret: 'abc' } })
+  ctx.qq.setStatus('connected')
+
   const node = new QqConversationNode(ctx, { allowFrom: ['user1'] }, ctx.logger())
   const events = []
   node.handleInbound = async (item) => {

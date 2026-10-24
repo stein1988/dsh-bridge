@@ -31,8 +31,8 @@ function sourceFiles(dir) {
       continue
     }
     if (!/\.(js|mjs)$/.test(name)) continue
-    // client/client.js 是 esbuild 打包产物；lark-bundled 是官方 SDK 原始 bundle —— 均非本仓手写
-    if (name === 'client.js' || name === 'lark-bundled.mjs') continue
+    // client/client.js 是 esbuild 打包产物；*-bundled.mjs 是官方 SDK 原始 bundle —— 均非本仓手写
+    if (name === 'client.js' || name === 'lark-bundled.mjs' || name === 'qqbot-bundled.mjs') continue
     out.push(full)
   }
   return out
